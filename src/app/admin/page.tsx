@@ -2,10 +2,10 @@ import { supabase } from '@/lib/supabase'
 import Link from 'next/link'
 import { Diagnostico } from '@/types'
 
-const ESTADO_LABEL: Record<string, { label: string; color: string }> = {
-  borrador:   { label: 'Borrador',   color: '#9B8B74' },
-  activo:     { label: 'Activo',     color: '#3D6B4F' },
-  completado: { label: 'Completado', color: '#4A7FA5' },
+const ESTADO_LABEL: Record<string, string> = {
+  borrador:   'Borrador',
+  activo:     'Activo',
+  completado: 'Completado',
 }
 
 export const revalidate = 0
@@ -18,51 +18,58 @@ export default async function AdminPage() {
 
   return (
     <div>
-      <div className="flex items-end justify-between mb-8">
+      <div className="flex items-end justify-between mb-10">
         <div>
-          <h1 className="text-3xl" style={{ color: 'var(--brown)' }}>Diagnósticos</h1>
-          <p className="text-sm font-sans mt-1" style={{ color: 'var(--brown-light)' }}>
-            {diagnosticos?.length ?? 0} en total
+          <p className="text-xs tracking-widest uppercase mb-2" style={{ color: 'var(--gray-mid)' }}>
+            Panel
           </p>
+          <div style={{ borderBottom: '2px solid var(--black)', width: 32, marginBottom: 12 }} />
+          <h1 className="text-5xl font-black">Diagnósticos</h1>
         </div>
         <Link href="/admin/nuevo"
-          className="font-sans text-sm px-5 py-2.5 rounded-lg transition-opacity hover:opacity-80"
-          style={{ background: 'var(--brown)', color: 'var(--cream)' }}>
-          + Nuevo diagnóstico
+          className="font-black text-sm px-6 py-3 transition-opacity hover:opacity-70 border-2 border-black"
+          style={{ background: 'var(--black)', color: 'var(--bg)' }}>
+          + NUEVO
         </Link>
       </div>
 
       {!diagnosticos?.length ? (
-        <div className="text-center py-20" style={{ color: 'var(--brown-light)' }}>
-          <p className="text-lg">Aún no hay diagnósticos</p>
-          <p className="text-sm font-sans mt-1">Crea el primero para comenzar</p>
+        <div className="py-20 border-t border-black">
+          <p className="text-lg font-bold">Aún no hay diagnósticos.</p>
+          <p className="text-sm mt-1" style={{ color: 'var(--gray-mid)' }}>Crea el primero para comenzar.</p>
         </div>
       ) : (
-        <div className="flex flex-col gap-3">
-          {diagnosticos.map((d: Diagnostico) => {
-            const estado = ESTADO_LABEL[d.estado]
-            return (
-              <Link key={d.id} href={`/admin/${d.id}`}
-                className="flex items-center justify-between px-6 py-4 rounded-xl transition-opacity hover:opacity-80"
-                style={{ background: 'white', border: '1px solid var(--cream-dark)' }}>
-                <div>
-                  <p className="font-medium" style={{ color: 'var(--brown)' }}>{d.nombre_compania}</p>
-                  <p className="text-sm font-sans mt-0.5" style={{ color: 'var(--brown-light)' }}>
-                    {d.contacto_nombre} · {d.contacto_cargo}
-                  </p>
-                </div>
-                <div className="flex items-center gap-4">
-                  <span className="text-xs font-sans" style={{ color: 'var(--brown-light)' }}>
-                    {new Date(d.created_at).toLocaleDateString('es-CO', { day: 'numeric', month: 'short', year: 'numeric' })}
-                  </span>
-                  <span className="text-xs font-sans px-3 py-1 rounded-full"
-                    style={{ background: `${estado.color}18`, color: estado.color }}>
-                    {estado.label}
-                  </span>
-                </div>
-              </Link>
-            )
-          })}
+        <div className="flex flex-col">
+          {/* Header tabla */}
+          <div className="grid grid-cols-12 py-2 border-t border-b border-black text-xs font-black uppercase tracking-widest"
+            style={{ color: 'var(--gray-mid)' }}>
+            <span className="col-span-4">Compañía</span>
+            <span className="col-span-3">Contacto</span>
+            <span className="col-span-2">Estado</span>
+            <span className="col-span-2">Fecha</span>
+            <span className="col-span-1">Neón</span>
+          </div>
+
+          {diagnosticos.map((d: Diagnostico) => (
+            <Link key={d.id} href={`/admin/${d.id}`}
+              className="grid grid-cols-12 py-4 border-b border-black hover:bg-black hover:text-white transition-colors items-center group">
+              <span className="col-span-4 font-black">{d.nombre_compania}</span>
+              <span className="col-span-3 text-sm" style={{ color: 'var(--gray-mid)' }}>
+                <span className="group-hover:text-white transition-colors">{d.contacto_nombre}</span>
+              </span>
+              <span className="col-span-2 text-xs font-bold uppercase tracking-wide">
+                {ESTADO_LABEL[d.estado]}
+              </span>
+              <span className="col-span-2 text-xs" style={{ color: 'var(--gray-mid)' }}>
+                <span className="group-hover:text-white transition-colors">
+                  {new Date(d.created_at).toLocaleDateString('es-CO', { day: 'numeric', month: 'short', year: 'numeric' })}
+                </span>
+              </span>
+              <span className="col-span-1">
+                <span className="w-4 h-4 block rounded-sm" style={{ background: d.color_neon }} />
+              </span>
+            </Link>
+          ))}
         </div>
       )}
     </div>

@@ -27,6 +27,7 @@ create table diagnosticos (
   codigo_participacion  text not null unique default substring(gen_random_uuid()::text, 1, 8),
   codigo_resultados     text not null unique default substring(gen_random_uuid()::text, 1, 8),
   estado                text not null default 'borrador' check (estado in ('borrador','activo','completado')),
+  color_neon            text not null default '#39FF14',
   vertical              text,
   contexto_ia           text,
   created_at            timestamptz not null default now()

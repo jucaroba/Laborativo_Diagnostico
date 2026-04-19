@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { PREGUNTAS_BASE } from '@/lib/claude'
 import { DIMENSIONES, ROL_INFO, Rol } from '@/types'
+import NeonPicker from './NeonPicker'
 
 const VERTICALES = [
   'Tecnología', 'Retail', 'Salud', 'Manufactura', 'Educación',
@@ -32,13 +33,10 @@ export default function NuevoDiagnosticoForm() {
     contacto_nombre: '',
     contacto_cargo: '',
     contacto_email: '',
+    color_neon: '#39FF14',
   })
 
-  const [iaConfig, setIaConfig] = useState({
-    vertical: '',
-    contexto: '',
-  })
-
+  const [iaConfig, setIaConfig] = useState({ vertical: '', contexto: '' })
   const [preguntas, setPreguntas] = useState<PreguntaEditable[]>([])
 
   function cargarBase() {
@@ -60,17 +58,13 @@ export default function NuevoDiagnosticoForm() {
       const res = await fetch('/api/generar-preguntas', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          nombreCompania: datos.nombre_compania,
-          vertical: iaConfig.vertical,
-          contexto: iaConfig.contexto,
-        }),
+        body: JSON.stringify({ nombreCompania: datos.nombre_compania, vertical: iaConfig.vertical, contexto: iaConfig.contexto }),
       })
       if (!res.ok) throw new Error('Error generando preguntas')
       const { preguntas: generadas } = await res.json()
       setPreguntas(generadas)
       setPaso('revision')
-    } catch (e) {
+    } catch {
       setError('No se pudieron generar las preguntas. Intenta de nuevo.')
     } finally {
       setGenerando(false)
@@ -83,14 +77,22 @@ export default function NuevoDiagnosticoForm() {
     try {
       const { data: diag, error: diagErr } = await supabase
         .from('diagnosticos')
-        .insert({ ...datos, vertical: iaConfig.vertical || null, contexto_ia: iaConfig.contexto || null })
+        .insert({
+          nombre_compania: datos.nombre_compania,
+          contacto_nombre: datos.contacto_nombre,
+          contacto_cargo: datos.contacto_cargo,
+          contacto_email: datos.contacto_email,
+          color_neon: datos.color_neon,
+          vertical: iaConfig.vertical || null,
+          contexto_ia: iaConfig.contexto || null,
+        })
         .select()
         .single()
 
       if (diagErr || !diag) throw new Error(diagErr?.message)
 
-      const rows = preguntas.map((p) => ({ ...p, diagnostico_id: diag.id }))
-      const { error: pregErr } = await supabase.from('preguntas').insert(rows)
+      const { error: pregErr } = await supabase.from('preguntas')
+        .insert(preguntas.map(p => ({ ...p, diagnostico_id: diag.id })))
       if (pregErr) throw new Error(pregErr.message)
 
       router.push(`/admin/${diag.id}`)
@@ -102,75 +104,82 @@ export default function NuevoDiagnosticoForm() {
   }
 
   function actualizarPregunta(idx: number, texto: string) {
-    setPreguntas((prev) => prev.map((p, i) => i === idx ? { ...p, texto } : p))
+    setPreguntas(prev => prev.map((p, i) => i === idx ? { ...p, texto } : p))
   }
 
   const datosValidos = datos.nombre_compania && datos.contacto_nombre && datos.contacto_cargo && datos.contacto_email
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-8">
 
-      {/* PASO 1: Datos del cliente */}
+      {/* PASO 1: Datos */}
       {paso === 'datos' && (
-        <div className="flex flex-col gap-4">
-          <Campo label="Nombre de la compañía" required>
-            <input value={datos.nombre_compania} onChange={e => setDatos(d => ({ ...d, nombre_compania: e.target.value }))}
+        <div className="flex flex-col gap-6">
+          <Campo label="Nombre de la compañía">
+            <input value={datos.nombre_compania}
+              onChange={e => setDatos(d => ({ ...d, nombre_compania: e.target.value }))}
               placeholder="Ej: Bancolombia S.A." className={inputCls} />
           </Campo>
+
           <div className="grid grid-cols-2 gap-4">
-            <Campo label="Nombre del contacto" required>
-              <input value={datos.contacto_nombre} onChange={e => setDatos(d => ({ ...d, contacto_nombre: e.target.value }))}
+            <Campo label="Nombre del contacto">
+              <input value={datos.contacto_nombre}
+                onChange={e => setDatos(d => ({ ...d, contacto_nombre: e.target.value }))}
                 placeholder="Nombre completo" className={inputCls} />
             </Campo>
-            <Campo label="Cargo" required>
-              <input value={datos.contacto_cargo} onChange={e => setDatos(d => ({ ...d, contacto_cargo: e.target.value }))}
+            <Campo label="Cargo">
+              <input value={datos.contacto_cargo}
+                onChange={e => setDatos(d => ({ ...d, contacto_cargo: e.target.value }))}
                 placeholder="Ej: Gerente de Cultura" className={inputCls} />
             </Campo>
           </div>
-          <Campo label="Email del contacto" required>
-            <input type="email" value={datos.contacto_email} onChange={e => setDatos(d => ({ ...d, contacto_email: e.target.value }))}
+
+          <Campo label="Email del contacto">
+            <input type="email" value={datos.contacto_email}
+              onChange={e => setDatos(d => ({ ...d, contacto_email: e.target.value }))}
               placeholder="correo@empresa.com" className={inputCls} />
           </Campo>
-          <div className="mt-2">
-            <button onClick={() => setPaso('preguntas-opcion')} disabled={!datosValidos}
-              className={btnPrimary + (!datosValidos ? ' opacity-40 cursor-not-allowed' : '')}>
-              Continuar →
-            </button>
-          </div>
+
+          <Campo label="Color neón del diagnóstico">
+            <NeonPicker value={datos.color_neon} onChange={c => setDatos(d => ({ ...d, color_neon: c }))} />
+          </Campo>
+
+          <button onClick={() => setPaso('preguntas-opcion')} disabled={!datosValidos}
+            className={btnPrimary + (!datosValidos ? ' opacity-30 cursor-not-allowed' : '')}>
+            CONTINUAR →
+          </button>
         </div>
       )}
 
-      {/* PASO 2: Opción de preguntas */}
+      {/* PASO 2: Opción preguntas */}
       {paso === 'preguntas-opcion' && (
         <div className="flex flex-col gap-4">
-          <p className="font-sans text-sm" style={{ color: 'var(--brown-mid)' }}>
-            ¿Cómo quieres configurar las preguntas para <strong>{datos.nombre_compania}</strong>?
+          <p className="text-sm" style={{ color: 'var(--gray-mid)' }}>
+            ¿Cómo configuramos las preguntas para <strong className="text-black">{datos.nombre_compania}</strong>?
           </p>
           <div className="grid grid-cols-2 gap-4">
             <button onClick={cargarBase}
-              className="text-left p-5 rounded-xl border-2 transition-all hover:border-current"
-              style={{ borderColor: 'var(--cream-dark)', background: 'white' }}>
-              <p className="font-medium mb-1" style={{ color: 'var(--brown)' }}>Preguntas base</p>
-              <p className="text-sm font-sans" style={{ color: 'var(--brown-light)' }}>
-                Carga las preguntas genéricas de Laborativo. Puedes editarlas después.
+              className="text-left p-6 border-2 border-black hover:bg-black hover:text-white transition-colors">
+              <p className="font-black mb-1">Preguntas base</p>
+              <p className="text-sm" style={{ color: 'var(--gray-mid)' }}>
+                Preguntas genéricas de Laborativo. Editables antes de guardar.
               </p>
             </button>
             <button onClick={() => setPaso('ia-config')}
-              className="text-left p-5 rounded-xl border-2 transition-all hover:border-current"
-              style={{ borderColor: 'var(--cream-dark)', background: 'white' }}>
-              <p className="font-medium mb-1" style={{ color: 'var(--brown)' }}>Contextualizar con IA ✦</p>
-              <p className="text-sm font-sans" style={{ color: 'var(--brown-light)' }}>
-                Claude investiga la empresa y genera preguntas ajustadas al contexto.
+              className="text-left p-6 border-2 border-black hover:bg-black hover:text-white transition-colors">
+              <p className="font-black mb-1">Contextualizar con IA ✦</p>
+              <p className="text-sm" style={{ color: 'var(--gray-mid)' }}>
+                Claude investiga la empresa y ajusta las preguntas al contexto.
               </p>
             </button>
           </div>
-          <button onClick={() => setPaso('datos')} className={btnSecondary}>← Volver</button>
+          <button onClick={() => setPaso('datos')} className={btnSecondary}>← VOLVER</button>
         </div>
       )}
 
-      {/* PASO 3: Configuración IA */}
+      {/* PASO 3: Config IA */}
       {paso === 'ia-config' && (
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-6">
           <Campo label="Vertical / Industria">
             <select value={iaConfig.vertical} onChange={e => setIaConfig(c => ({ ...c, vertical: e.target.value }))}
               className={inputCls}>
@@ -179,42 +188,43 @@ export default function NuevoDiagnosticoForm() {
             </select>
           </Campo>
           <Campo label="Contexto adicional (opcional)">
-            <textarea value={iaConfig.contexto} onChange={e => setIaConfig(c => ({ ...c, contexto: e.target.value }))}
-              placeholder="Describe retos específicos de cultura, situación actual de la organización, o cualquier contexto relevante..."
+            <textarea value={iaConfig.contexto}
+              onChange={e => setIaConfig(c => ({ ...c, contexto: e.target.value }))}
+              placeholder="Retos de cultura, situación actual, lo que consideres relevante..."
               rows={5} className={inputCls + ' resize-none'} />
           </Campo>
-          {error && <p className="text-sm font-sans" style={{ color: 'var(--rol-c)' }}>{error}</p>}
+          {error && <p className="text-sm font-bold" style={{ color: '#FF3366' }}>{error}</p>}
           <div className="flex gap-3">
             <button onClick={generarConIA} disabled={!iaConfig.vertical || generando}
-              className={btnPrimary + ((!iaConfig.vertical || generando) ? ' opacity-40 cursor-not-allowed' : '')}>
-              {generando ? 'Generando preguntas…' : '✦ Generar preguntas'}
+              className={btnPrimary + ((!iaConfig.vertical || generando) ? ' opacity-30 cursor-not-allowed' : '')}>
+              {generando ? 'GENERANDO…' : '✦ GENERAR PREGUNTAS'}
             </button>
-            <button onClick={() => setPaso('preguntas-opcion')} disabled={generando} className={btnSecondary}>← Volver</button>
+            <button onClick={() => setPaso('preguntas-opcion')} disabled={generando} className={btnSecondary}>
+              ← VOLVER
+            </button>
           </div>
         </div>
       )}
 
-      {/* PASO 4: Revisión y edición de preguntas */}
+      {/* PASO 4: Revisión */}
       {paso === 'revision' && (
         <div className="flex flex-col gap-6">
-          <p className="font-sans text-sm" style={{ color: 'var(--brown-mid)' }}>
-            Revisa y edita las preguntas antes de guardar el diagnóstico.
+          <p className="text-sm" style={{ color: 'var(--gray-mid)' }}>
+            Revisa y edita las preguntas antes de guardar.
           </p>
           {DIMENSIONES.map(dim => (
             <div key={dim.id}>
-              <div className="mb-3">
-                <span className="font-medium" style={{ color: 'var(--brown)' }}>{dim.nombre}</span>
-                <span className="text-sm font-sans ml-2" style={{ color: 'var(--brown-light)' }}>{dim.subtitulo}</span>
+              <div className="flex items-baseline gap-3 mb-4">
+                <span className="font-black text-lg">{dim.nombre}</span>
+                <span className="text-xs uppercase tracking-widest" style={{ color: 'var(--gray-mid)' }}>{dim.subtitulo}</span>
               </div>
               {(['A', 'B', 'C', 'D'] as Rol[]).map(rol => {
-                const rolInfo = ROL_INFO[rol]
                 const ps = preguntas.map((p, i) => ({ ...p, idx: i })).filter(p => p.dimension_id === dim.id && p.rol === rol)
                 if (!ps.length) return null
                 return (
                   <div key={rol} className="mb-4">
-                    <p className="text-xs font-sans uppercase tracking-wide mb-2"
-                      style={{ color: rolInfo.color }}>
-                      {rol} — {rolInfo.label}
+                    <p className="text-xs font-black uppercase tracking-widest mb-2" style={{ color: 'var(--gray-mid)' }}>
+                      {rol} — {ROL_INFO[rol].label}
                     </p>
                     <div className="flex flex-col gap-2">
                       {ps.map(p => (
@@ -226,17 +236,17 @@ export default function NuevoDiagnosticoForm() {
                   </div>
                 )
               })}
-              <div style={{ borderBottom: '1px solid var(--cream-dark)' }} className="mb-4" />
+              <div style={{ borderBottom: '1px solid var(--gray-border)' }} className="mb-6" />
             </div>
           ))}
-          {error && <p className="text-sm font-sans" style={{ color: 'var(--rol-c)' }}>{error}</p>}
+          {error && <p className="text-sm font-bold" style={{ color: '#FF3366' }}>{error}</p>}
           <div className="flex gap-3">
             <button onClick={guardar} disabled={guardando}
-              className={btnPrimary + (guardando ? ' opacity-40 cursor-not-allowed' : '')}>
-              {guardando ? 'Guardando…' : 'Guardar diagnóstico'}
+              className={btnPrimary + (guardando ? ' opacity-30 cursor-not-allowed' : '')}>
+              {guardando ? 'GUARDANDO…' : 'GUARDAR DIAGNÓSTICO'}
             </button>
             <button onClick={() => setPaso('preguntas-opcion')} disabled={guardando} className={btnSecondary}>
-              ← Cambiar preguntas
+              ← CAMBIAR PREGUNTAS
             </button>
           </div>
         </div>
@@ -245,23 +255,22 @@ export default function NuevoDiagnosticoForm() {
   )
 }
 
-function Campo({ label, required, children }: { label: string; required?: boolean; children: React.ReactNode }) {
+function Campo({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div className="flex flex-col gap-1.5">
-      <label className="text-sm font-sans" style={{ color: 'var(--brown-mid)' }}>
-        {label}{required && <span style={{ color: 'var(--rol-c)' }}> *</span>}
+    <div className="flex flex-col gap-2">
+      <label className="text-xs font-black uppercase tracking-widest" style={{ color: 'var(--gray-mid)' }}>
+        {label}
       </label>
       {children}
     </div>
   )
 }
 
-const inputCls = 'w-full px-4 py-2.5 rounded-lg text-sm font-sans outline-none transition-colors'
-  + ' border border-[var(--cream-dark)] bg-white focus:border-[var(--brown-mid)]'
-  + ' text-[var(--brown)] placeholder:text-[var(--brown-light)]'
+const inputCls = 'w-full px-4 py-3 text-sm border-2 border-black bg-white outline-none focus:border-black'
+  + ' font-medium placeholder:text-gray-400'
 
-const btnPrimary = 'font-sans text-sm px-5 py-2.5 rounded-lg transition-opacity hover:opacity-80'
-  + ' bg-[var(--brown)] text-[var(--cream)]'
+const btnPrimary = 'font-black text-sm px-6 py-3 transition-opacity hover:opacity-70'
+  + ' bg-black text-white border-2 border-black uppercase tracking-wide'
 
-const btnSecondary = 'font-sans text-sm px-5 py-2.5 rounded-lg transition-opacity hover:opacity-70'
-  + ' border border-[var(--cream-dark)] text-[var(--brown-mid)] bg-white'
+const btnSecondary = 'font-black text-sm px-6 py-3 transition-colors hover:bg-black hover:text-white'
+  + ' border-2 border-black bg-transparent uppercase tracking-wide'

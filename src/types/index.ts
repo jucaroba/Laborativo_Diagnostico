@@ -24,6 +24,7 @@ export interface Diagnostico {
   codigo_participacion: string
   codigo_resultados: string
   estado: EstadoDiagnostico
+  color_neon: string
   vertical: string | null
   contexto_ia: string | null
   created_at: string
