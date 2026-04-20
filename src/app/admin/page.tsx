@@ -35,32 +35,29 @@ export default async function AdminPage() {
       ) : (
         <Table>
           <TableHeader>
-            <TableRow>
-              <TableHead>Compañía</TableHead>
-              <TableHead>Contacto</TableHead>
-              <TableHead>Estado</TableHead>
-              <TableHead>Fecha</TableHead>
-              <TableHead>Neón</TableHead>
-              <TableHead></TableHead>
+            <TableRow className="table-header-row">
+              {['Compañía', 'Contacto', 'Estado', 'Fecha', 'Color', ''].map(h => (
+                <TableHead key={h} className="table-header-cell">{h}</TableHead>
+              ))}
             </TableRow>
           </TableHeader>
           <TableBody>
             {diagnosticos.map((d: Diagnostico) => (
               <TableRow key={d.id}>
                 <TableCell>
-                  <Link href={`/admin/${d.id}`} style={{ textDecoration: 'none', color: 'inherit', fontWeight: 800, fontSize: 15 }}>
+                  <Link href={`/admin/${d.id}`} style={{ textDecoration: 'none', color: 'inherit', fontWeight: 500, fontSize: 14 }}>
                     {d.nombre_compania}
                   </Link>
                 </TableCell>
-                <TableCell style={{ fontSize: 13, fontWeight: 500 }}>{d.contacto_nombre}</TableCell>
+                <TableCell className="table-cell">{d.contacto_nombre}</TableCell>
                 <TableCell>
                   <Badge variant={ESTADO_VARIANT[d.estado]}>{ESTADO_LABEL[d.estado]}</Badge>
                 </TableCell>
-                <TableCell className="text-mute" style={{ fontSize: 12 }}>
+                <TableCell className="table-cell-mute">
                   {new Date(d.created_at).toLocaleDateString('es-CO', { day: 'numeric', month: 'short', year: 'numeric' })}
                 </TableCell>
                 <TableCell>
-                  <span style={{ width: 14, height: 14, background: d.color_neon, border: '1.5px solid var(--ink)', display: 'inline-block' }} />
+                  <span style={{ width: 14, height: 14, background: d.color_neon, display: 'inline-block' }} />
                 </TableCell>
                 <TableCell>
                   <AccionesRow id={d.id} />
