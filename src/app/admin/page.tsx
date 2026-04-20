@@ -1,7 +1,7 @@
 import { supabase } from '@/lib/supabase'
 import Link from 'next/link'
 import { Diagnostico } from '@/types'
-import { Button } from '@/components/ui/button'
+import { buttonVariants } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 
@@ -33,9 +33,7 @@ export default async function AdminPage() {
           <div style={{ width: 24, height: 2, background: 'var(--ink)', marginBottom: 12 }} />
           <h1 style={{ fontSize: 48, fontWeight: 900, letterSpacing: '-1.5px', lineHeight: 1, margin: 0 }}>Diagnósticos</h1>
         </div>
-        <Button asChild>
-          <Link href="/admin/nuevo">+ Nuevo</Link>
-        </Button>
+        <Link href="/admin/nuevo" className={buttonVariants()}>+ Nuevo</Link>
       </div>
 
       {!diagnosticos?.length ? (
