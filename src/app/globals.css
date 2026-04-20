@@ -161,13 +161,14 @@ button { font-family: inherit; }
 .text-mute { color: var(--mute); font-weight: 500; }
 
 /* Cabecera de tabla — fondo negro, texto blanco uppercase */
-.table-header-row { background: #0A0A0A; border-bottom: none; }
+.table-header-row { background: #0A0A0A !important; border-bottom: none !important; }
 .table-header-cell {
-  color: #fff;
-  font-weight: 700;
-  font-size: 12px;
-  letter-spacing: .06em;
-  text-transform: uppercase;
+  color: #fff !important;
+  font-weight: 700 !important;
+  font-size: 12px !important;
+  letter-spacing: .06em !important;
+  text-transform: uppercase !important;
+  background: transparent !important;
 }
 
 /* Celdas de datos de tabla */

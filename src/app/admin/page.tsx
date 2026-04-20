@@ -35,9 +35,9 @@ export default async function AdminPage() {
       ) : (
         <Table>
           <TableHeader>
-            <TableRow className="table-header-row">
+            <TableRow style={{ background: '#0A0A0A', borderBottom: 'none' }}>
               {['Compañía', 'Contacto', 'Estado', 'Fecha', 'Color', ''].map(h => (
-                <TableHead key={h} className="table-header-cell">{h}</TableHead>
+                <TableHead key={h} style={{ color: '#fff', fontWeight: 700, fontSize: 12, letterSpacing: '.06em', textTransform: 'uppercase', background: 'transparent' }}>{h}</TableHead>
               ))}
             </TableRow>
           </TableHeader>
