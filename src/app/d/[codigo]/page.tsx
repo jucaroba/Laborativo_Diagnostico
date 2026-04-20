@@ -15,6 +15,11 @@ export default async function LandingPage({ params }: { params: Promise<{ codigo
 
   if (!diag || diag.estado !== 'activo') notFound()
 
+  const { count: totalPreguntas } = await supabase
+    .from('preguntas')
+    .select('*', { count: 'exact', head: true })
+    .eq('diagnostico_id', diag.id)
+
   const neon = diag.color_neon || '#D8FF00'
 
   return (
@@ -22,7 +27,8 @@ export default async function LandingPage({ params }: { params: Promise<{ codigo
 
       {/* Hero */}
       <div style={{ padding: '48px 56px 64px', borderBottom: '1.5px solid var(--ink)', position: 'relative' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 40, marginBottom: 72 }}>
+        <div style={{ marginBottom: 72 }}>
+          <Image src="/brand/laborativo-logo.png" alt="Laborativo" width={154} height={39} style={{ objectFit: 'contain', display: 'block', marginBottom: 24, marginLeft: -15 }} />
           <div style={{ display: 'flex', gap: 32 }}>
             <span style={{ fontSize: 10, letterSpacing: '.12em', textTransform: 'uppercase', color: 'var(--mute)', fontWeight: 600 }}>
               Producto<b style={{ display: 'block', fontSize: 12, color: 'var(--ink)', marginTop: 6, fontWeight: 700, letterSpacing: '.04em' }}>Diagnóstico de Cultura</b>
@@ -34,7 +40,6 @@ export default async function LandingPage({ params }: { params: Promise<{ codigo
               Tiempo<b style={{ display: 'block', fontSize: 12, color: 'var(--ink)', marginTop: 6, fontWeight: 700, letterSpacing: '.04em' }}>12–18 minutos</b>
             </span>
           </div>
-          <Image src="/brand/laborativo-logo.png" alt="Laborativo" width={224} height={56} style={{ objectFit: 'contain' }} />
         </div>
 
         <div style={{ position: 'absolute', right: 56, top: 48, textAlign: 'right', fontSize: 10, color: 'var(--mute)', letterSpacing: '.1em', textTransform: 'uppercase', fontWeight: 600 }}>
@@ -48,11 +53,12 @@ export default async function LandingPage({ params }: { params: Promise<{ codigo
           las empresas son<br />personas, las personas <em style={{ fontStyle: 'italic' }}>emoción.</em>
         </h1>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1.3fr 1fr', gap: 80, marginTop: 72, alignItems: 'end' }}>
-          <p style={{ fontSize: 17, lineHeight: 1.45, maxWidth: '46ch', color: 'var(--ink)', margin: 0, fontWeight: 500 }}>
+        <div style={{ display: 'flex', gap: 40, marginTop: 72, alignItems: 'flex-end' }}>
+          <p style={{ fontSize: 17, lineHeight: 1.45, width: '46ch', flexShrink: 0, color: 'var(--ink)', margin: 0, fontWeight: 500 }}>
             Un diagnóstico breve para ver con claridad cómo se comporta tu cultura hoy y dónde están las brechas entre lo que el líder cree, lo que el equipo vive, y lo que la organización realmente hace.{' '}
             <b style={{ fontWeight: 800 }}>Un modelo de consultoría creativa basada en la emoción.</b>
           </p>
+          <div style={{ width: 1, background: 'var(--ink)', alignSelf: 'stretch', flexShrink: 0 }} />
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16, alignItems: 'flex-start' }}>
             <span style={{ fontSize: 13, color: 'var(--mute)', fontWeight: 500 }}>{diag.nombre_compania}</span>
             <Link href={`/d/${codigo}/intake`} className="btn primary">Iniciar diagnóstico <ArrowRight size={15} strokeWidth={2.5} /></Link>
@@ -70,27 +76,26 @@ export default async function LandingPage({ params }: { params: Promise<{ codigo
               Cuatro dimensiones para abordar cualquier reto.
             </h2>
           </div>
-          <span className="chip">4 ejes · 32 preguntas</span>
+          <span className="chip">4 ejes · {totalPreguntas ?? 0} preguntas</span>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', border: '1.5px solid var(--ink)' }}>
           {[
-            { n: '01', idx: 'Intención', h: 'Sentido', pair: '¿A dónde vamos?', p: 'El propósito compartido. Qué hace que este equipo exista y hacia qué horizonte se orienta.' },
-            { n: '02', idx: 'Motivación', h: 'Energía', pair: '¿Por qué?', p: 'Lo que enciende o apaga a las personas. Las razones internas detrás del esfuerzo cotidiano.' },
-            { n: '03', idx: 'Interacción', h: 'Vínculos', pair: '¿Con quién?', p: 'Cómo nos relacionamos. Calidad de la conversación, confianza y colaboración entre personas.' },
-            { n: '04', idx: 'Acción', h: 'Comportamiento', pair: '¿Qué?', p: 'Lo que se hace realmente —no lo que se dice—. Hábitos, decisiones y entregas visibles.' },
+            { n: '01', idx: 'Intención', h: 'Sentido', pair: '¿A dónde vamos?', p: 'El propósito compartido.\nQué hace que este equipo exista y hacia qué horizonte se orienta.' },
+            { n: '02', idx: 'Motivación', h: 'Energía', pair: '¿Por qué?', p: 'Lo que enciende o apaga a las personas.\nLas razones internas detrás del esfuerzo cotidiano.' },
+            { n: '03', idx: 'Interacción', h: 'Vínculos', pair: '¿Con quién?', p: 'Cómo nos relacionamos.\nCalidad de la conversación, confianza y colaboración entre personas.' },
+            { n: '04', idx: 'Acción', h: 'Comportamiento', pair: '¿Qué?', p: 'Lo que se hace realmente, no lo que se dice.\nHábitos, decisiones y entregas visibles.' },
           ].map((d, i) => (
             <div key={d.n} className="dim-card" style={{
               borderRight: i < 3 ? '1.5px solid var(--ink)' : 'none',
               padding: '28px 24px 32px', position: 'relative',
-              minHeight: 280, display: 'flex', flexDirection: 'column', gap: 14,
+              minHeight: 250, display: 'flex', flexDirection: 'column', gap: 14,
               background: 'var(--card)',
             }}>
-              <span style={{ position: 'absolute', top: 16, right: 20, fontWeight: 900, fontSize: 14 }}>{d.n}</span>
+              <span style={{ position: 'absolute', top: 16, right: 20, fontWeight: 900, fontSize: 14, color: neon }}>{d.n}</span>
               <span style={{ fontSize: 11, letterSpacing: .5, textTransform: 'uppercase', color: 'var(--mute)', fontWeight: 700 }}>{d.idx}</span>
               <div style={{ width: 56, height: 8, background: 'var(--ink)' }} />
-              <h3 style={{ fontWeight: 900, fontSize: 32, letterSpacing: -.5, lineHeight: 1 }}>{d.h}</h3>
-              <span style={{ fontWeight: 500, fontSize: 14, color: 'var(--mute)', letterSpacing: .5, textTransform: 'uppercase' }}>{d.pair}</span>
-              <p style={{ fontSize: 14, lineHeight: 1.45, color: 'var(--ink-2)', margin: '8px 0 0', maxWidth: '30ch', fontWeight: 500 }}>{d.p}</p>
+              <h3 style={{ fontWeight: 900, fontSize: 26, letterSpacing: -.5, lineHeight: 1, marginTop: 15 }}>{d.h} / {d.pair}</h3>
+              <p style={{ fontSize: 14, lineHeight: 1.45, color: 'var(--ink-2)', margin: '8px 0 0', maxWidth: '30ch', fontWeight: 500, whiteSpace: 'pre-line' }}>{d.p}</p>
             </div>
           ))}
         </div>
@@ -105,7 +110,7 @@ export default async function LandingPage({ params }: { params: Promise<{ codigo
             Cómo funciona el diagnóstico.
           </h2>
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column', borderTop: '1.5px solid var(--ink)', marginLeft: 25 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', marginLeft: 25 }}>
           {[
             { n: '01', h: 'Invitación y roles', p: 'Cada persona entra con el enlace compartido y selecciona si responde como miembro del equipo o como líder.', meta: '2 min · administrativo' },
             { n: '02', h: 'Cuatro niveles de mirada', p: 'Autoevaluación individual, autoevaluación del líder, líder evalúa al equipo y equipo evalúa al líder. De ahí nacen las brechas.', meta: '12–18 min · por persona' },
@@ -118,7 +123,9 @@ export default async function LandingPage({ params }: { params: Promise<{ codigo
                 <h4 style={{ margin: '0 0 6px', fontSize: 20, fontWeight: 800, letterSpacing: '-.02em' }}>{s.h}</h4>
                 <p style={{ margin: 0, fontSize: 14, color: 'var(--ink-2)', lineHeight: 1.5, maxWidth: '50ch', fontWeight: 500 }}>{s.p}</p>
               </div>
-              <span style={{ fontSize: 10, letterSpacing: '.1em', textTransform: 'uppercase', color: 'var(--mute)', textAlign: 'right', fontWeight: 600 }}>{s.meta}</span>
+              <span style={{ fontSize: 10, letterSpacing: '.1em', textTransform: 'uppercase', color: neon, textAlign: 'right', fontWeight: 600, display: 'flex', flexDirection: 'column', gap: 4 }}>
+                {s.meta.split(' · ').map((part, i) => <span key={i}>{part}</span>)}
+              </span>
             </div>
           ))}
         </div>
@@ -132,22 +139,25 @@ export default async function LandingPage({ params }: { params: Promise<{ codigo
           Cuatro puntos de vista<br />sobre la misma cultura.
         </h2>
         <p style={{ color: 'var(--ink-2)', maxWidth: '56ch', margin: '0 0 40px', fontSize: 16, lineHeight: 1.5, fontWeight: 500 }}>
-          Donde estas miradas coinciden, hay alineación. Donde no, hay una brecha —y ahí empieza el trabajo.
+          Donde estas miradas coinciden, hay alineación.<br />Donde no, hay una brecha y ahí empieza el trabajo.
         </p>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 16 }}>
           {[
             { tag: 'Nivel 01 · Individuo', h: 'Autoevaluación personal', p: 'Cada miembro del equipo se observa a sí mismo en las cuatro dimensiones.', accent: false },
-            { tag: 'Nivel 02 · Líder', h: 'Autoevaluación del líder', p: 'El líder se observa con los mismos criterios que su equipo.', accent: true },
+            { tag: 'Nivel 02 · Líder', h: 'Autoevaluación del líder', p: 'El líder se observa con los mismos criterios que su equipo.', accent: false },
             { tag: 'Nivel 03 · Descendente', h: 'Líder evalúa al equipo', p: 'La mirada del líder sobre las conductas colectivas que observa.', accent: false },
             { tag: 'Nivel 04 · Ascendente', h: 'Equipo evalúa al líder', p: 'El contrapeso. Cómo ve el equipo al liderazgo que recibe.', accent: false },
           ].map(l => (
             <div key={l.tag} style={{
               border: '1.5px solid var(--ink)', padding: 22,
-              display: 'flex', flexDirection: 'column', gap: 14, minHeight: 260,
+              display: 'flex', flexDirection: 'column', gap: 14, minHeight: 156,
               background: l.accent ? neon : 'var(--card)',
               color: 'var(--ink)',
             }}>
-              <span style={{ fontSize: 10, letterSpacing: '.12em', textTransform: 'uppercase', fontWeight: 700, color: l.accent ? 'var(--ink)' : 'var(--mute)' }}>{l.tag}</span>
+              <span style={{ fontSize: 10, letterSpacing: '.12em', textTransform: 'uppercase', fontWeight: 700, color: 'var(--mute)' }}>
+                <span style={{ color: neon }}>{l.tag.split(' · ')[0]}</span>
+                {' · '}{l.tag.split(' · ')[1]}
+              </span>
               <h4 style={{ fontWeight: 900, fontSize: 22, letterSpacing: '-.02em', lineHeight: 1.05, margin: 0 }}>{l.h}</h4>
               <p style={{ margin: 0, fontSize: 13, lineHeight: 1.45, fontWeight: 500, color: 'var(--ink-2)' }}>{l.p}</p>
             </div>
@@ -157,7 +167,7 @@ export default async function LandingPage({ params }: { params: Promise<{ codigo
 
       {/* Closing CTA */}
       <div style={{ padding: '80px 56px' }}>
-        <span className="eyebrow soft">Empieza ahora</span>
+        <span className="eyebrow">Empieza ahora</span>
         <div className="rule" />
         <h2 style={{ fontWeight: 900, fontSize: 'clamp(48px,6.5vw,96px)', lineHeight: .88, letterSpacing: '-.045em', margin: '12px 0 32px', maxWidth: '14ch' }}>
           De la intuición<br />al mapa.
