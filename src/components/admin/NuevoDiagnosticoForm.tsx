@@ -2,7 +2,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
-import { PREGUNTAS_BASE } from '@/lib/claude'
+import { PREGUNTAS_BASE } from '@/lib/preguntas-base'
 import { DIMENSIONES, ROL_INFO, Rol } from '@/types'
 import NeonPicker from './NeonPicker'
 
