@@ -40,8 +40,8 @@ export default async function DiagnosticoPage({ params }: { params: Promise<{ id
           <p className="page-header__subtitle">{d.contacto_nombre} / {d.contacto_cargo} / {d.contacto_email}</p>
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
-          <EliminarDiagnostico id={d.id} neonColor={d.color_neon} />
           <EditarDiagnostico diagnostico={d} />
+          <EliminarDiagnostico id={d.id} neonColor={d.color_neon} />
           <AccionesDiagnostico diagnostico={d} />
         </div>
       </div>
