@@ -65,7 +65,7 @@ export default async function DiagnosticoPage({ params }: { params: Promise<{ id
       {/* Participantes */}
       <div>
         <div style={{ background: 'var(--ink)', padding: '10px 16px', marginBottom: 12 }}>
-          <h2 style={{ fontSize: 20, fontWeight: 900, letterSpacing: '-0.03em', margin: 0, color: '#fff', fontFamily: 'Red Hat Display, sans-serif' }}>Participantes</h2>
+          <h2 style={{ fontSize: 20, fontWeight: 900, letterSpacing: '0', margin: 0, color: '#fff', fontFamily: 'Red Hat Display, sans-serif' }}>Participantes</h2>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 12 }}>
           {(['A', 'B', 'C', 'D'] as Rol[]).map(rol => (
@@ -82,13 +82,13 @@ export default async function DiagnosticoPage({ params }: { params: Promise<{ id
       {/* Preguntas */}
       <div>
         <div style={{ background: 'var(--ink)', padding: '10px 16px', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 10 }}>
-          <h2 style={{ fontSize: 20, fontWeight: 900, letterSpacing: '-0.03em', margin: 0, color: '#fff', fontFamily: 'Red Hat Display, sans-serif' }}>Preguntas</h2>
-          <span style={{ fontSize: 20, fontWeight: 900, letterSpacing: '-0.03em', color: d.color_neon, fontFamily: 'Red Hat Display, sans-serif' }}>{ps.length}</span>
+          <h2 style={{ fontSize: 20, fontWeight: 900, letterSpacing: '0', margin: 0, color: '#fff', fontFamily: 'Red Hat Display, sans-serif' }}>Preguntas</h2>
+          <span style={{ fontSize: 20, fontWeight: 900, letterSpacing: '0', color: d.color_neon, fontFamily: 'Red Hat Display, sans-serif' }}>{ps.length}</span>
         </div>
         {DIMENSIONES.map((dim, idx) => (
           <div key={dim.id} style={{ marginBottom: 40, borderTop: idx === 0 ? 'none' : '2px solid var(--ink)', paddingTop: idx === 0 ? 16 : 16 }}>
             <p className="page-header__eyebrow" style={{ margin: '0 0 4px' }}>{dim.subtitulo}</p>
-            <h3 style={{ fontSize: 20, fontWeight: 900, letterSpacing: '-0.03em', margin: '0 0 20px', fontFamily: 'Red Hat Display, sans-serif' }}>{dim.nombre}</h3>
+            <h3 style={{ fontSize: 20, fontWeight: 900, letterSpacing: '0', margin: '0 0 20px', fontFamily: 'Red Hat Display, sans-serif' }}>{dim.nombre}</h3>
             {(['A', 'B', 'C', 'D'] as Rol[]).map(rol => {
               const grupo = ps.filter(p => p.dimension_id === dim.id && p.rol === rol)
               const maxOrden = grupo.length ? Math.max(...grupo.map(p => p.orden)) : ps.length

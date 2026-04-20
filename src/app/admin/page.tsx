@@ -27,7 +27,7 @@ export default async function AdminPage() {
           <div className="page-header__rule" />
           <h1 className="page-header__title">Diagnósticos</h1>
         </div>
-        <Link href="/admin/nuevo" className={buttonVariants()}>+ Nuevo</Link>
+        <Link href="/admin/nuevo" className={buttonVariants()} style={{ background: '#0A0A0A', color: '#ffffff', border: '1px solid #0A0A0A' }}>+ Nuevo</Link>
       </div>
 
       {!diagnosticos?.length ? (

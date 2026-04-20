@@ -135,7 +135,7 @@ button { font-family: inherit; }
   line-height: 1; margin: 0; font-family: 'Red Hat Display', sans-serif;
 }
 .page-header__subtitle {
-  font-size: 13px; color: var(--mute); font-weight: 500; margin: 6px 0 0;
+  font-size: 13px; color: var(--ink); font-weight: 500; margin: 6px 0 0;
 }
 
 /* Títulos de sección dentro de una página */
@@ -162,6 +162,7 @@ button { font-family: inherit; }
 /* Acciones de fila — visibles solo en hover */
 tr:hover .row-actions { opacity: 1 !important; }
 .row-actions { transition: opacity .15s ease; }
+tr.revision-row:hover .row-actions { opacity: 1 !important; }
 
 /* Cabecera de tabla — fondo negro, texto blanco uppercase */
 .table-header-row { background: #0A0A0A !important; border-bottom: none !important; }

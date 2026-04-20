@@ -6,7 +6,7 @@ import { PREGUNTAS_BASE } from '@/lib/preguntas-base'
 import { DIMENSIONES, ROL_INFO, Rol } from '@/types'
 import NeonPicker from './NeonPicker'
 import { Button } from '@/components/ui/button'
-import { ArrowRight } from 'lucide-react'
+import { ArrowRight, Plus as PlusIcon, Pencil, Trash2, Check, X } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
@@ -33,6 +33,36 @@ function Row({ label, children }: { label: string; children: React.ReactNode }) 
 function Actions({ children }: { children: React.ReactNode }) {
   return <div style={{ paddingTop: 24, display: 'flex', gap: 8 }}>{children}</div>
 }
+
+function RevisionRow({ num, texto, onChange, onDelete }: { num: number; texto: string; onChange: (t: string) => void; onDelete: () => void }) {
+  const [editando, setEditando] = useState(false)
+  const [draft, setDraft] = useState(texto)
+  function confirmar() { onChange(draft); setEditando(false) }
+  return (
+    <tr style={{ borderBottom: '1px solid var(--line-soft)' }} className="revision-row">
+      <td style={{ width: 32, padding: '8px 8px 8px 0', fontSize: 12, fontWeight: 700, color: 'var(--mute)', verticalAlign: 'middle' }}>{num}</td>
+      <td style={{ padding: '8px 0', fontSize: 13, fontWeight: 500, verticalAlign: 'middle' }}>
+        {editando
+          ? <input autoFocus value={draft} onChange={e => setDraft(e.target.value)}
+              onKeyDown={e => { if (e.key === 'Enter') confirmar(); if (e.key === 'Escape') setEditando(false) }}
+              style={{ width: '100%', fontSize: 13, fontWeight: 500, border: '1.5px solid var(--ink)', padding: '4px 8px', background: '#fff', outline: 'none', fontFamily: 'inherit' }} />
+          : texto || <span style={{ color: 'var(--mute)' }}>Escribe la pregunta…</span>}
+      </td>
+      <td style={{ width: 64, textAlign: 'right', verticalAlign: 'middle' }}>
+        {editando
+          ? <span style={{ display: 'flex', gap: 6, justifyContent: 'flex-end' }}>
+              <button onClick={confirmar} style={iconBtn}><Check size={13} strokeWidth={2.5} color="#3D6B4F" /></button>
+              <button onClick={() => setEditando(false)} style={iconBtn}><X size={13} strokeWidth={2} color="#7A7A7A" /></button>
+            </span>
+          : <span className="row-actions" style={{ display: 'flex', gap: 6, justifyContent: 'flex-end', opacity: 0 }}>
+              <button onClick={() => { setDraft(texto); setEditando(true) }} style={iconBtn}><Pencil size={13} strokeWidth={2} color="#7A7A7A" /></button>
+              <button onClick={onDelete} style={iconBtn}><Trash2 size={13} strokeWidth={2} color="#FF3366" /></button>
+            </span>}
+      </td>
+    </tr>
+  )
+}
+const iconBtn: React.CSSProperties = { background: 'none', border: 'none', cursor: 'pointer', padding: 2, display: 'flex' }
 
 export default function NuevoDiagnosticoForm() {
   const router = useRouter()
@@ -126,17 +156,17 @@ export default function NuevoDiagnosticoForm() {
       {/* PASO 2: Tipo de preguntas */}
       {paso === 'preguntas-opcion' && (
         <div>
-          <div className="form-section-top" />
-          <div className="form-row" style={{ gridTemplateColumns: '1fr' }}>
-            <p className="text-mute" style={{ fontSize: 13, margin: '0 0 16px' }}>
-              ¿Cómo configuramos las preguntas para <strong style={{ color: 'var(--ink)', fontWeight: 800 }}>{datos.nombre_compania}</strong>?
+          <div className="form-row" style={{ gridTemplateColumns: '1fr', padding: '6px 0' }}>
+            <p style={{ fontSize: 14, fontWeight: 800, color: 'var(--ink)', margin: '20px 0 8px' }}>
+              ¿Cómo configuramos las preguntas para {datos.nombre_compania}?
             </p>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
               {[
-                { label: 'Preguntas base', desc: 'Preguntas genéricas de Laborativo. Editables antes de guardar.', action: cargarBase },
-                { label: 'Contextualizar con IA ✦', desc: 'Claude investiga la empresa y ajusta las preguntas al contexto.', action: () => setPaso('ia-config') },
-              ].map(opt => (
-                <button key={opt.label} onClick={opt.action} style={{
+                { label: 'Preguntas base', desc: <>Preguntas genéricas de Laborativo.<br />Editables antes de guardar.</>, action: cargarBase },
+                { label: 'Contextualizar con IA ✦', desc: <>Claude investiga la empresa y<br />ajusta las preguntas al contexto.</>
+, action: () => setPaso('ia-config') },
+              ].map((opt, i) => (
+                <button key={i} onClick={opt.action} style={{
                   textAlign: 'left', padding: '16px 20px',
                   border: '1px solid var(--border)', background: 'var(--card)',
                   cursor: 'pointer', display: 'flex', flexDirection: 'column', gap: 4,
@@ -159,7 +189,6 @@ export default function NuevoDiagnosticoForm() {
       {/* PASO 3: Config IA */}
       {paso === 'ia-config' && (
         <div>
-          <div className="form-section-top" />
           <Row label="Vertical / Industria">
             <Select value={iaConfig.vertical} onValueChange={(v: string | null) => setIaConfig(c => ({ ...c, vertical: v ?? '' }))}>
               <SelectTrigger><SelectValue placeholder="Selecciona un sector" /></SelectTrigger>
@@ -183,34 +212,40 @@ export default function NuevoDiagnosticoForm() {
       {/* PASO 4: Revisión de preguntas */}
       {paso === 'revision' && (
         <div>
-          <div className="form-section-top" />
-          {DIMENSIONES.map(dim => (
-            <div key={dim.id} className="form-row" style={{ alignItems: 'start' }}>
-              <div>
-                <p style={{ fontWeight: 800, fontSize: 14, margin: '0 0 4px' }}>{dim.nombre}</p>
-                <p className="page-header__eyebrow" style={{ margin: 0 }}>{dim.subtitulo}</p>
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                {(['A', 'B', 'C', 'D'] as Rol[]).map(rol => {
-                  const ps = preguntas.map((p, i) => ({ ...p, idx: i })).filter(p => p.dimension_id === dim.id && p.rol === rol)
-                  if (!ps.length) return null
-                  return (
-                    <div key={rol} style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                      <p className="page-header__eyebrow" style={{ margin: 0 }}>{rol} — {ROL_INFO[rol].label}</p>
-                      {ps.map(p => (
-                        <Textarea key={p.idx} value={p.texto} rows={2}
-                          onChange={e => setPreguntas(prev => prev.map((q, i) => i === p.idx ? { ...q, texto: e.target.value } : q))} />
-                      ))}
+          {DIMENSIONES.map((dim, dimIdx) => (
+            <div key={dim.id} style={{ marginBottom: 40, borderTop: dimIdx === 0 ? 'none' : '2px solid var(--ink)', paddingTop: 16 }}>
+              <p className="page-header__eyebrow" style={{ margin: '0 0 4px' }}>{dim.subtitulo}</p>
+              <h3 style={{ fontSize: 20, fontWeight: 900, letterSpacing: '0', margin: '0 0 20px', fontFamily: 'Red Hat Display, sans-serif' }}>{dim.nombre}</h3>
+              {(['A', 'B', 'C', 'D'] as Rol[]).map(rol => {
+                const grupo = preguntas.map((p, i) => ({ ...p, idx: i })).filter(p => p.dimension_id === dim.id && p.rol === rol)
+                return (
+                  <div key={rol} style={{ marginBottom: 20 }}>
+                    <div style={{ background: 'var(--bg-2)', padding: '6px 12px', marginBottom: 4, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <span className="page-header__eyebrow" style={{ margin: 0, color: 'var(--ink)', fontWeight: 800 }}>{rol} / {ROL_INFO[rol].label}</span>
+                      <button onClick={() => setPreguntas(prev => [...prev, { dimension_id: dim.id, rol, texto: '', orden: prev.length + 1 }])}
+                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: datos.color_neon, display: 'flex', padding: '2px 4px' }}>
+                        <PlusIcon size={13} strokeWidth={2.5} />
+                      </button>
                     </div>
-                  )
-                })}
-              </div>
+                    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                      <tbody>
+                        {grupo.map((p, i) => (
+                          <RevisionRow key={p.idx} num={i + 1} texto={p.texto}
+                            onChange={txt => setPreguntas(prev => prev.map((q, qi) => qi === p.idx ? { ...q, texto: txt } : q))}
+                            onDelete={() => setPreguntas(prev => prev.filter((_, qi) => qi !== p.idx))}
+                          />
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )
+              })}
             </div>
           ))}
           {error && <p style={{ fontSize: 12, fontWeight: 700, color: 'var(--destructive)', paddingTop: 12, margin: 0 }}>{error}</p>}
           <Actions>
+            <Button variant="outline" onClick={() => setPaso('preguntas-opcion')} disabled={guardando}><ArrowRight size={15} strokeWidth={2.5} style={{ transform: 'rotate(180deg)' }} /> Cambiar preguntas</Button>
             <Button onClick={guardar} disabled={guardando}>{guardando ? 'Guardando…' : 'Guardar diagnóstico'}</Button>
-            <Button variant="outline" onClick={() => setPaso('preguntas-opcion')} disabled={guardando}>← Cambiar preguntas</Button>
           </Actions>
         </div>
       )}
