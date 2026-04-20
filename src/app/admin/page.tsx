@@ -28,7 +28,7 @@ export default async function AdminPage() {
         </div>
         <Link href="/admin/nuevo"
           className="font-black text-sm px-6 py-3 transition-opacity hover:opacity-70 border-2 border-black"
-          style={{ background: 'var(--black)', color: 'var(--bg)' }}>
+          style={{ background: '#000', color: '#fff' }}>
           + NUEVO
         </Link>
       </div>
