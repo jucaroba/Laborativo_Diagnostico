@@ -2,6 +2,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
+import { ArrowRight } from 'lucide-react'
 
 type Perfil = 'equipo' | 'lider'
 
@@ -91,7 +92,7 @@ export default function IntakeForm({ diagnosticoId, nombreCompania, codigo }: {
           <button onClick={comenzar} disabled={!perfil || loading}
             className="btn primary"
             style={{ width: '100%', justifyContent: 'center', opacity: (!perfil || loading) ? .4 : 1, cursor: (!perfil || loading) ? 'not-allowed' : 'pointer' }}>
-            {loading ? 'Cargando…' : 'Comenzar preguntas →'}
+            {loading ? 'Cargando…' : <>Comenzar preguntas <ArrowRight size={15} strokeWidth={2.5} /></>}
           </button>
         </div>
       </div>

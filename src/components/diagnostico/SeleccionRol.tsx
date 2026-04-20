@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { ROL_INFO, Rol } from '@/types'
+import { ArrowRight } from 'lucide-react'
 
 export default function SeleccionRol({ diagnosticoId }: { diagnosticoId: string }) {
   const router = useRouter()
@@ -54,7 +55,7 @@ export default function SeleccionRol({ diagnosticoId }: { diagnosticoId: string 
       <button onClick={comenzar} disabled={!seleccionado || loading}
         className="mt-2 font-sans text-sm px-5 py-3 rounded-lg transition-opacity hover:opacity-80 disabled:opacity-40"
         style={{ background: 'var(--brown)', color: 'var(--cream)' }}>
-        {loading ? 'Cargando…' : 'Comenzar evaluación →'}
+        {loading ? 'Cargando…' : <>Comenzar evaluación <ArrowRight size={15} strokeWidth={2.5} /></>}
       </button>
     </div>
   )

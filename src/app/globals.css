@@ -152,13 +152,16 @@ button { font-family: inherit; }
 /* Fila de formulario estilo tabla */
 .form-row {
   display: grid; grid-template-columns: 180px 1fr; gap: 24px;
-  align-items: start; padding: 16px 0;
-  border-bottom: 1px solid var(--border);
+  align-items: start; padding: 12px 0;
 }
-.form-section-top { border-top: 1.5px solid var(--ink); }
+.form-section-top { border-top: 1.5px solid var(--ink); margin-bottom: 24px; }
 
 /* Texto muted reutilizable */
 .text-mute { color: var(--mute); font-weight: 500; }
+
+/* Acciones de fila — visibles solo en hover */
+tr:hover .row-actions { opacity: 1 !important; }
+.row-actions { transition: opacity .15s ease; }
 
 /* Cabecera de tabla — fondo negro, texto blanco uppercase */
 .table-header-row { background: #0A0A0A !important; border-bottom: none !important; }

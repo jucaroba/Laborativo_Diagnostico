@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { PREGUNTAS_BASE } from '@/lib/preguntas-base'
 import { DIMENSIONES, Rol } from '@/types'
+import { ArrowRight } from 'lucide-react'
 
 const ESCALA = [
   { n: 1, label: 'Muy bajo', desc: 'Totalmente en desacuerdo' },
@@ -58,7 +59,7 @@ export default function QuestionForm({ diagnosticoId, codigo, idx, neon }: {
     return (
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh' }}>
         <p style={{ color: 'var(--mute)', fontFamily: "'Red Hat Display', sans-serif" }}>
-          Sesión no encontrada. <a href={`/d/${codigo}/intake`} style={{ color: 'var(--ink)', fontWeight: 700 }}>Reiniciar →</a>
+          Sesión no encontrada. <a href={`/d/${codigo}/intake`} style={{ color: 'var(--ink)', fontWeight: 700 }}>Reiniciar <ArrowRight size={13} strokeWidth={2.5} style={{ display: 'inline', verticalAlign: 'middle' }} /></a>
         </p>
       </div>
     )
@@ -171,7 +172,7 @@ export default function QuestionForm({ diagnosticoId, codigo, idx, neon }: {
           <button className="btn primary" onClick={siguiente}
             disabled={!valor || guardando}
             style={{ opacity: (!valor || guardando) ? .4 : 1, cursor: (!valor || guardando) ? 'not-allowed' : 'pointer' }}>
-            {guardando ? 'Guardando…' : esUltima ? 'Finalizar →' : 'Siguiente →'}
+            {guardando ? 'Guardando…' : <>{esUltima ? 'Finalizar' : 'Siguiente'} <ArrowRight size={15} strokeWidth={2.5} /></>}
           </button>
         </div>
       </div>

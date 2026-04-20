@@ -2,6 +2,7 @@ import { supabase } from '@/lib/supabase'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
+import { ArrowRight } from 'lucide-react'
 
 export default async function LandingPage({ params }: { params: Promise<{ codigo: string }> }) {
   const { codigo } = await params
@@ -54,7 +55,7 @@ export default async function LandingPage({ params }: { params: Promise<{ codigo
           </p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16, alignItems: 'flex-start' }}>
             <span style={{ fontSize: 13, color: 'var(--mute)', fontWeight: 500 }}>{diag.nombre_compania}</span>
-            <Link href={`/d/${codigo}/intake`} className="btn primary">Iniciar diagnóstico →</Link>
+            <Link href={`/d/${codigo}/intake`} className="btn primary">Iniciar diagnóstico <ArrowRight size={15} strokeWidth={2.5} /></Link>
           </div>
         </div>
       </div>
@@ -163,7 +164,7 @@ export default async function LandingPage({ params }: { params: Promise<{ codigo
         <h2 style={{ fontWeight: 900, fontSize: 'clamp(48px,6.5vw,96px)', lineHeight: .88, letterSpacing: '-.045em', margin: '12px 0 32px', maxWidth: '14ch' }}>
           De la intuición<br />al mapa.
         </h2>
-        <Link href={`/d/${codigo}/intake`} className="btn primary">Iniciar diagnóstico →</Link>
+        <Link href={`/d/${codigo}/intake`} className="btn primary">Iniciar diagnóstico <ArrowRight size={15} strokeWidth={2.5} /></Link>
         <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 72, fontSize: 10, color: 'var(--mute)', letterSpacing: '.12em', textTransform: 'uppercase', fontWeight: 600 }}>
           <span>Laborativo / Consultoría Creativa Basada en la Emoción</span>
           <span>Diag-2026 · V1.0</span>

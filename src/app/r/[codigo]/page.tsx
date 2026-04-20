@@ -2,6 +2,7 @@ import { supabase } from '@/lib/supabase'
 import { notFound } from 'next/navigation'
 import { DIMENSIONES, Rol } from '@/types'
 import Image from 'next/image'
+import { ArrowRight } from 'lucide-react'
 
 export const revalidate = 0
 
@@ -229,7 +230,7 @@ export default async function ResultadosPage({ params }: { params: Promise<{ cod
         <h2 style={{ fontWeight: 900, fontSize: 'clamp(36px,4vw,56px)', lineHeight: .92, letterSpacing: '-.035em', margin: '16px 0 24px', maxWidth: '18ch' }}>
           Convierte los datos en acción.
         </h2>
-        <a href="https://laborativo.com" className="btn primary">Agendar sesión de lectura →</a>
+        <a href="https://laborativo.com" className="btn primary">Agendar sesión de lectura <ArrowRight size={15} strokeWidth={2.5} /></a>
       </div>
 
     </div>

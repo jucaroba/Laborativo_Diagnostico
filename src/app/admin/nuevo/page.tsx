@@ -7,9 +7,13 @@ export default function NuevoDiagnosticoPage() {
         <span className="page-header__eyebrow">Nuevo diagnóstico</span>
         <div className="page-header__rule" />
         <h1 className="page-header__title">Configuración</h1>
-        <p className="page-header__subtitle">Completa los datos del cliente y configura las preguntas antes de activar.</p>
       </div>
-      <NuevoDiagnosticoForm />
+      <div style={{ maxWidth: 720 }}>
+        <div style={{ background: 'var(--ink)', padding: '10px 16px', marginBottom: 12 }}>
+          <h2 style={{ fontSize: 20, fontWeight: 900, letterSpacing: '-0.03em', margin: 0, color: '#fff', fontFamily: 'Red Hat Display, sans-serif' }}>Características del diagnóstico</h2>
+        </div>
+        <NuevoDiagnosticoForm />
+      </div>
     </div>
   )
 }

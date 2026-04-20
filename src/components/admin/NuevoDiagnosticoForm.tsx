@@ -6,6 +6,7 @@ import { PREGUNTAS_BASE } from '@/lib/preguntas-base'
 import { DIMENSIONES, ROL_INFO, Rol } from '@/types'
 import NeonPicker from './NeonPicker'
 import { Button } from '@/components/ui/button'
+import { ArrowRight } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
@@ -39,6 +40,8 @@ export default function NuevoDiagnosticoForm() {
   const [guardando, setGuardando] = useState(false)
   const [generando, setGenerando] = useState(false)
   const [error, setError] = useState('')
+
+  const [intentoContinuar, setIntentoContinuar] = useState(false)
 
   const [datos, setDatos] = useState({
     nombre_compania: '', contacto_nombre: '', contacto_cargo: '',
@@ -90,12 +93,11 @@ export default function NuevoDiagnosticoForm() {
   const datosValidos = datos.nombre_compania && datos.contacto_nombre && datos.contacto_cargo && datos.contacto_email
 
   return (
-    <div style={{ maxWidth: 720 }}>
+    <div>
 
       {/* PASO 1: Datos */}
       {paso === 'datos' && (
         <div>
-          <div className="form-section-top" />
           <Row label="Compañía">
             <Input value={datos.nombre_compania} onChange={e => setDatos(d => ({ ...d, nombre_compania: e.target.value }))} placeholder="Ej: Bancolombia S.A." />
           </Row>
@@ -111,9 +113,13 @@ export default function NuevoDiagnosticoForm() {
           <Row label="Color neón">
             <NeonPicker value={datos.color_neon} onChange={c => setDatos(d => ({ ...d, color_neon: c }))} />
           </Row>
-          <Actions>
-            <Button onClick={() => setPaso('preguntas-opcion')} disabled={!datosValidos}>Continuar →</Button>
-          </Actions>
+          <div className="form-row">
+            <div />
+            <div style={{ paddingTop: 8, display: 'flex', alignItems: 'center', gap: 16 }}>
+              <Button onClick={() => { if (datosValidos) setPaso('preguntas-opcion'); else setIntentoContinuar(true) }}>Continuar <ArrowRight size={15} strokeWidth={2.5} /></Button>
+              {intentoContinuar && !datosValidos && <span style={{ fontSize: 12, color: 'var(--mute)', fontWeight: 500 }}>Completa los campos para seguir</span>}
+            </div>
+          </div>
         </div>
       )}
 
