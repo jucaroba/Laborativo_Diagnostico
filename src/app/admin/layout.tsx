@@ -10,7 +10,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     <div style={{ minHeight: '100vh', background: 'var(--bg)', fontFamily: "'Red Hat Display', sans-serif" }}>
       <header style={{ borderBottom: '1.5px solid var(--ink)', background: 'var(--bg)', padding: '14px 40px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-          <Image src="/brand/laborativo-logo.png" alt="Laborativo" width={110} height={28} style={{ objectFit: 'contain' }} />
+          <Image src="/brand/laborativo-logo.png" alt="Laborativo" width={154} height={39} style={{ objectFit: 'contain' }} />
           <span style={{ color: 'var(--mute)', fontSize: 14 }}>/</span>
           <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--mute)', letterSpacing: '.04em' }}>Diagnóstico Admin</span>
         </div>

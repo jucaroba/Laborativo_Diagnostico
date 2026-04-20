@@ -33,7 +33,7 @@ export default async function LandingPage({ params }: { params: Promise<{ codigo
               Tiempo<b style={{ display: 'block', fontSize: 12, color: 'var(--ink)', marginTop: 6, fontWeight: 700, letterSpacing: '.04em' }}>12–18 minutos</b>
             </span>
           </div>
-          <Image src="/brand/laborativo-logo.png" alt="Laborativo" width={160} height={40} style={{ objectFit: 'contain' }} />
+          <Image src="/brand/laborativo-logo.png" alt="Laborativo" width={224} height={56} style={{ objectFit: 'contain' }} />
         </div>
 
         <div style={{ position: 'absolute', right: 56, top: 48, textAlign: 'right', fontSize: 10, color: 'var(--mute)', letterSpacing: '.1em', textTransform: 'uppercase', fontWeight: 600 }}>

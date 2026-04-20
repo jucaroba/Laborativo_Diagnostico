@@ -79,7 +79,7 @@ export default async function ResultadosPage({ params }: { params: Promise<{ cod
       <div style={{ padding: '56px 56px 32px', borderBottom: '1.5px solid var(--ink)', display: 'grid', gridTemplateColumns: '1fr 320px', gap: 56, alignItems: 'end', background: 'var(--bg)' }}>
         <div>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
-            <Image src="/brand/laborativo-logo.png" alt="Laborativo" width={140} height={36} style={{ objectFit: 'contain' }} />
+            <Image src="/brand/laborativo-logo.png" alt="Laborativo" width={196} height={50} style={{ objectFit: 'contain' }} />
           </div>
           <span className="eyebrow soft">Diagnóstico organizacional</span>
           <div className="rule" />
