@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import AccionesDiagnostico from '@/components/admin/AccionesDiagnostico'
 import CopiarLink from '@/components/admin/CopiarLink'
 import EliminarDiagnostico from '@/components/admin/EliminarDiagnostico'
+import EditarDiagnostico from '@/components/admin/EditarDiagnostico'
 import GrupoPreguntas from '@/components/admin/GrupoPreguntas'
 import { ArrowUpRight } from 'lucide-react'
 
@@ -40,6 +41,7 @@ export default async function DiagnosticoPage({ params }: { params: Promise<{ id
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
           <EliminarDiagnostico id={d.id} neonColor={d.color_neon} />
+          <EditarDiagnostico diagnostico={d} />
           <AccionesDiagnostico diagnostico={d} />
         </div>
       </div>
