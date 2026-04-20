@@ -2,6 +2,7 @@ import { supabase } from '@/lib/supabase'
 import { notFound } from 'next/navigation'
 import { Diagnostico, Pregunta, DIMENSIONES, ROL_INFO, Rol } from '@/types'
 import AccionesDiagnostico from '@/components/admin/AccionesDiagnostico'
+import EliminarDiagnostico from '@/components/admin/EliminarDiagnostico'
 
 export const revalidate = 0
 
@@ -40,7 +41,10 @@ export default async function DiagnosticoPage({ params }: { params: Promise<{ id
             {d.contacto_nombre} · {d.contacto_cargo} · {d.contacto_email}
           </p>
         </div>
-        <AccionesDiagnostico diagnostico={d} />
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+          <EliminarDiagnostico id={d.id} />
+          <AccionesDiagnostico diagnostico={d} />
+        </div>
       </div>
 
       {/* Links */}
