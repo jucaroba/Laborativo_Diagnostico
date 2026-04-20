@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Laborativo Diagnóstico — Design System</title>
+<style>
+  /* ===================== TOKENS ===================== */
+  :root {
+    --bg: #F5F5F5;
+    --white: #FFFFFF;
+    --black: #000000;
+    --gray-border: #D9D9D9;
+    --gray-mid: #666666;
+    --gray-light: #999999;
+    --neon: #39FF14;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--black);
+    font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3 { font-weight: 900; letter-spacing: -0.02em; line-height: 1.05; }
+
+  /* ===================== LAYOUT ===================== */
+  .section {
+    padding: 60px 40px;
+    border-bottom: 2px solid var(--black);
+  }
+
+  .section-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--gray-mid);
+    margin-bottom: 32px;
+  }
+
+  .cols { display: grid; gap: 24px; }
+  .cols-2 { grid-template-columns: 1fr 1fr; }
+  .cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+
+  /* ===================== ADMIN HEADER ===================== */
+  .admin-header {
+    background: var(--bg);
+    border-bottom: 1px solid var(--black);
+    padding: 16px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .admin-header-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .brand { font-size: 13px; font-weight: 900; letter-spacing: 0.1em; text-transform: uppercase; }
+  .slash { color: var(--gray-border); }
+  .breadcrumb { font-size: 13px; color: var(--gray-mid); }
+
+  /* ===================== BUTTONS ===================== */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 12px 24px;
+    border: 2px solid var(--black);
+    cursor: pointer;
+    transition: all 0.15s;
+    text-decoration: none;
+  }
+
+  .btn-primary { background: var(--black); color: var(--bg); }
+  .btn-primary:hover { opacity: 0.75; }
+
+  .btn-outline { background: transparent; color: var(--black); }
+  .btn-outline:hover { background: var(--black); color: var(--bg); }
+
+  .btn-neon { background: var(--neon); color: var(--black); border-color: var(--neon); }
+  .btn-neon:hover { opacity: 0.85; }
+
+  /* ===================== CARDS ===================== */
+  .card {
+    background: var(--white);
+    border: 1px solid var(--black);
+    padding: 24px;
+  }
+
+  .card-hover { transition: all 0.15s; cursor: pointer; }
+  .card-hover:hover { background: var(--black); color: var(--white); }
+
+  /* ===================== TABLE ===================== */
+  .table { width: 100%; border-collapse: collapse; }
+
+  .table-header {
+    display: grid;
+    grid-template-columns: 3fr 2fr 1fr 1fr 40px;
+    padding: 10px 0;
+    border-top: 2px solid var(--black);
+    border-bottom: 2px solid var(--black);
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--gray-mid);
+  }
+
+  .table-row {
+    display: grid;
+    grid-template-columns: 3fr 2fr 1fr 1fr 40px;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--black);
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .table-row:hover { background: var(--black); color: var(--white); padding-left: 12px; padding-right: 12px; }
+  .table-row:hover .row-sub { color: var(--gray-border); }
+
+  .row-main { font-size: 15px; font-weight: 900; }
+  .row-sub { font-size: 12px; color: var(--gray-mid); margin-top: 2px; }
+  .row-status { font-size: 11px; font-weight: 900; letter-spacing: 0.08em; text-transform: uppercase; }
+  .row-date { font-size: 12px; color: var(--gray-mid); }
+
+  .neon-dot { width: 14px; height: 14px; }
+
+  /* ===================== INPUTS ===================== */
+  .field { display: flex; flex-direction: column; gap: 8px; }
+
+  .field-label {
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--gray-mid);
+  }
+
+  .input {
+    width: 100%;
+    padding: 14px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    border: 2px solid var(--black);
+    background: var(--white);
+    outline: none;
+    color: var(--black);
+    transition: border-color 0.15s;
+  }
+
+  .input:focus { border-color: var(--neon); }
+  .input::placeholder { color: var(--gray-light); font-weight: 400; }
+
+  textarea.input { resize: none; }
+  select.input { appearance: none; cursor: pointer; }
+
+  /* ===================== NEON PICKER ===================== */
+  .neon-picker { display: flex; flex-direction: column; gap: 12px; }
+
+  .neon-swatches { display: flex; gap: 8px; flex-wrap: wrap; }
+
+  .swatch {
+    width: 36px;
+    height: 36px;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all 0.15s;
+    flex-shrink: 0;
+  }
+
+  .swatch:hover, .swatch.active { outline: 2px solid var(--black); outline-offset: 2px; }
+
+  .neon-custom { display: flex; align-items: center; gap: 12px; }
+
+  .color-input {
+    width: 36px;
+    height: 36px;
+    border: 2px solid var(--black);
+    padding: 0;
+    cursor: pointer;
+    background: none;
+  }
+
+  .neon-hex { font-size: 12px; font-family: monospace; color: var(--gray-mid); }
+
+  .neon-preview {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .preview-label { font-size: 11px; color: var(--gray-light); }
+
+  .preview-badge {
+    padding: 4px 12px;
+    background: var(--black);
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: 0.05em;
+  }
+
+  /* ===================== STEPPER ===================== */
+  .steps { display: flex; gap: 0; margin-bottom: 40px; }
+
+  .step {
+    flex: 1;
+    padding: 12px 16px;
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gray-mid);
+    border-bottom: 2px solid var(--gray-border);
+  }
+
+  .step.active {
+    color: var(--black);
+    border-bottom: 3px solid var(--black);
+  }
+
+  .step.done {
+    color: var(--gray-mid);
+    border-bottom: 2px solid var(--black);
+  }
+
+  /* ===================== ROLE CARDS ===================== */
+  .role-card {
+    padding: 20px;
+    border: 2px solid var(--black);
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .role-card:hover { background: var(--black); color: var(--white); }
+  .role-card.selected { background: var(--neon); color: var(--black); border-color: var(--neon); }
+
+  .role-badge {
+    width: 40px;
+    height: 40px;
+    background: var(--black);
+    color: var(--white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+
+  .role-card.selected .role-badge { background: var(--black); color: var(--neon); }
+
+  .role-name { font-weight: 900; font-size: 15px; }
+  .role-desc { font-size: 12px; color: var(--gray-mid); margin-top: 2px; }
+  .role-card:hover .role-desc, .role-card.selected .role-desc { color: inherit; opacity: 0.7; }
+
+  /* ===================== QUESTION CARD ===================== */
+  .question-screen {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 60px 40px;
+  }
+
+  .question-meta {
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--gray-mid);
+    margin-bottom: 8px;
+  }
+
+  .question-dimension {
+    font-size: 13px;
+    font-weight: 900;
+    margin-bottom: 32px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--black);
+  }
+
+  .question-text {
+    font-size: 22px;
+    font-weight: 900;
+    line-height: 1.3;
+    margin-bottom: 40px;
+    letter-spacing: -0.01em;
+  }
+
+  .scale {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .scale-btn {
+    flex: 1;
+    aspect-ratio: 1;
+    border: 2px solid var(--black);
+    background: var(--white);
+    font-weight: 900;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.12s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .scale-btn:hover { background: var(--black); color: var(--white); }
+  .scale-btn.selected { background: var(--neon); color: var(--black); border-color: var(--neon); }
+
+  .scale-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--gray-mid);
+    font-weight: 700;
+  }
+
+  .question-progress {
+    height: 3px;
+    background: var(--gray-border);
+    margin-bottom: 40px;
+  }
+
+  .question-progress-fill {
+    height: 100%;
+    background: var(--neon);
+    transition: width 0.3s;
+  }
+
+  /* ===================== RESULTS ===================== */
+  .results-header {
+    background: var(--black);
+    color: var(--white);
+    padding: 40px;
+  }
+
+  .results-company { font-size: 11px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--gray-mid); margin-bottom: 8px; }
+  .results-title { font-size: 40px; font-weight: 900; letter-spacing: -0.02em; }
+  .results-subtitle { font-size: 14px; color: var(--gray-mid); margin-top: 8px; }
+
+  .results-body { padding: 40px; max-width: 900px; margin: 0 auto; }
+
+  /* Dot plot */
+  .dotplot { display: flex; flex-direction: column; gap: 0; }
+
+  .dotplot-row {
+    display: grid;
+    grid-template-columns: 160px 1fr 80px;
+    align-items: center;
+    padding: 20px 0;
+    border-bottom: 1px solid var(--gray-border);
+    gap: 24px;
+  }
+
+  .dotplot-dim { }
+  .dotplot-dim-name { font-weight: 900; font-size: 15px; }
+  .dotplot-dim-sub { font-size: 11px; color: var(--gray-mid); margin-top: 2px; }
+
+  .dotplot-track { position: relative; height: 32px; }
+
+  .dotplot-line {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: var(--gray-border);
+  }
+
+  .dotplot-dot {
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 2px solid var(--white);
+  }
+
+  .dotplot-ticks {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    color: var(--gray-light);
+    padding-top: 4px;
+  }
+
+  .dotplot-delta {
+    text-align: right;
+  }
+
+  .delta-value {
+    font-size: 14px;
+    font-weight: 900;
+    padding: 4px 10px;
+    border: 2px solid var(--black);
+  }
+
+  .delta-high { border-color: var(--neon); color: var(--black); background: var(--neon); }
+
+  /* Legend */
+  .legend {
+    display: flex;
+    gap: 20px;
+    margin: 24px 0;
+    flex-wrap: wrap;
+  }
+
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; }
+  .legend-dot { width: 12px; height: 12px; border-radius: 50%; }
+
+  /* ===================== SEPARATOR ===================== */
+  .sep { height: 2px; background: var(--black); margin: 40px 0; }
+  .sep-light { height: 1px; background: var(--gray-border); margin: 24px 0; }
+
+  /* ===================== PAGE TITLE ===================== */
+  .page-title { margin-bottom: 40px; }
+  .page-eyebrow {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--gray-mid);
+    margin-bottom: 8px;
+  }
+  .page-eyebrow-line { width: 32px; height: 2px; background: var(--black); margin-bottom: 16px; }
+</style>
+</head>
+<body>
+
+<!-- =================== ADMIN HEADER =================== -->
+<div class="admin-header">
+  <div class="admin-header-left">
+    <span class="brand">Laborativo</span>
+    <span class="slash">/</span>
+    <span class="breadcrumb">Diagnóstico Admin</span>
+  </div>
+  <a href="#" class="btn btn-outline" style="font-size:11px; padding: 8px 16px;">← Diagnósticos</a>
+</div>
+
+<!-- =================== ADMIN: LISTA =================== -->
+<div class="section">
+  <div class="section-label">Vista 1 — Admin · Lista de diagnósticos</div>
+
+  <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:40px;">
+    <div class="page-title" style="margin:0">
+      <div class="page-eyebrow">Panel</div>
+      <div class="page-eyebrow-line"></div>
+      <h1 style="font-size:48px;">Diagnósticos</h1>
+    </div>
+    <button class="btn btn-primary">+ NUEVO</button>
+  </div>
+
+  <div class="table-header">
+    <span>Compañía</span>
+    <span>Contacto</span>
+    <span>Estado</span>
+    <span>Fecha</span>
+    <span></span>
+  </div>
+
+  <div class="table-row">
+    <div>
+      <div class="row-main">Bancolombia S.A.</div>
+      <div class="row-sub">María Pérez · Gerente de Cultura</div>
+    </div>
+    <div class="row-sub">maria.perez@bancolombia.com</div>
+    <div class="row-status">Activo</div>
+    <div class="row-date">12 abr 2026</div>
+    <div><div class="neon-dot" style="background:#39FF14;"></div></div>
+  </div>
+
+  <div class="table-row">
+    <div>
+      <div class="row-main">Grupo Éxito</div>
+      <div class="row-sub">Carlos Ruiz · VP de Personas</div>
+    </div>
+    <div class="row-sub">c.ruiz@exito.com.co</div>
+    <div class="row-status">Completado</div>
+    <div class="row-date">3 mar 2026</div>
+    <div><div class="neon-dot" style="background:#FF2D78;"></div></div>
+  </div>
+
+  <div class="table-row">
+    <div>
+      <div class="row-main">Teleperformance CO</div>
+      <div class="row-sub">Ana González · Dir. RRHH</div>
+    </div>
+    <div class="row-sub">a.gonzalez@tp.com</div>
+    <div class="row-status">Borrador</div>
+    <div class="row-date">19 abr 2026</div>
+    <div><div class="neon-dot" style="background:#00FFFF;"></div></div>
+  </div>
+</div>
+
+<!-- =================== ADMIN: CREAR =================== -->
+<div class="section">
+  <div class="section-label">Vista 2 — Admin · Crear diagnóstico</div>
+
+  <div style="max-width:640px;">
+    <div class="page-eyebrow">Nuevo</div>
+    <div class="page-eyebrow-line"></div>
+    <h1 style="font-size:36px; margin-bottom:40px;">Nuevo diagnóstico</h1>
+
+    <!-- Stepper -->
+    <div class="steps">
+      <div class="step done">01 Datos</div>
+      <div class="step active">02 Color</div>
+      <div class="step">03 Preguntas</div>
+      <div class="step">04 Revisión</div>
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:24px;">
+      <div class="cols cols-2">
+        <div class="field">
+          <label class="field-label">Nombre de la compañía</label>
+          <input class="input" placeholder="Ej: Bancolombia S.A." value="Bancolombia S.A.">
+        </div>
+        <div class="field">
+          <label class="field-label">Contacto</label>
+          <input class="input" placeholder="Nombre completo" value="María Pérez">
+        </div>
+      </div>
+
+      <div class="cols cols-2">
+        <div class="field">
+          <label class="field-label">Cargo</label>
+          <input class="input" placeholder="Gerente de Cultura" value="Gerente de Cultura">
+        </div>
+        <div class="field">
+          <label class="field-label">Email</label>
+          <input class="input" type="email" placeholder="correo@empresa.com" value="m.perez@bancolombia.com">
+        </div>
+      </div>
+
+      <!-- Neon Picker -->
+      <div class="field">
+        <label class="field-label">Color neón del diagnóstico</label>
+        <div class="neon-picker">
+          <div class="neon-swatches">
+            <div class="swatch active" style="background:#39FF14;"></div>
+            <div class="swatch" style="background:#EEFF00;"></div>
+            <div class="swatch" style="background:#FF6600;"></div>
+            <div class="swatch" style="background:#FF3366;"></div>
+            <div class="swatch" style="background:#FF2D78;"></div>
+            <div class="swatch" style="background:#00FFFF;"></div>
+            <div class="swatch" style="background:#BF00FF;"></div>
+            <div class="swatch" style="background:#CCFF00;"></div>
+          </div>
+          <div class="neon-custom">
+            <input type="color" class="color-input" value="#39FF14">
+            <span class="neon-hex">#39FF14 — o elige tu color</span>
+            <div class="neon-preview">
+              <span class="preview-label">Preview</span>
+              <div class="preview-badge" style="color:#39FF14;">Laborativo</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex; gap:12px; padding-top:8px;">
+        <button class="btn btn-primary">CONTINUAR →</button>
+        <button class="btn btn-outline">← VOLVER</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- =================== PARTICIPANTES: SELECCIÓN ROL =================== -->
+<div class="section">
+  <div class="section-label">Vista 3 — Participante · Selección de rol</div>
+
+  <div style="max-width:520px;">
+    <div class="page-eyebrow">Bancolombia S.A.</div>
+    <div class="page-eyebrow-line" style="background: var(--neon);"></div>
+    <h1 style="font-size:32px; margin-bottom:8px;">¿Desde qué perspectiva participas?</h1>
+    <p style="font-size:14px; color:var(--gray-mid); margin-bottom:32px;">
+      Selecciona tu rol. Las preguntas se adaptarán a tu perspectiva.
+    </p>
+
+    <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:24px;">
+      <div class="role-card">
+        <div class="role-badge">A</div>
+        <div>
+          <div class="role-name">Equipo</div>
+          <div class="role-desc">Auto-evaluación del equipo</div>
+        </div>
+      </div>
+      <div class="role-card selected">
+        <div class="role-badge">B</div>
+        <div>
+          <div class="role-name">Líder → Equipo</div>
+          <div class="role-desc">El líder evalúa al equipo</div>
+        </div>
+      </div>
+      <div class="role-card">
+        <div class="role-badge">C</div>
+        <div>
+          <div class="role-name">Equipo → Líder</div>
+          <div class="role-desc">El equipo evalúa al líder</div>
+        </div>
+      </div>
+      <div class="role-card">
+        <div class="role-badge">D</div>
+        <div>
+          <div class="role-name">Líder auto</div>
+          <div class="role-desc">Auto-evaluación del líder</div>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn btn-neon" style="width:100%; justify-content:center;">COMENZAR EVALUACIÓN →</button>
+  </div>
+</div>
+
+<!-- =================== PARTICIPANTES: PREGUNTA =================== -->
+<div class="section">
+  <div class="section-label">Vista 4 — Participante · Formulario de preguntas</div>
+
+  <div class="question-screen" style="padding:0; max-width:600px;">
+    <div class="question-progress">
+      <div class="question-progress-fill" style="width:35%; background:var(--neon);"></div>
+    </div>
+
+    <div class="question-meta">Dimensión 2 de 4 · Pregunta 3 de 12</div>
+    <div class="question-dimension">Motivación — Energía</div>
+
+    <div class="question-text">
+      El equipo muestra genuino entusiasmo por su trabajo incluso en momentos de alta presión.
+    </div>
+
+    <div class="scale">
+      <button class="scale-btn">1</button>
+      <button class="scale-btn">2</button>
+      <button class="scale-btn">3</button>
+      <button class="scale-btn">4</button>
+      <button class="scale-btn selected">5</button>
+      <button class="scale-btn">6</button>
+      <button class="scale-btn">7</button>
+      <button class="scale-btn">8</button>
+      <button class="scale-btn">9</button>
+      <button class="scale-btn">10</button>
+    </div>
+    <div class="scale-labels">
+      <span>Totalmente en desacuerdo</span>
+      <span>Totalmente de acuerdo</span>
+    </div>
+
+    <div style="display:flex; gap:12px; margin-top:40px;">
+      <button class="btn btn-outline" style="flex:1; justify-content:center;">← ANTERIOR</button>
+      <button class="btn btn-neon" style="flex:2; justify-content:center;">SIGUIENTE →</button>
+    </div>
+  </div>
+</div>
+
+<!-- =================== RESULTADOS =================== -->
+<div class="section" style="padding:0;">
+  <div class="section-label" style="padding:20px 40px 0;">Vista 5 — Resultados · Dashboard</div>
+
+  <div class="results-header">
+    <div class="results-company">Bancolombia S.A. · Diagnóstico organizacional</div>
+    <h1 class="results-title">Resultados del<br>diagnóstico</h1>
+    <div class="results-subtitle">Abril 2026 · 24 participantes</div>
+  </div>
+
+  <div class="results-body">
+
+    <!-- Legend -->
+    <div class="legend">
+      <div class="legend-item">
+        <div class="legend-dot" style="background:#39FF14; outline:1.5px solid #000; outline-offset:1px;"></div>
+        <span>A · Equipo auto</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-dot" style="background:#000;"></div>
+        <span>B · Líder → Equipo</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-dot" style="background:#666;"></div>
+        <span>C · Equipo → Líder</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-dot" style="background:#999;"></div>
+        <span>D · Líder auto</span>
+      </div>
+    </div>
+
+    <!-- Dot Plot -->
+    <div class="dotplot">
+
+      <div class="dotplot-row">
+        <div class="dotplot-dim">
+          <div class="dotplot-dim-name">Intención</div>
+          <div class="dotplot-dim-sub">Sentido</div>
+        </div>
+        <div>
+          <div class="dotplot-track">
+            <div class="dotplot-line"></div>
+            <!-- A=7, B=8, C=6.5, D=8 -->
+            <div class="dotplot-dot" style="left:60%; background:#39FF14; outline:2px solid #000; outline-offset:0;"></div>
+            <div class="dotplot-dot" style="left:70%; background:#000;"></div>
+            <div class="dotplot-dot" style="left:55%; background:#666;"></div>
+            <div class="dotplot-dot" style="left:70%; background:#999;"></div>
+          </div>
+          <div class="dotplot-ticks">
+            <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span>
+            <span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
+          </div>
+        </div>
+        <div class="dotplot-delta">
+          <div class="delta-value">Δ 1.5</div>
+        </div>
+      </div>
+
+      <div class="dotplot-row">
+        <div class="dotplot-dim">
+          <div class="dotplot-dim-name">Motivación</div>
+          <div class="dotplot-dim-sub">Energía</div>
+        </div>
+        <div>
+          <div class="dotplot-track">
+            <div class="dotplot-line"></div>
+            <!-- A=5, B=8, C=5.5, D=8 -->
+            <div class="dotplot-dot" style="left:40%; background:#39FF14; outline:2px solid #000; outline-offset:0;"></div>
+            <div class="dotplot-dot" style="left:70%; background:#000;"></div>
+            <div class="dotplot-dot" style="left:45%; background:#666;"></div>
+            <div class="dotplot-dot" style="left:70%; background:#999;"></div>
+          </div>
+          <div class="dotplot-ticks">
+            <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span>
+            <span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
+          </div>
+        </div>
+        <div class="dotplot-delta">
+          <div class="delta-value delta-high">Δ 3.0</div>
+        </div>
+      </div>
+
+      <div class="dotplot-row">
+        <div class="dotplot-dim">
+          <div class="dotplot-dim-name">Interacción</div>
+          <div class="dotplot-dim-sub">Vínculos</div>
+        </div>
+        <div>
+          <div class="dotplot-track">
+            <div class="dotplot-line"></div>
+            <div class="dotplot-dot" style="left:55%; background:#39FF14; outline:2px solid #000; outline-offset:0;"></div>
+            <div class="dotplot-dot" style="left:65%; background:#000;"></div>
+            <div class="dotplot-dot" style="left:55%; background:#666;"></div>
+            <div class="dotplot-dot" style="left:65%; background:#999;"></div>
+          </div>
+          <div class="dotplot-ticks">
+            <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span>
+            <span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
+          </div>
+        </div>
+        <div class="dotplot-delta">
+          <div class="delta-value">Δ 2.0</div>
+        </div>
+      </div>
+
+      <div class="dotplot-row">
+        <div class="dotplot-dim">
+          <div class="dotplot-dim-name">Acción</div>
+          <div class="dotplot-dim-sub">Comportamiento</div>
+        </div>
+        <div>
+          <div class="dotplot-track">
+            <div class="dotplot-line"></div>
+            <div class="dotplot-dot" style="left:60%; background:#39FF14; outline:2px solid #000; outline-offset:0;"></div>
+            <div class="dotplot-dot" style="left:70%; background:#000;"></div>
+            <div class="dotplot-dot" style="left:65%; background:#666;"></div>
+            <div class="dotplot-dot" style="left:72%; background:#999;"></div>
+          </div>
+          <div class="dotplot-ticks">
+            <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span>
+            <span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
+          </div>
+        </div>
+        <div class="dotplot-delta">
+          <div class="delta-value">Δ 1.2</div>
+        </div>
+      </div>
+
+    </div><!-- /dotplot -->
+
+  </div>
+</div>
+
+</body>
+</html>

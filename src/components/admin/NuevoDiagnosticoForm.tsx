@@ -5,6 +5,9 @@ import { supabase } from '@/lib/supabase'
 import { PREGUNTAS_BASE } from '@/lib/preguntas-base'
 import { DIMENSIONES, ROL_INFO, Rol } from '@/types'
 import NeonPicker from './NeonPicker'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 
 const VERTICALES = [
   'Tecnología', 'Retail', 'Salud', 'Manufactura', 'Educación',
@@ -20,6 +23,9 @@ interface PreguntaEditable {
   texto: string
   orden: number
 }
+
+const field = { display: 'flex', flexDirection: 'column' as const, gap: 6 }
+const labelStyle = { fontSize: 10, fontWeight: 700, letterSpacing: '.1em', textTransform: 'uppercase' as const, color: 'var(--mute)' }
 
 export default function NuevoDiagnosticoForm() {
   const router = useRouter()
@@ -86,8 +92,7 @@ export default function NuevoDiagnosticoForm() {
           vertical: iaConfig.vertical || null,
           contexto_ia: iaConfig.contexto || null,
         })
-        .select()
-        .single()
+        .select().single()
 
       if (diagErr || !diag) throw new Error(diagErr?.message)
 
@@ -103,174 +108,155 @@ export default function NuevoDiagnosticoForm() {
     }
   }
 
-  function actualizarPregunta(idx: number, texto: string) {
-    setPreguntas(prev => prev.map((p, i) => i === idx ? { ...p, texto } : p))
-  }
-
   const datosValidos = datos.nombre_compania && datos.contacto_nombre && datos.contacto_cargo && datos.contacto_email
 
   return (
-    <div className="flex flex-col gap-8">
+    <div style={{ fontFamily: "'Red Hat Display', sans-serif", maxWidth: 640 }}>
 
       {/* PASO 1: Datos */}
       {paso === 'datos' && (
-        <div className="flex flex-col gap-6">
-          <Campo label="Nombre de la compañía">
-            <input value={datos.nombre_compania}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+          <div style={field}>
+            <Label style={labelStyle}>Nombre de la compañía</Label>
+            <Input value={datos.nombre_compania}
               onChange={e => setDatos(d => ({ ...d, nombre_compania: e.target.value }))}
-              placeholder="Ej: Bancolombia S.A." className={inputCls} />
-          </Campo>
-
-          <div className="grid grid-cols-2 gap-4">
-            <Campo label="Nombre del contacto">
-              <input value={datos.contacto_nombre}
-                onChange={e => setDatos(d => ({ ...d, contacto_nombre: e.target.value }))}
-                placeholder="Nombre completo" className={inputCls} />
-            </Campo>
-            <Campo label="Cargo">
-              <input value={datos.contacto_cargo}
-                onChange={e => setDatos(d => ({ ...d, contacto_cargo: e.target.value }))}
-                placeholder="Ej: Gerente de Cultura" className={inputCls} />
-            </Campo>
+              placeholder="Ej: Bancolombia S.A." />
           </div>
 
-          <Campo label="Email del contacto">
-            <input type="email" value={datos.contacto_email}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+            <div style={field}>
+              <Label style={labelStyle}>Nombre del contacto</Label>
+              <Input value={datos.contacto_nombre}
+                onChange={e => setDatos(d => ({ ...d, contacto_nombre: e.target.value }))}
+                placeholder="Nombre completo" />
+            </div>
+            <div style={field}>
+              <Label style={labelStyle}>Cargo</Label>
+              <Input value={datos.contacto_cargo}
+                onChange={e => setDatos(d => ({ ...d, contacto_cargo: e.target.value }))}
+                placeholder="Ej: Gerente de Cultura" />
+            </div>
+          </div>
+
+          <div style={field}>
+            <Label style={labelStyle}>Email del contacto</Label>
+            <Input type="email" value={datos.contacto_email}
               onChange={e => setDatos(d => ({ ...d, contacto_email: e.target.value }))}
-              placeholder="correo@empresa.com" className={inputCls} />
-          </Campo>
+              placeholder="correo@empresa.com" />
+          </div>
 
-          <Campo label="Color neón del diagnóstico">
+          <div style={field}>
+            <Label style={labelStyle}>Color neón del diagnóstico</Label>
             <NeonPicker value={datos.color_neon} onChange={c => setDatos(d => ({ ...d, color_neon: c }))} />
-          </Campo>
+          </div>
 
-          <button onClick={() => setPaso('preguntas-opcion')} disabled={!datosValidos}
-            className={btnPrimary + (!datosValidos ? ' opacity-30 cursor-not-allowed' : '')}>
-            CONTINUAR →
-          </button>
+          <Button onClick={() => setPaso('preguntas-opcion')} disabled={!datosValidos}>
+            Continuar →
+          </Button>
         </div>
       )}
 
       {/* PASO 2: Opción preguntas */}
       {paso === 'preguntas-opcion' && (
-        <div className="flex flex-col gap-4">
-          <p className="text-sm" style={{ color: 'var(--gray-mid)' }}>
-            ¿Cómo configuramos las preguntas para <strong className="text-black">{datos.nombre_compania}</strong>?
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <p style={{ fontSize: 13, color: 'var(--mute)', fontWeight: 500, margin: 0 }}>
+            ¿Cómo configuramos las preguntas para <strong style={{ color: 'var(--ink)' }}>{datos.nombre_compania}</strong>?
           </p>
-          <div className="grid grid-cols-2 gap-4">
-            <button onClick={cargarBase}
-              className="text-left p-6 border-2 border-black hover:bg-black hover:text-white transition-colors">
-              <p className="font-black mb-1">Preguntas base</p>
-              <p className="text-sm" style={{ color: 'var(--gray-mid)' }}>
-                Preguntas genéricas de Laborativo. Editables antes de guardar.
-              </p>
-            </button>
-            <button onClick={() => setPaso('ia-config')}
-              className="text-left p-6 border-2 border-black hover:bg-black hover:text-white transition-colors">
-              <p className="font-black mb-1">Contextualizar con IA ✦</p>
-              <p className="text-sm" style={{ color: 'var(--gray-mid)' }}>
-                Claude investiga la empresa y ajusta las preguntas al contexto.
-              </p>
-            </button>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            {[
+              { label: 'Preguntas base', desc: 'Preguntas genéricas de Laborativo. Editables antes de guardar.', action: cargarBase },
+              { label: 'Contextualizar con IA ✦', desc: 'Claude investiga la empresa y ajusta las preguntas al contexto.', action: () => setPaso('ia-config') },
+            ].map(opt => (
+              <button key={opt.label} onClick={opt.action}
+                style={{
+                  textAlign: 'left', padding: '20px', border: '1.5px solid var(--border)',
+                  background: 'var(--card)', cursor: 'pointer', display: 'flex', flexDirection: 'column', gap: 6,
+                  fontFamily: "'Red Hat Display', sans-serif",
+                  transition: 'border-color .15s, background .15s',
+                }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--ink)'; e.currentTarget.style.background = 'var(--ink)'; e.currentTarget.style.color = '#fff' }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.background = 'var(--card)'; e.currentTarget.style.color = 'inherit' }}>
+                <span style={{ fontWeight: 800, fontSize: 14 }}>{opt.label}</span>
+                <span style={{ fontSize: 12, fontWeight: 500, opacity: .7 }}>{opt.desc}</span>
+              </button>
+            ))}
           </div>
-          <button onClick={() => setPaso('datos')} className={btnSecondary}>← VOLVER</button>
+          <Button variant="outline" onClick={() => setPaso('datos')}>← Volver</Button>
         </div>
       )}
 
       {/* PASO 3: Config IA */}
       {paso === 'ia-config' && (
-        <div className="flex flex-col gap-6">
-          <Campo label="Vertical / Industria">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+          <div style={field}>
+            <Label style={labelStyle}>Vertical / Industria</Label>
             <select value={iaConfig.vertical} onChange={e => setIaConfig(c => ({ ...c, vertical: e.target.value }))}
-              className={inputCls}>
+              style={{ height: 36, padding: '0 12px', border: '1px solid var(--border)', background: 'var(--card)', fontFamily: "'Red Hat Display', sans-serif", fontSize: 13, fontWeight: 500 }}>
               <option value="">Selecciona un sector</option>
               {VERTICALES.map(v => <option key={v} value={v}>{v}</option>)}
             </select>
-          </Campo>
-          <Campo label="Contexto adicional (opcional)">
+          </div>
+          <div style={field}>
+            <Label style={labelStyle}>Contexto adicional (opcional)</Label>
             <textarea value={iaConfig.contexto}
               onChange={e => setIaConfig(c => ({ ...c, contexto: e.target.value }))}
               placeholder="Retos de cultura, situación actual, lo que consideres relevante..."
-              rows={5} className={inputCls + ' resize-none'} />
-          </Campo>
-          {error && <p className="text-sm font-bold" style={{ color: '#FF3366' }}>{error}</p>}
-          <div className="flex gap-3">
-            <button onClick={generarConIA} disabled={!iaConfig.vertical || generando}
-              className={btnPrimary + ((!iaConfig.vertical || generando) ? ' opacity-30 cursor-not-allowed' : '')}>
-              {generando ? 'GENERANDO…' : '✦ GENERAR PREGUNTAS'}
-            </button>
-            <button onClick={() => setPaso('preguntas-opcion')} disabled={generando} className={btnSecondary}>
-              ← VOLVER
-            </button>
+              rows={4}
+              style={{ padding: '10px 12px', border: '1px solid var(--border)', background: 'var(--card)', fontFamily: "'Red Hat Display', sans-serif", fontSize: 13, fontWeight: 500, resize: 'none', outline: 'none' }} />
+          </div>
+          {error && <p style={{ fontSize: 12, fontWeight: 700, color: '#FF3366', margin: 0 }}>{error}</p>}
+          <div style={{ display: 'flex', gap: 8 }}>
+            <Button onClick={generarConIA} disabled={!iaConfig.vertical || generando}>
+              {generando ? 'Generando…' : '✦ Generar preguntas'}
+            </Button>
+            <Button variant="outline" onClick={() => setPaso('preguntas-opcion')} disabled={generando}>← Volver</Button>
           </div>
         </div>
       )}
 
       {/* PASO 4: Revisión */}
       {paso === 'revision' && (
-        <div className="flex flex-col gap-6">
-          <p className="text-sm" style={{ color: 'var(--gray-mid)' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+          <p style={{ fontSize: 13, color: 'var(--mute)', fontWeight: 500, margin: 0 }}>
             Revisa y edita las preguntas antes de guardar.
           </p>
           {DIMENSIONES.map(dim => (
             <div key={dim.id}>
-              <div className="flex items-baseline gap-3 mb-4">
-                <span className="font-black text-lg">{dim.nombre}</span>
-                <span className="text-xs uppercase tracking-widest" style={{ color: 'var(--gray-mid)' }}>{dim.subtitulo}</span>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 12 }}>
+                <span style={{ fontSize: 15, fontWeight: 800 }}>{dim.nombre}</span>
+                <span style={{ fontSize: 11, color: 'var(--mute)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.06em' }}>{dim.subtitulo}</span>
               </div>
               {(['A', 'B', 'C', 'D'] as Rol[]).map(rol => {
                 const ps = preguntas.map((p, i) => ({ ...p, idx: i })).filter(p => p.dimension_id === dim.id && p.rol === rol)
                 if (!ps.length) return null
                 return (
-                  <div key={rol} className="mb-4">
-                    <p className="text-xs font-black uppercase tracking-widest mb-2" style={{ color: 'var(--gray-mid)' }}>
+                  <div key={rol} style={{ marginBottom: 16 }}>
+                    <p style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.1em', color: 'var(--mute)', margin: '0 0 8px' }}>
                       {rol} — {ROL_INFO[rol].label}
                     </p>
-                    <div className="flex flex-col gap-2">
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                       {ps.map(p => (
                         <textarea key={p.idx} value={p.texto}
-                          onChange={e => actualizarPregunta(p.idx, e.target.value)}
-                          rows={2} className={inputCls + ' resize-none text-sm'} />
+                          onChange={e => setPreguntas(prev => prev.map((q, i) => i === p.idx ? { ...q, texto: e.target.value } : q))}
+                          rows={2}
+                          style={{ padding: '10px 12px', border: '1px solid var(--border)', background: 'var(--card)', fontFamily: "'Red Hat Display', sans-serif", fontSize: 13, fontWeight: 500, resize: 'none', outline: 'none', width: '100%' }} />
                       ))}
                     </div>
                   </div>
                 )
               })}
-              <div style={{ borderBottom: '1px solid var(--gray-border)' }} className="mb-6" />
+              <div style={{ borderBottom: '1px solid var(--border)', marginBottom: 8 }} />
             </div>
           ))}
-          {error && <p className="text-sm font-bold" style={{ color: '#FF3366' }}>{error}</p>}
-          <div className="flex gap-3">
-            <button onClick={guardar} disabled={guardando}
-              className={btnPrimary + (guardando ? ' opacity-30 cursor-not-allowed' : '')}>
-              {guardando ? 'GUARDANDO…' : 'GUARDAR DIAGNÓSTICO'}
-            </button>
-            <button onClick={() => setPaso('preguntas-opcion')} disabled={guardando} className={btnSecondary}>
-              ← CAMBIAR PREGUNTAS
-            </button>
+          {error && <p style={{ fontSize: 12, fontWeight: 700, color: '#FF3366', margin: 0 }}>{error}</p>}
+          <div style={{ display: 'flex', gap: 8 }}>
+            <Button onClick={guardar} disabled={guardando}>
+              {guardando ? 'Guardando…' : 'Guardar diagnóstico'}
+            </Button>
+            <Button variant="outline" onClick={() => setPaso('preguntas-opcion')} disabled={guardando}>← Cambiar preguntas</Button>
           </div>
         </div>
       )}
     </div>
   )
 }
-
-function Campo({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div className="flex flex-col gap-2">
-      <label className="text-xs font-black uppercase tracking-widest" style={{ color: 'var(--gray-mid)' }}>
-        {label}
-      </label>
-      {children}
-    </div>
-  )
-}
-
-const inputCls = 'w-full px-4 py-3 text-sm border-2 border-black bg-white outline-none focus:border-black'
-  + ' font-medium placeholder:text-gray-400'
-
-const btnPrimary = 'font-black text-sm px-6 py-3 transition-opacity hover:opacity-70'
-  + ' bg-black text-white border-2 border-black uppercase tracking-wide'
-
-const btnSecondary = 'font-black text-sm px-6 py-3 transition-colors hover:bg-black hover:text-white'
-  + ' border-2 border-black bg-transparent uppercase tracking-wide'
