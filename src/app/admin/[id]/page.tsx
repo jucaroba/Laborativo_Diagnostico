@@ -19,7 +19,6 @@ export default async function DiagnosticoPage({ params }: { params: Promise<{ id
 
   const { data: preguntas } = await supabase
     .from('preguntas').select('*').eq('diagnostico_id', id).order('orden')
-
   const { data: participantes } = await supabase
     .from('participantes').select('rol').eq('diagnostico_id', id)
 
@@ -30,17 +29,15 @@ export default async function DiagnosticoPage({ params }: { params: Promise<{ id
   const ps = (preguntas ?? []) as Pregunta[]
 
   return (
-    <div style={{ fontFamily: "'Red Hat Display', sans-serif", display: 'flex', flexDirection: 'column', gap: 32 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
 
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
         <div>
-          <h1 style={{ fontSize: 32, fontWeight: 900, letterSpacing: '-1px', margin: '0 0 6px' }}>{d.nombre_compania}</h1>
-          <p style={{ fontSize: 13, color: 'var(--mute)', fontWeight: 500, margin: 0 }}>
-            {d.contacto_nombre} · {d.contacto_cargo} · {d.contacto_email}
-          </p>
+          <h1 className="page-header__title" style={{ fontSize: 32 }}>{d.nombre_compania}</h1>
+          <p className="page-header__subtitle">{d.contacto_nombre} · {d.contacto_cargo} · {d.contacto_email}</p>
         </div>
-        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+        <div style={{ display: 'flex', gap: 8 }}>
           <EliminarDiagnostico id={d.id} />
           <AccionesDiagnostico diagnostico={d} />
         </div>
@@ -54,9 +51,7 @@ export default async function DiagnosticoPage({ params }: { params: Promise<{ id
         ].map(l => (
           <Card key={l.label}>
             <CardHeader style={{ paddingBottom: 8 }}>
-              <CardTitle style={{ fontSize: 10, letterSpacing: '.1em', textTransform: 'uppercase', fontWeight: 700, color: 'var(--mute)' }}>
-                {l.label}
-              </CardTitle>
+              <CardTitle className="page-header__eyebrow" style={{ margin: 0 }}>{l.label}</CardTitle>
             </CardHeader>
             <CardContent>
               <p style={{ fontSize: 13, wordBreak: 'break-all', fontWeight: 500, margin: 0 }}>{l.url}</p>
@@ -67,13 +62,13 @@ export default async function DiagnosticoPage({ params }: { params: Promise<{ id
 
       {/* Participantes */}
       <div>
-        <h2 style={{ fontSize: 16, fontWeight: 800, letterSpacing: '-.02em', margin: '0 0 12px' }}>Participantes</h2>
+        <h2 className="section-title">Participantes</h2>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 12 }}>
           {(['A', 'B', 'C', 'D'] as Rol[]).map(rol => (
             <Card key={rol}>
               <CardContent style={{ textAlign: 'center', paddingTop: 20 }}>
                 <p style={{ fontSize: 40, fontWeight: 900, letterSpacing: '-1px', margin: '0 0 4px' }}>{conteoRoles[rol]}</p>
-                <p style={{ fontSize: 11, color: 'var(--mute)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.06em', margin: 0 }}>{ROL_INFO[rol].label}</p>
+                <p className="page-header__eyebrow" style={{ margin: 0 }}>{ROL_INFO[rol].label}</p>
               </CardContent>
             </Card>
           ))}
@@ -82,28 +77,26 @@ export default async function DiagnosticoPage({ params }: { params: Promise<{ id
 
       {/* Preguntas */}
       <div>
-        <h2 style={{ fontSize: 16, fontWeight: 800, letterSpacing: '-.02em', margin: '0 0 16px' }}>
-          Preguntas <Badge variant="secondary">{ps.length}</Badge>
+        <h2 className="section-title">
+          Preguntas <Badge variant="secondary" style={{ marginLeft: 8 }}>{ps.length}</Badge>
         </h2>
         {DIMENSIONES.map(dim => (
           <div key={dim.id} style={{ marginBottom: 32 }}>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 12 }}>
               <span style={{ fontSize: 15, fontWeight: 800 }}>{dim.nombre}</span>
-              <span style={{ fontSize: 11, color: 'var(--mute)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.06em' }}>{dim.subtitulo}</span>
+              <span className="page-header__eyebrow" style={{ margin: 0 }}>{dim.subtitulo}</span>
             </div>
             {(['A', 'B', 'C', 'D'] as Rol[]).map(rol => {
               const grupo = ps.filter(p => p.dimension_id === dim.id && p.rol === rol)
               if (!grupo.length) return null
               return (
                 <div key={rol} style={{ marginBottom: 16 }}>
-                  <p style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.1em', color: 'var(--mute)', margin: '0 0 8px' }}>
-                    {rol} — {ROL_INFO[rol].label}
-                  </p>
+                  <p className="page-header__eyebrow" style={{ margin: '0 0 8px' }}>{rol} — {ROL_INFO[rol].label}</p>
                   <Table>
                     <TableBody>
                       {grupo.map((p, i) => (
                         <TableRow key={p.id}>
-                          <TableCell style={{ width: 32, color: 'var(--mute)', fontWeight: 700, fontSize: 12 }}>{i + 1}</TableCell>
+                          <TableCell className="text-mute" style={{ width: 32, fontWeight: 700, fontSize: 12 }}>{i + 1}</TableCell>
                           <TableCell style={{ fontSize: 13, fontWeight: 500 }}>{p.texto}</TableCell>
                         </TableRow>
                       ))}

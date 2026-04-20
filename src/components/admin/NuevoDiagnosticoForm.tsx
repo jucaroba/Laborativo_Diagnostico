@@ -22,15 +22,10 @@ const VERTICALES = [
 type Paso = 'datos' | 'preguntas-opcion' | 'ia-config' | 'revision'
 interface PreguntaEditable { dimension_id: number; rol: Rol; texto: string; orden: number }
 
-const lbl = {
-  fontSize: 10, fontWeight: 700, letterSpacing: '.1em',
-  textTransform: 'uppercase' as const, color: 'var(--mute)',
-}
-
 function Row({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: '180px 1fr', gap: 24, alignItems: 'start', padding: '16px 0', borderBottom: '1px solid var(--border)' }}>
-      <Label style={lbl}>{label}</Label>
+    <div className="form-row">
+      <Label className="form-label">{label}</Label>
       <div>{children}</div>
     </div>
   )
@@ -101,7 +96,7 @@ export default function NuevoDiagnosticoForm() {
       {/* PASO 1 */}
       {paso === 'datos' && (
         <div>
-          <div style={{ borderTop: '1.5px solid var(--ink)', marginBottom: 0 }} />
+          <div className="form-section-top" />
           <Row label="Compañía">
             <Input value={datos.nombre_compania} onChange={e => setDatos(d => ({ ...d, nombre_compania: e.target.value }))} placeholder="Ej: Bancolombia S.A." />
           </Row>
@@ -126,7 +121,7 @@ export default function NuevoDiagnosticoForm() {
       {/* PASO 2 */}
       {paso === 'preguntas-opcion' && (
         <div>
-          <div style={{ borderTop: '1.5px solid var(--ink)' }} />
+          <div className="form-section-top" />
           <div style={{ padding: '16px 0', borderBottom: '1px solid var(--border)' }}>
             <p style={{ fontSize: 13, color: 'var(--mute)', fontWeight: 500, margin: '0 0 16px' }}>
               ¿Cómo configuramos las preguntas para <strong style={{ color: 'var(--ink)', fontWeight: 800 }}>{datos.nombre_compania}</strong>?
@@ -156,7 +151,7 @@ export default function NuevoDiagnosticoForm() {
       {/* PASO 3 */}
       {paso === 'ia-config' && (
         <div>
-          <div style={{ borderTop: '1.5px solid var(--ink)' }} />
+          <div className="form-section-top" />
           <Row label="Vertical / Industria">
             <Select value={iaConfig.vertical} onValueChange={(v: string | null) => setIaConfig(c => ({ ...c, vertical: v ?? '' }))}>
               <SelectTrigger><SelectValue placeholder="Selecciona un sector" /></SelectTrigger>
@@ -180,7 +175,7 @@ export default function NuevoDiagnosticoForm() {
       {/* PASO 4 */}
       {paso === 'revision' && (
         <div>
-          <div style={{ borderTop: '1.5px solid var(--ink)' }} />
+          <div className="form-section-top" />
           {DIMENSIONES.map(dim => (
             <div key={dim.id}>
               <div style={{ display: 'grid', gridTemplateColumns: '180px 1fr', gap: 24, padding: '16px 0', borderBottom: '1px solid var(--border)', alignItems: 'start' }}>
