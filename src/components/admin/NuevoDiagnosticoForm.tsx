@@ -8,6 +8,11 @@ import NeonPicker from './NeonPicker'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
+import { Card, CardContent } from '@/components/ui/card'
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from '@/components/ui/select'
 
 const VERTICALES = [
   'Tecnología', 'Retail', 'Salud', 'Manufactura', 'Educación',
@@ -24,8 +29,7 @@ interface PreguntaEditable {
   orden: number
 }
 
-const field = { display: 'flex', flexDirection: 'column' as const, gap: 6 }
-const labelStyle = { fontSize: 10, fontWeight: 700, letterSpacing: '.1em', textTransform: 'uppercase' as const, color: 'var(--mute)' }
+const lbl = { fontSize: 10, fontWeight: 700, letterSpacing: '.1em', textTransform: 'uppercase' as const, color: 'var(--mute)' }
 
 export default function NuevoDiagnosticoForm() {
   const router = useRouter()
@@ -115,70 +119,68 @@ export default function NuevoDiagnosticoForm() {
 
       {/* PASO 1: Datos */}
       {paso === 'datos' && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-          <div style={field}>
-            <Label style={labelStyle}>Nombre de la compañía</Label>
-            <Input value={datos.nombre_compania}
-              onChange={e => setDatos(d => ({ ...d, nombre_compania: e.target.value }))}
-              placeholder="Ej: Bancolombia S.A." />
-          </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-            <div style={field}>
-              <Label style={labelStyle}>Nombre del contacto</Label>
-              <Input value={datos.contacto_nombre}
-                onChange={e => setDatos(d => ({ ...d, contacto_nombre: e.target.value }))}
-                placeholder="Nombre completo" />
+        <Card>
+          <CardContent style={{ display: 'flex', flexDirection: 'column', gap: 20, paddingTop: 24 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              <Label style={lbl}>Nombre de la compañía</Label>
+              <Input value={datos.nombre_compania}
+                onChange={e => setDatos(d => ({ ...d, nombre_compania: e.target.value }))}
+                placeholder="Ej: Bancolombia S.A." />
             </div>
-            <div style={field}>
-              <Label style={labelStyle}>Cargo</Label>
-              <Input value={datos.contacto_cargo}
-                onChange={e => setDatos(d => ({ ...d, contacto_cargo: e.target.value }))}
-                placeholder="Ej: Gerente de Cultura" />
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                <Label style={lbl}>Nombre del contacto</Label>
+                <Input value={datos.contacto_nombre}
+                  onChange={e => setDatos(d => ({ ...d, contacto_nombre: e.target.value }))}
+                  placeholder="Nombre completo" />
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                <Label style={lbl}>Cargo</Label>
+                <Input value={datos.contacto_cargo}
+                  onChange={e => setDatos(d => ({ ...d, contacto_cargo: e.target.value }))}
+                  placeholder="Ej: Gerente de Cultura" />
+              </div>
             </div>
-          </div>
 
-          <div style={field}>
-            <Label style={labelStyle}>Email del contacto</Label>
-            <Input type="email" value={datos.contacto_email}
-              onChange={e => setDatos(d => ({ ...d, contacto_email: e.target.value }))}
-              placeholder="correo@empresa.com" />
-          </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              <Label style={lbl}>Email del contacto</Label>
+              <Input type="email" value={datos.contacto_email}
+                onChange={e => setDatos(d => ({ ...d, contacto_email: e.target.value }))}
+                placeholder="correo@empresa.com" />
+            </div>
 
-          <div style={field}>
-            <Label style={labelStyle}>Color neón del diagnóstico</Label>
-            <NeonPicker value={datos.color_neon} onChange={c => setDatos(d => ({ ...d, color_neon: c }))} />
-          </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <Label style={lbl}>Color neón del diagnóstico</Label>
+              <NeonPicker value={datos.color_neon} onChange={c => setDatos(d => ({ ...d, color_neon: c }))} />
+            </div>
 
-          <Button onClick={() => setPaso('preguntas-opcion')} disabled={!datosValidos}>
-            Continuar →
-          </Button>
-        </div>
+            <Button onClick={() => setPaso('preguntas-opcion')} disabled={!datosValidos}>
+              Continuar →
+            </Button>
+          </CardContent>
+        </Card>
       )}
 
       {/* PASO 2: Opción preguntas */}
       {paso === 'preguntas-opcion' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           <p style={{ fontSize: 13, color: 'var(--mute)', fontWeight: 500, margin: 0 }}>
-            ¿Cómo configuramos las preguntas para <strong style={{ color: 'var(--ink)' }}>{datos.nombre_compania}</strong>?
+            ¿Cómo configuramos las preguntas para <strong style={{ color: 'var(--ink)', fontWeight: 800 }}>{datos.nombre_compania}</strong>?
           </p>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
             {[
               { label: 'Preguntas base', desc: 'Preguntas genéricas de Laborativo. Editables antes de guardar.', action: cargarBase },
               { label: 'Contextualizar con IA ✦', desc: 'Claude investiga la empresa y ajusta las preguntas al contexto.', action: () => setPaso('ia-config') },
             ].map(opt => (
-              <button key={opt.label} onClick={opt.action}
-                style={{
-                  textAlign: 'left', padding: '20px', border: '1.5px solid var(--border)',
-                  background: 'var(--card)', cursor: 'pointer', display: 'flex', flexDirection: 'column', gap: 6,
-                  fontFamily: "'Red Hat Display', sans-serif",
-                  transition: 'border-color .15s, background .15s',
-                }}
-                onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--ink)'; e.currentTarget.style.background = 'var(--ink)'; e.currentTarget.style.color = '#fff' }}
-                onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.background = 'var(--card)'; e.currentTarget.style.color = 'inherit' }}>
-                <span style={{ fontWeight: 800, fontSize: 14 }}>{opt.label}</span>
-                <span style={{ fontSize: 12, fontWeight: 500, opacity: .7 }}>{opt.desc}</span>
-              </button>
+              <Card key={opt.label} style={{ cursor: 'pointer', transition: 'border-color .15s' }}
+                onClick={opt.action}
+                className="hover:border-foreground">
+                <CardContent style={{ paddingTop: 20, display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <span style={{ fontWeight: 800, fontSize: 14 }}>{opt.label}</span>
+                  <span style={{ fontSize: 12, fontWeight: 500, color: 'var(--mute)' }}>{opt.desc}</span>
+                </CardContent>
+              </Card>
             ))}
           </div>
           <Button variant="outline" onClick={() => setPaso('datos')}>← Volver</Button>
@@ -187,31 +189,35 @@ export default function NuevoDiagnosticoForm() {
 
       {/* PASO 3: Config IA */}
       {paso === 'ia-config' && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-          <div style={field}>
-            <Label style={labelStyle}>Vertical / Industria</Label>
-            <select value={iaConfig.vertical} onChange={e => setIaConfig(c => ({ ...c, vertical: e.target.value }))}
-              style={{ height: 36, padding: '0 12px', border: '1px solid var(--border)', background: 'var(--card)', fontFamily: "'Red Hat Display', sans-serif", fontSize: 13, fontWeight: 500 }}>
-              <option value="">Selecciona un sector</option>
-              {VERTICALES.map(v => <option key={v} value={v}>{v}</option>)}
-            </select>
-          </div>
-          <div style={field}>
-            <Label style={labelStyle}>Contexto adicional (opcional)</Label>
-            <textarea value={iaConfig.contexto}
-              onChange={e => setIaConfig(c => ({ ...c, contexto: e.target.value }))}
-              placeholder="Retos de cultura, situación actual, lo que consideres relevante..."
-              rows={4}
-              style={{ padding: '10px 12px', border: '1px solid var(--border)', background: 'var(--card)', fontFamily: "'Red Hat Display', sans-serif", fontSize: 13, fontWeight: 500, resize: 'none', outline: 'none' }} />
-          </div>
-          {error && <p style={{ fontSize: 12, fontWeight: 700, color: '#FF3366', margin: 0 }}>{error}</p>}
-          <div style={{ display: 'flex', gap: 8 }}>
-            <Button onClick={generarConIA} disabled={!iaConfig.vertical || generando}>
-              {generando ? 'Generando…' : '✦ Generar preguntas'}
-            </Button>
-            <Button variant="outline" onClick={() => setPaso('preguntas-opcion')} disabled={generando}>← Volver</Button>
-          </div>
-        </div>
+        <Card>
+          <CardContent style={{ display: 'flex', flexDirection: 'column', gap: 20, paddingTop: 24 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              <Label style={lbl}>Vertical / Industria</Label>
+              <Select value={iaConfig.vertical} onValueChange={(v: string | null) => setIaConfig(c => ({ ...c, vertical: v ?? '' }))}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecciona un sector" />
+                </SelectTrigger>
+                <SelectContent>
+                  {VERTICALES.map(v => <SelectItem key={v} value={v}>{v}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              <Label style={lbl}>Contexto adicional (opcional)</Label>
+              <Textarea value={iaConfig.contexto}
+                onChange={e => setIaConfig(c => ({ ...c, contexto: e.target.value }))}
+                placeholder="Retos de cultura, situación actual, lo que consideres relevante..."
+                rows={4} />
+            </div>
+            {error && <p style={{ fontSize: 12, fontWeight: 700, color: '#FF3366', margin: 0 }}>{error}</p>}
+            <div style={{ display: 'flex', gap: 8 }}>
+              <Button onClick={generarConIA} disabled={!iaConfig.vertical || generando}>
+                {generando ? 'Generando…' : '✦ Generar preguntas'}
+              </Button>
+              <Button variant="outline" onClick={() => setPaso('preguntas-opcion')} disabled={generando}>← Volver</Button>
+            </div>
+          </CardContent>
+        </Card>
       )}
 
       {/* PASO 4: Revisión */}
@@ -221,32 +227,29 @@ export default function NuevoDiagnosticoForm() {
             Revisa y edita las preguntas antes de guardar.
           </p>
           {DIMENSIONES.map(dim => (
-            <div key={dim.id}>
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 12 }}>
-                <span style={{ fontSize: 15, fontWeight: 800 }}>{dim.nombre}</span>
-                <span style={{ fontSize: 11, color: 'var(--mute)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.06em' }}>{dim.subtitulo}</span>
-              </div>
-              {(['A', 'B', 'C', 'D'] as Rol[]).map(rol => {
-                const ps = preguntas.map((p, i) => ({ ...p, idx: i })).filter(p => p.dimension_id === dim.id && p.rol === rol)
-                if (!ps.length) return null
-                return (
-                  <div key={rol} style={{ marginBottom: 16 }}>
-                    <p style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.1em', color: 'var(--mute)', margin: '0 0 8px' }}>
-                      {rol} — {ROL_INFO[rol].label}
-                    </p>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            <Card key={dim.id}>
+              <CardContent style={{ paddingTop: 20, display: 'flex', flexDirection: 'column', gap: 16 }}>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: 10 }}>
+                  <span style={{ fontSize: 15, fontWeight: 800 }}>{dim.nombre}</span>
+                  <span style={{ fontSize: 11, color: 'var(--mute)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.06em' }}>{dim.subtitulo}</span>
+                </div>
+                {(['A', 'B', 'C', 'D'] as Rol[]).map(rol => {
+                  const ps = preguntas.map((p, i) => ({ ...p, idx: i })).filter(p => p.dimension_id === dim.id && p.rol === rol)
+                  if (!ps.length) return null
+                  return (
+                    <div key={rol} style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                      <p style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.1em', color: 'var(--mute)', margin: 0 }}>
+                        {rol} — {ROL_INFO[rol].label}
+                      </p>
                       {ps.map(p => (
-                        <textarea key={p.idx} value={p.texto}
-                          onChange={e => setPreguntas(prev => prev.map((q, i) => i === p.idx ? { ...q, texto: e.target.value } : q))}
-                          rows={2}
-                          style={{ padding: '10px 12px', border: '1px solid var(--border)', background: 'var(--card)', fontFamily: "'Red Hat Display', sans-serif", fontSize: 13, fontWeight: 500, resize: 'none', outline: 'none', width: '100%' }} />
+                        <Textarea key={p.idx} value={p.texto} rows={2}
+                          onChange={e => setPreguntas(prev => prev.map((q, i) => i === p.idx ? { ...q, texto: e.target.value } : q))} />
                       ))}
                     </div>
-                  </div>
-                )
-              })}
-              <div style={{ borderBottom: '1px solid var(--border)', marginBottom: 8 }} />
-            </div>
+                  )
+                })}
+              </CardContent>
+            </Card>
           ))}
           {error && <p style={{ fontSize: 12, fontWeight: 700, color: '#FF3366', margin: 0 }}>{error}</p>}
           <div style={{ display: 'flex', gap: 8 }}>
