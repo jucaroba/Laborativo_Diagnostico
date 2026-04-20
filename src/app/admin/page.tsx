@@ -36,7 +36,7 @@ export default async function AdminPage() {
         <Table>
           <TableHeader>
             <TableRow style={{ background: '#0A0A0A', borderBottom: 'none' }}>
-              {['Compañía', 'Contacto', 'Estado', 'Fecha', 'Color', ''].map(h => (
+              {['Empresa', 'Contacto', 'Estado', 'Fecha', 'Color', ''].map(h => (
                 <TableHead key={h} style={{ color: '#fff', fontWeight: 700, fontSize: 12, letterSpacing: '.06em', textTransform: 'uppercase', background: 'transparent' }}>{h}</TableHead>
               ))}
             </TableRow>
@@ -56,7 +56,7 @@ export default async function AdminPage() {
                 <TableCell className="table-cell-mute">
                   {new Date(d.created_at).toLocaleDateString('es-CO', { day: 'numeric', month: 'short', year: 'numeric' })}
                 </TableCell>
-                <TableCell>
+                <TableCell style={{ textAlign: 'center', paddingRight: 35 }}>
                   <span style={{ width: 14, height: 14, background: d.color_neon, display: 'inline-block' }} />
                 </TableCell>
                 <TableCell>
