@@ -79,14 +79,12 @@ export default async function LandingPage({ params }: { params: Promise<{ codigo
             { n: '03', idx: 'Interacción', h: 'Vínculos', pair: '¿Con quién?', p: 'Cómo nos relacionamos. Calidad de la conversación, confianza y colaboración entre personas.' },
             { n: '04', idx: 'Acción', h: 'Comportamiento', pair: '¿Qué?', p: 'Lo que se hace realmente —no lo que se dice—. Hábitos, decisiones y entregas visibles.' },
           ].map((d, i) => (
-            <div key={d.n} style={{
+            <div key={d.n} className="dim-card" style={{
               borderRight: i < 3 ? '1.5px solid var(--ink)' : 'none',
               padding: '28px 24px 32px', position: 'relative',
               minHeight: 280, display: 'flex', flexDirection: 'column', gap: 14,
-              background: 'var(--card)', transition: 'background .2s ease',
-            }}
-              onMouseEnter={e => (e.currentTarget.style.background = neon)}
-              onMouseLeave={e => (e.currentTarget.style.background = 'var(--card)')}>
+              background: 'var(--card)',
+            }}>
               <span style={{ position: 'absolute', top: 16, right: 20, fontWeight: 900, fontSize: 14 }}>{d.n}</span>
               <span style={{ fontSize: 11, letterSpacing: .5, textTransform: 'uppercase', color: 'var(--mute)', fontWeight: 700 }}>{d.idx}</span>
               <div style={{ width: 56, height: 8, background: 'var(--ink)' }} />

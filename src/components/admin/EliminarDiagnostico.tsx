@@ -8,7 +8,7 @@ import {
   DialogDescription, DialogFooter,
 } from '@/components/ui/dialog'
 
-export default function EliminarDiagnostico({ id }: { id: string }) {
+export default function EliminarDiagnostico({ id, neonColor }: { id: string; neonColor?: string }) {
   const router = useRouter()
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -33,7 +33,7 @@ export default function EliminarDiagnostico({ id }: { id: string }) {
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setOpen(false)} disabled={loading}>Cancelar</Button>
-            <Button variant="destructive" onClick={eliminar} disabled={loading}>
+            <Button onClick={eliminar} disabled={loading} style={{ background: neonColor ?? '#D8FF00', color: '#0A0A0A', border: `1px solid ${neonColor ?? '#D8FF00'}` }}>
               {loading ? 'Eliminando…' : 'Sí, eliminar'}
             </Button>
           </DialogFooter>

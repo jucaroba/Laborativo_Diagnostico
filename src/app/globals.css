@@ -159,6 +159,11 @@ button { font-family: inherit; }
 /* Texto muted reutilizable */
 .text-mute { color: var(--mute); font-weight: 500; }
 
+/* Hover cards en landing diagnóstico */
+.dim-card { transition: background .2s ease; }
+.dim-card:hover { background: var(--neon) !important; }
+.nivel-card { transition: background .2s ease; }
+
 /* Acciones de fila — visibles solo en hover */
 tr:hover .row-actions { opacity: 1 !important; }
 .row-actions { transition: opacity .15s ease; }
