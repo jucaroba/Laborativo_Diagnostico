@@ -4,6 +4,7 @@ import { Diagnostico } from '@/types'
 import { buttonVariants } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import AccionesRow from '@/components/admin/AccionesRow'
 
 export const revalidate = 0
 
@@ -40,6 +41,7 @@ export default async function AdminPage() {
               <TableHead>Estado</TableHead>
               <TableHead>Fecha</TableHead>
               <TableHead>Neón</TableHead>
+              <TableHead></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -59,6 +61,9 @@ export default async function AdminPage() {
                 </TableCell>
                 <TableCell>
                   <span style={{ width: 14, height: 14, background: d.color_neon, border: '1.5px solid var(--ink)', display: 'inline-block' }} />
+                </TableCell>
+                <TableCell>
+                  <AccionesRow id={d.id} />
                 </TableCell>
               </TableRow>
             ))}

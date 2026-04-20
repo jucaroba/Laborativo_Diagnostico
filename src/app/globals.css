@@ -146,7 +146,7 @@ button { font-family: inherit; }
 
 /* Label de formulario estilo tabla */
 .form-label {
-  font-size: 14px; font-weight: 500; color: var(--mute);
+  font-size: 14px; font-weight: 500; color: var(--ink);
 }
 
 /* Fila de formulario estilo tabla */
