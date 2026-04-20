@@ -3,9 +3,10 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { Diagnostico } from '@/types'
+import { Button } from '@/components/ui/button'
 
 const ESTADO_SIGUIENTE: Record<string, string> = { borrador: 'activo', activo: 'completado' }
-const ESTADO_BTN: Record<string, string> = { borrador: 'ACTIVAR Y ENVIAR LINK', activo: 'MARCAR COMPLETADO' }
+const ESTADO_BTN: Record<string, string> = { borrador: 'Activar y enviar link', activo: 'Marcar completado' }
 
 export default function AccionesDiagnostico({ diagnostico }: { diagnostico: Diagnostico }) {
   const router = useRouter()
@@ -34,13 +35,11 @@ export default function AccionesDiagnostico({ diagnostico }: { diagnostico: Diag
   }
 
   return (
-    <div className="flex flex-col items-end gap-2">
-      <button onClick={avanzarEstado} disabled={loading}
-        className="font-black text-sm px-6 py-3 transition-opacity hover:opacity-70 disabled:opacity-30 border-2 border-black uppercase tracking-wide"
-        style={{ background: '#000', color: '#fff' }}>
-        {loading ? 'PROCESANDO…' : ESTADO_BTN[diagnostico.estado]}
-      </button>
-      {error && <p className="text-xs font-bold" style={{ color: '#FF3366' }}>{error}</p>}
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6 }}>
+      <Button onClick={avanzarEstado} disabled={loading}>
+        {loading ? 'Procesando…' : ESTADO_BTN[diagnostico.estado]}
+      </Button>
+      {error && <p style={{ fontSize: 11, fontWeight: 700, color: '#FF3366', margin: 0 }}>{error}</p>}
     </div>
   )
 }

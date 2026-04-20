@@ -1,6 +1,9 @@
 import { supabase } from '@/lib/supabase'
 import { notFound } from 'next/navigation'
 import { Diagnostico, Pregunta, DIMENSIONES, ROL_INFO, Rol } from '@/types'
+import { Badge } from '@/components/ui/badge'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import AccionesDiagnostico from '@/components/admin/AccionesDiagnostico'
 import EliminarDiagnostico from '@/components/admin/EliminarDiagnostico'
 
@@ -15,15 +18,10 @@ export default async function DiagnosticoPage({ params }: { params: Promise<{ id
   if (!diag) notFound()
 
   const { data: preguntas } = await supabase
-    .from('preguntas')
-    .select('*')
-    .eq('diagnostico_id', id)
-    .order('orden')
+    .from('preguntas').select('*').eq('diagnostico_id', id).order('orden')
 
   const { data: participantes } = await supabase
-    .from('participantes')
-    .select('rol')
-    .eq('diagnostico_id', id)
+    .from('participantes').select('rol').eq('diagnostico_id', id)
 
   const conteoRoles = { A: 0, B: 0, C: 0, D: 0 }
   for (const p of participantes ?? []) conteoRoles[p.rol as Rol]++
@@ -32,12 +30,13 @@ export default async function DiagnosticoPage({ params }: { params: Promise<{ id
   const ps = (preguntas ?? []) as Pregunta[]
 
   return (
-    <div className="flex flex-col gap-8">
+    <div style={{ fontFamily: "'Red Hat Display', sans-serif", display: 'flex', flexDirection: 'column', gap: 32 }}>
+
       {/* Header */}
-      <div className="flex items-start justify-between">
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
         <div>
-          <h1 className="text-3xl" style={{ color: 'var(--brown)' }}>{d.nombre_compania}</h1>
-          <p className="font-sans text-sm mt-1" style={{ color: 'var(--brown-light)' }}>
+          <h1 style={{ fontSize: 32, fontWeight: 900, letterSpacing: '-1px', margin: '0 0 6px' }}>{d.nombre_compania}</h1>
+          <p style={{ fontSize: 13, color: 'var(--mute)', fontWeight: 500, margin: 0 }}>
             {d.contacto_nombre} · {d.contacto_cargo} · {d.contacto_email}
           </p>
         </div>
@@ -48,75 +47,71 @@ export default async function DiagnosticoPage({ params }: { params: Promise<{ id
       </div>
 
       {/* Links */}
-      <div className="grid grid-cols-2 gap-4">
-        <div className="p-4 rounded-xl" style={{ background: 'white', border: '1px solid var(--cream-dark)' }}>
-          <p className="text-xs font-sans uppercase tracking-wide mb-2" style={{ color: 'var(--brown-light)' }}>
-            Link de participación
-          </p>
-          <p className="text-sm font-sans break-all" style={{ color: 'var(--brown-mid)' }}>
-            {BASE_URL}/d/{d.codigo_participacion}
-          </p>
-        </div>
-        <div className="p-4 rounded-xl" style={{ background: 'white', border: '1px solid var(--cream-dark)' }}>
-          <p className="text-xs font-sans uppercase tracking-wide mb-2" style={{ color: 'var(--brown-light)' }}>
-            Link de resultados
-          </p>
-          <p className="text-sm font-sans break-all" style={{ color: 'var(--brown-mid)' }}>
-            {BASE_URL}/r/{d.codigo_resultados}
-          </p>
-        </div>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+        {[
+          { label: 'Link de participación', url: `${BASE_URL}/d/${d.codigo_participacion}` },
+          { label: 'Link de resultados', url: `${BASE_URL}/r/${d.codigo_resultados}` },
+        ].map(l => (
+          <Card key={l.label}>
+            <CardHeader style={{ paddingBottom: 8 }}>
+              <CardTitle style={{ fontSize: 10, letterSpacing: '.1em', textTransform: 'uppercase', fontWeight: 700, color: 'var(--mute)' }}>
+                {l.label}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p style={{ fontSize: 13, wordBreak: 'break-all', fontWeight: 500, margin: 0 }}>{l.url}</p>
+            </CardContent>
+          </Card>
+        ))}
       </div>
 
       {/* Participantes */}
       <div>
-        <h2 className="text-lg mb-3" style={{ color: 'var(--brown)' }}>Participantes</h2>
-        <div className="grid grid-cols-4 gap-3">
+        <h2 style={{ fontSize: 16, fontWeight: 800, letterSpacing: '-.02em', margin: '0 0 12px' }}>Participantes</h2>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 12 }}>
           {(['A', 'B', 'C', 'D'] as Rol[]).map(rol => (
-            <div key={rol} className="p-4 rounded-xl text-center"
-              style={{ background: 'white', border: '1px solid var(--cream-dark)' }}>
-              <p className="text-3xl font-medium mb-1" style={{ color: ROL_INFO[rol].color }}>
-                {conteoRoles[rol]}
-              </p>
-              <p className="text-xs font-sans" style={{ color: 'var(--brown-light)' }}>
-                {ROL_INFO[rol].label}
-              </p>
-            </div>
+            <Card key={rol}>
+              <CardContent style={{ textAlign: 'center', paddingTop: 20 }}>
+                <p style={{ fontSize: 40, fontWeight: 900, letterSpacing: '-1px', margin: '0 0 4px' }}>{conteoRoles[rol]}</p>
+                <p style={{ fontSize: 11, color: 'var(--mute)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.06em', margin: 0 }}>{ROL_INFO[rol].label}</p>
+              </CardContent>
+            </Card>
           ))}
         </div>
       </div>
 
-      {/* Preguntas por dimensión */}
+      {/* Preguntas */}
       <div>
-        <h2 className="text-lg mb-4" style={{ color: 'var(--brown)' }}>
-          Preguntas ({ps.length})
+        <h2 style={{ fontSize: 16, fontWeight: 800, letterSpacing: '-.02em', margin: '0 0 16px' }}>
+          Preguntas <Badge variant="secondary">{ps.length}</Badge>
         </h2>
         {DIMENSIONES.map(dim => (
-          <div key={dim.id} className="mb-6">
-            <div className="mb-2">
-              <span className="font-medium" style={{ color: 'var(--brown)' }}>{dim.nombre}</span>
-              <span className="text-sm font-sans ml-2" style={{ color: 'var(--brown-light)' }}>{dim.subtitulo}</span>
+          <div key={dim.id} style={{ marginBottom: 32 }}>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 12 }}>
+              <span style={{ fontSize: 15, fontWeight: 800 }}>{dim.nombre}</span>
+              <span style={{ fontSize: 11, color: 'var(--mute)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.06em' }}>{dim.subtitulo}</span>
             </div>
             {(['A', 'B', 'C', 'D'] as Rol[]).map(rol => {
               const grupo = ps.filter(p => p.dimension_id === dim.id && p.rol === rol)
               if (!grupo.length) return null
               return (
-                <div key={rol} className="mb-3">
-                  <p className="text-xs font-sans uppercase tracking-wide mb-1.5"
-                    style={{ color: ROL_INFO[rol].color }}>
+                <div key={rol} style={{ marginBottom: 16 }}>
+                  <p style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.1em', color: 'var(--mute)', margin: '0 0 8px' }}>
                     {rol} — {ROL_INFO[rol].label}
                   </p>
-                  <div className="flex flex-col gap-1">
-                    {grupo.map((p, i) => (
-                      <p key={p.id} className="text-sm font-sans pl-3 py-1.5 rounded"
-                        style={{ background: 'white', color: 'var(--brown-mid)', border: '1px solid var(--cream-dark)' }}>
-                        {i + 1}. {p.texto}
-                      </p>
-                    ))}
-                  </div>
+                  <Table>
+                    <TableBody>
+                      {grupo.map((p, i) => (
+                        <TableRow key={p.id}>
+                          <TableCell style={{ width: 32, color: 'var(--mute)', fontWeight: 700, fontSize: 12 }}>{i + 1}</TableCell>
+                          <TableCell style={{ fontSize: 13, fontWeight: 500 }}>{p.texto}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
                 </div>
               )
             })}
-            <div style={{ borderBottom: '1px solid var(--cream-dark)' }} className="mt-4 mb-2" />
           </div>
         ))}
       </div>

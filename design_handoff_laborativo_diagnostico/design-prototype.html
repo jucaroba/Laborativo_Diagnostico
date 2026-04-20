@@ -1,0 +1,1239 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=1440, initial-scale=1" />
+<title>Laborativo — Diagnosticador</title>
+<style>
+  @font-face{font-family:'Red Hat Display';src:url('fonts/RedHatDisplay-Light.ttf') format('truetype');font-weight:300;font-style:normal;font-display:swap}
+  @font-face{font-family:'Red Hat Display';src:url('fonts/RedHatDisplay-Regular.ttf') format('truetype');font-weight:400;font-style:normal;font-display:swap}
+  @font-face{font-family:'Red Hat Display';src:url('fonts/RedHatDisplay-Italic.ttf') format('truetype');font-weight:400;font-style:italic;font-display:swap}
+  @font-face{font-family:'Red Hat Display';src:url('fonts/RedHatDisplay-Medium.ttf') format('truetype');font-weight:500;font-style:normal;font-display:swap}
+  @font-face{font-family:'Red Hat Display';src:url('fonts/RedHatDisplay-SemiBold.ttf') format('truetype');font-weight:600;font-style:normal;font-display:swap}
+  @font-face{font-family:'Red Hat Display';src:url('fonts/RedHatDisplay-Bold.ttf') format('truetype');font-weight:700;font-style:normal;font-display:swap}
+  @font-face{font-family:'Red Hat Display';src:url('fonts/RedHatDisplay-BoldItalic.ttf') format('truetype');font-weight:700;font-style:italic;font-display:swap}
+  @font-face{font-family:'Red Hat Display';src:url('fonts/RedHatDisplay-ExtraBold.ttf') format('truetype');font-weight:800;font-style:normal;font-display:swap}
+  @font-face{font-family:'Red Hat Display';src:url('fonts/RedHatDisplay-Black.ttf') format('truetype');font-weight:900;font-style:normal;font-display:swap}
+
+  :root{
+    --bg:#E6E6E6;          /* gris 10% */
+    --bg-2:#DADADA;
+    --paper:#F2F2F2;
+    --card:#FFFFFF;
+    --ink:#0A0A0A;
+    --ink-2:#1A1A1A;
+    --mute:#7A7A7A;
+    --line:#0A0A0A;
+    --line-soft:rgba(10,10,10,.14);
+    --neon:#D8FF00;        /* acento neón — amarillo/lima por defecto */
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:'Red Hat Display',system-ui,sans-serif;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+  body{min-height:100vh}
+  h1,h2,h3,h4,h5{font-family:'Red Hat Display',sans-serif;margin:0;letter-spacing:-.02em}
+  .mono{font-family:ui-monospace,'SF Mono',Menlo,monospace;font-feature-settings:"zero"}
+  button{font-family:inherit}
+
+  /* ============ App shell ============ */
+  #app{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
+  aside{
+    border-right:1.5px solid var(--line);
+    padding:24px 20px;background:var(--bg);
+    position:sticky;top:0;height:100vh;
+    display:flex;flex-direction:column;gap:20px;
+  }
+  .brand{display:flex;align-items:center;gap:10px}
+  .brand .mark{
+    width:38px;height:38px;background:var(--ink);color:var(--bg);
+    display:grid;place-items:center;font-weight:900;font-size:15px;letter-spacing:-.03em;
+    border-radius:0;
+  }
+  .brand .name{font-weight:800;letter-spacing:-.02em;font-size:18px;line-height:1}
+  .brand .name small{display:block;font-size:10px;font-weight:500;color:var(--mute);letter-spacing:.08em;text-transform:uppercase;margin-top:4px}
+
+  nav{display:flex;flex-direction:column;gap:2px;margin-top:8px}
+  nav .group{font-size:10px;letter-spacing:.12em;color:var(--mute);text-transform:uppercase;margin:16px 0 6px;font-weight:700}
+  nav button{
+    all:unset;cursor:pointer;padding:11px 12px;display:flex;align-items:center;gap:12px;
+    font-size:13px;color:var(--ink);font-weight:600;
+    border:1.5px solid transparent;
+  }
+  nav button:hover{background:var(--bg-2)}
+  nav button.active{background:var(--ink);color:var(--bg)}
+  nav button .num{font-weight:400;font-size:11px;opacity:.6;min-width:22px;font-variant-numeric:tabular-nums}
+
+  aside .foot{margin-top:auto;font-size:10px;color:var(--mute);line-height:1.6;font-weight:500;letter-spacing:.04em}
+  aside .neon-dot{display:inline-flex;align-items:center;gap:8px;font-size:11px;color:var(--ink);font-weight:600}
+  aside .neon-dot i{width:10px;height:10px;background:var(--neon);border:1.5px solid var(--line);display:inline-block}
+
+  main{overflow-x:hidden}
+
+  /* ============ Common ============ */
+  .eyebrow{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink);font-weight:700}
+  .eyebrow.soft{color:var(--mute)}
+  .rule{height:2px;background:var(--ink);width:42px;margin:12px 0 0}
+
+  .btn{
+    all:unset;cursor:pointer;display:inline-flex;align-items:center;gap:10px;
+    padding:14px 22px;border:1.5px solid var(--ink);background:transparent;color:var(--ink);
+    font-weight:700;font-size:14px;transition:background .15s ease,color .15s ease;
+    letter-spacing:-.01em;
+  }
+  .btn:hover{background:var(--ink);color:var(--bg)}
+  .btn.primary{background:var(--ink);color:var(--bg)}
+  .btn.primary:hover{background:var(--neon);color:var(--ink);border-color:var(--neon)}
+  .btn.neon{background:var(--neon);border-color:var(--ink);color:var(--ink)}
+  .btn.neon:hover{background:var(--ink);color:var(--neon)}
+  .btn .chev{width:22px;height:22px;display:grid;place-items:center;border:1.5px solid currentColor;border-radius:100px}
+  .btn .chev::before{content:"";width:6px;height:6px;border-top:1.5px solid currentColor;border-right:1.5px solid currentColor;transform:rotate(45deg);margin-left:-2px}
+
+  .chip{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border:1.5px solid var(--line);font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase}
+  .sq{width:10px;height:10px;display:inline-block}
+
+  /* ============ Screens ============ */
+  .screen{display:none}
+  .screen.active{display:block}
+
+  /* ============ LANDING ============ */
+  .hero{padding:48px 56px 64px;border-bottom:1.5px solid var(--line);position:relative;background:var(--bg)}
+  .hero-top{display:flex;justify-content:space-between;align-items:flex-start;gap:40px;margin-bottom:72px}
+  .hero-meta{display:flex;gap:32px}
+  .hero-meta span{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--mute);font-weight:600}
+  .hero-meta span b{display:block;font-size:12px;color:var(--ink);margin-top:6px;font-weight:700;letter-spacing:.04em}
+  .hero h1{
+    font-weight:900;
+    font-size:clamp(64px,8.4vw,136px);line-height:.88;letter-spacing:-.045em;
+    max-width:13ch;padding-bottom:.08em;
+  }
+  .hero h1 .mark-bg{background:transparent;padding:0}
+  .hero h1 em{font-style:italic;font-weight:900}
+  .hero-sub{display:grid;grid-template-columns:1.3fr 1fr;gap:80px;margin-top:72px;align-items:end}
+  .hero-sub p{font-size:17px;line-height:1.45;max-width:46ch;color:var(--ink);margin:0;font-weight:500}
+  .hero-sub p b{font-weight:800}
+  .hero-cta{display:flex;flex-direction:column;gap:16px;align-items:flex-start}
+
+  .hero-num{
+    position:absolute;right:56px;top:48px;text-align:right;
+    font-size:10px;color:var(--mute);letter-spacing:.1em;text-transform:uppercase;font-weight:600
+  }
+  .hero-num b{display:block;font-weight:900;font-size:56px;color:var(--ink);line-height:1;margin-bottom:6px;letter-spacing:-.04em}
+
+  /* Dimensiones */
+  .dims{padding:64px 56px;border-bottom:1.5px solid var(--line);background:var(--paper)}
+  .dims-head{display:flex;justify-content:space-between;align-items:flex-end;gap:40px;margin-bottom:40px}
+  .dims-head h2{font-weight:900;font-size:clamp(36px,4.2vw,64px);line-height:.95;letter-spacing:-.035em;max-width:16ch}
+  .dims-grid{display:grid;grid-template-columns:repeat(4,1fr)}
+  .dim{
+    border-right:1.5px solid var(--line);padding:28px 24px 32px;position:relative;
+    min-height:280px;display:flex;flex-direction:column;gap:14px;background:var(--card);
+    transition:background .2s ease;
+  }
+  .dim:hover{background:var(--neon)}
+  .dim:last-child{border-right:0}
+  .dim .idx{font-size:11px;letter-spacing:0.5px;text-transform:uppercase;color:var(--mute);font-weight:700}
+  .dim .swatch{width:56px;height:8px;background:var(--ink);margin:4px 0}
+  .dim h3{font-weight:900;font-size:32px;letter-spacing:-0.5px;line-height:1}
+  .dim .pair{font-weight:500;font-size:14px;color:var(--mute);letter-spacing:0.5px;text-transform:uppercase}
+  .dim:hover .pair{color:var(--ink)}
+  .dim p{font-size:14px;line-height:1.45;color:var(--ink-2);margin:8px 0 0;max-width:30ch;font-weight:500}
+  .dim .num{position:absolute;top:16px;right:20px;font-weight:900;font-size:14px;letter-spacing:-.02em;color:var(--ink)}
+
+  /* Proceso */
+  .process{padding:64px 56px;border-bottom:1.5px solid var(--line);display:grid;grid-template-columns:280px 1fr;gap:72px;background:var(--bg)}
+  .process h2{font-weight:900;font-size:clamp(36px,4vw,56px);line-height:.92;letter-spacing:-.035em}
+  .process h2 .mark-bg{background:transparent;padding:0}
+  .process-steps{display:flex;flex-direction:column;border-top:1.5px solid var(--line);margin-left:25px}
+  .step{display:grid;grid-template-columns:90px 1fr 180px;gap:32px;padding:24px 0;border-bottom:1.5px solid var(--line);align-items:start}
+  .step .n{font-weight:900;font-size:44px;line-height:.9;letter-spacing:-.04em}
+  .step h4{margin:0 0 6px;font-size:20px;font-weight:800;letter-spacing:-.02em}
+  .step p{margin:0;font-size:14px;color:var(--ink-2);line-height:1.5;max-width:50ch;font-weight:500}
+  .step .meta{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--mute);text-align:right;font-weight:600}
+
+  /* Niveles */
+  .levels{padding:64px 56px;border-bottom:1.5px solid var(--line);background:var(--paper);color:var(--ink)}
+  .levels .eyebrow{color:var(--ink)}
+  .levels .rule{background:var(--ink);height:2px}
+  .levels h2{font-weight:900;font-size:clamp(36px,4.2vw,64px);line-height:.92;letter-spacing:-.035em;margin:16px 0 8px}
+  .levels .lede{color:var(--ink-2);max-width:56ch;margin:0 0 40px;font-size:16px;line-height:1.5;font-weight:500}
+  .levels-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+  .level{border:1.5px solid var(--line);padding:22px;display:flex;flex-direction:column;gap:14px;min-height:260px;position:relative;background:var(--card);color:var(--ink)}
+  .level.accent{background:var(--neon);color:var(--ink);border-color:var(--ink)}
+  .level .tag{font-size:10px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:var(--mute)}
+  .level.accent .tag{color:var(--ink)}
+  .level h4{font-weight:900;font-size:22px;letter-spacing:-.02em;line-height:1.05;margin:0}
+  .level p{margin:0;font-size:13px;line-height:1.45;font-weight:500;color:var(--ink-2)}
+  .level.accent p{color:var(--ink)}
+  .level .viz{margin-top:auto;height:96px;display:flex;align-items:center;justify-content:center}
+
+  /* Closing */
+  .closing{padding:80px 56px;background:var(--bg);position:relative}
+  .closing .eyebrow.soft{color:var(--mute)}
+  .closing h2{font-weight:900;font-size:clamp(48px,6.5vw,112px);line-height:.88;letter-spacing:-.045em;margin:12px 0 32px;max-width:14ch}
+  .closing h2 .mark-bg{background:transparent;padding:0}
+  .closing-bottom{display:flex;justify-content:space-between;margin-top:72px;font-size:10px;color:var(--mute);letter-spacing:.12em;text-transform:uppercase;font-weight:600}
+
+  /* ============ INTAKE ============ */
+  .intake{display:grid;grid-template-columns:1fr 1fr;min-height:100vh}
+  .intake .side{padding:56px;border-right:1.5px solid var(--line);display:flex;flex-direction:column;gap:24px;background:var(--bg);color:var(--ink)}
+  .intake .side .eyebrow{color:var(--ink);letter-spacing:0.5px}
+  .intake .side .rule{background:var(--ink);height:2px}
+  .intake .side h2{font-weight:900;font-size:64px;line-height:.92;letter-spacing:-1px;margin:24px 0 0}
+  .intake .side h2 .mark-bg{background:transparent;color:inherit;padding:0}
+  .intake .side p{color:var(--ink-2);line-height:1.5;max-width:42ch;font-weight:500;font-size:15px}
+  .intake .form{padding:56px;display:flex;flex-direction:column;gap:20px;background:var(--paper);border-left:1.5px solid var(--line)}
+  .field{display:flex;flex-direction:column;gap:6px}
+  .field label{font-size:10px;letter-spacing:0.5px;text-transform:uppercase;color:var(--ink);font-weight:700}
+  .field input,.field select{
+    all:unset;border-bottom:1.5px solid var(--ink);padding:10px 0;font-size:16px;font-family:inherit;font-weight:600;
+  }
+  .field input::placeholder{color:var(--mute);font-weight:500}
+  .field input:focus{border-bottom-color:var(--neon);box-shadow:0 2px 0 var(--neon)}
+  .roles{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:15px}
+  .role{border:1.5px solid var(--line);padding:16px 18px;cursor:pointer;display:flex;flex-direction:column;gap:4px;background:var(--card)}
+  .role:hover{background:var(--neon)}
+  .role.sel{background:var(--ink);color:var(--bg)}
+  .role h5{margin:0;font-size:16px;font-weight:800;letter-spacing:-.01em}
+  .role p{margin:0;font-size:13px;color:var(--mute);font-weight:500;line-height:1.4}
+  .role.sel p{color:rgba(255,255,255,.6)}
+
+  /* ============ QUESTION ============ */
+  .qheader{padding:20px 56px;border-bottom:1.5px solid var(--line);display:flex;justify-content:space-between;align-items:center;background:var(--bg);position:sticky;top:0;z-index:10}
+  .qprogress{display:flex;align-items:center;gap:18px}
+  .qprogress .bar{width:240px;height:4px;background:var(--bg-2);position:relative;border:1.5px solid var(--line)}
+  .qprogress .bar i{position:absolute;left:0;top:0;height:100%;background:var(--ink);transition:width .4s ease}
+  .qprogress .label{font-size:11px;color:var(--ink);font-weight:700;letter-spacing:0.5px}
+  .qheader .dimension{display:flex;align-items:center;gap:10px;font-size:11px;letter-spacing:0.5px;font-weight:700;text-transform:uppercase}
+
+  .qbody{padding:56px 56px 100px;max-width:1100px;margin:0 auto}
+  .qgrid{display:grid;grid-template-columns:1fr 240px;gap:56px;align-items:start}
+
+  .qeyebrow{display:flex;align-items:flex-start;gap:24px;margin-bottom:32px}
+  .qeyebrow .n{font-weight:900;font-size:88px;line-height:.88;letter-spacing:-1px;flex-shrink:0;color:var(--ink)}
+  .qeyebrow .n em{font-style:normal;padding:0}
+  .qeyebrow .lbl{display:flex;flex-direction:column;gap:10px;padding-top:12px}
+  .qeyebrow .lbl .of{font-size:11px;color:var(--ink);letter-spacing:0.5px;text-transform:uppercase;font-weight:700}
+  .qeyebrow .lbl .eyebrow{color:var(--mute);letter-spacing:0.5px}
+
+  .qtitle{font-weight:900;font-size:40px;line-height:1.05;letter-spacing:-1px;margin:0 0 20px;max-width:22ch}
+  .qctx{color:var(--ink-2);font-size:15px;line-height:1.55;max-width:60ch;margin:0 0 40px;font-weight:500}
+
+  .scale{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:28px}
+  .scale-opt{
+    border:1.5px solid var(--line);padding:18px 16px;cursor:pointer;display:flex;flex-direction:column;gap:10px;
+    min-height:132px;background:var(--card);transition:background .15s ease;
+  }
+  .scale-opt:hover{background:var(--neon)}
+  .scale-opt.sel{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+  .scale-opt .s-num{font-weight:900;font-size:32px;line-height:1;letter-spacing:-.04em}
+  .scale-opt .s-label{font-size:13px;line-height:1.35;font-weight:700}
+  .scale-opt .s-desc{font-size:10px;letter-spacing:0.5px;text-transform:uppercase;color:var(--mute);margin-top:auto;font-weight:600}
+  .scale-opt.sel .s-desc{color:rgba(255,255,255,.55)}
+
+  .qnav{display:flex;justify-content:space-between;align-items:center;margin-top:40px;padding-top:24px;border-top:1.5px solid var(--line)}
+  .qnav .nav-left{display:flex;gap:10px}
+
+  .qsidebar{display:flex;flex-direction:column;gap:10px;padding-top:24px}
+  .levelpill{
+    border:1.5px solid var(--line);padding:12px 14px;cursor:pointer;
+    display:flex;align-items:center;gap:10px;background:var(--card);
+    font-size:13px;font-weight:700;
+  }
+  .levelpill.active{background:var(--ink);color:var(--bg)}
+  .levelpill.done{background:var(--neon)}
+  .levelpill .ln{font-size:10px;opacity:.6;font-weight:500}
+
+  .dimlist{display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:700}
+  .dimlist .item{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--line-soft)}
+  .dimlist .item .v{margin-left:auto;color:var(--mute);font-weight:600;font-variant-numeric:tabular-nums}
+
+  /* ============ RESULTS ============ */
+  .rhead{padding:56px 56px 32px;border-bottom:1.5px solid var(--line);display:grid;grid-template-columns:1fr 360px;gap:56px;align-items:end;background:var(--bg)}
+  .rhead .eyebrow{letter-spacing:0.5px}
+  .rhead h1{font-weight:900;font-size:clamp(48px,6vw,88px);line-height:.88;letter-spacing:-1px;margin:24px 0 0;max-width:14ch}
+  .rhead h1 .mark-bg{background:transparent;padding:0}
+  .rhead-meta{display:flex;flex-direction:column;gap:8px;font-size:12px}
+  .rhead-meta .row{display:flex;justify-content:space-between;border-bottom:1.5px solid var(--line);padding:8px 0;font-weight:700;letter-spacing:.02em}
+  .rhead-meta .row span:first-child{text-transform:uppercase;font-size:10px;letter-spacing:0.5px;color:var(--mute)}
+  .rhead-meta .row b{font-weight:800}
+
+  .sectionbar{padding:16px 56px;font-size:10px;color:var(--ink);letter-spacing:0.5px;text-transform:uppercase;font-weight:700;display:flex;justify-content:space-between;border-bottom:1.5px solid var(--line);background:var(--bg-2)}
+
+  /* Score cards */
+  .scores{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1.5px solid var(--line)}
+  .score{border-right:1.5px solid var(--line);padding:28px 24px 20px;position:relative;min-height:300px;display:flex;flex-direction:column;gap:14px;background:var(--card)}
+  .score:last-child{border-right:0}
+  .score .top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+  .score .top > div{min-width:0}
+  .score .label{font-size:10px;letter-spacing:0.5px;text-transform:uppercase;color:var(--mute);font-weight:700}
+  .score h3{font-weight:900;font-size:26px;letter-spacing:-1px;line-height:1;margin-top:4px}
+  .score .big{font-weight:900;font-size:88px;line-height:1;letter-spacing:-1px;margin:8px 0 0}
+  .score .gap{
+    display:inline-flex;align-items:center;gap:6px;padding:4px 8px;border:1.5px solid var(--line);
+    font-size:10px;letter-spacing:0.5px;text-transform:uppercase;font-weight:700;
+    white-space:nowrap;flex-shrink:0;
+  }
+  .score .gap.low{background:var(--card)}
+  .score .gap.med{background:var(--bg-2)}
+  .score .gap.high{background:var(--neon)}
+  .score .minibar{height:10px;background:var(--bg-2);position:relative;margin-top:auto;border:1.5px solid var(--line)}
+  .score .minibar i{position:absolute;left:0;top:0;height:100%;background:var(--ink)}
+  .score .tinynote{font-size:12px;color:var(--ink-2);line-height:1.4;font-weight:500}
+
+  /* Charts */
+  .charts{padding:56px;display:grid;grid-template-columns:1fr 1fr;gap:56px;border-bottom:1.5px solid var(--line);background:var(--bg)}
+  .chart-block h2{font-weight:900;font-size:32px;letter-spacing:-1px;line-height:1;margin:0 0 8px}
+  .chart-block .csub{color:var(--ink-2);font-size:13px;line-height:1.5;margin:0 0 24px;max-width:50ch;font-weight:500}
+  .legend{display:flex;gap:16px;margin-bottom:16px;flex-wrap:wrap}
+  .legend span{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:600;color:var(--ink-2)}
+  .legend i{width:14px;height:14px;display:inline-block;border:1.5px solid var(--line)}
+  .chartbox{background:var(--card);border:1.5px solid var(--line);padding:16px}
+
+  /* Gap table */
+  .gaptable{padding:56px;border-bottom:1.5px solid var(--line);background:var(--paper)}
+  .gaptable h2{font-weight:900;font-size:32px;letter-spacing:-1px;margin:0 0 8px}
+  .gaptable .csub{color:var(--ink-2);font-size:13px;margin:0 0 24px;max-width:60ch;font-weight:500}
+  .gaps-wrap{background:var(--card);border:1.5px solid var(--line)}
+  table.gaps{width:100%;border-collapse:collapse;font-size:13px}
+  table.gaps thead th{text-align:left;padding:12px 16px;font-size:10px;letter-spacing:0.5px;text-transform:uppercase;color:var(--ink);border-bottom:1.5px solid var(--line);font-weight:800;background:var(--bg-2)}
+  table.gaps td{padding:14px 16px;border-bottom:1px solid var(--line-soft);vertical-align:middle;font-weight:600}
+  table.gaps tbody tr:last-child td{border-bottom:0}
+  table.gaps tr:hover td{background:var(--bg-2)}
+  table.gaps .dimcell{display:flex;align-items:center;gap:10px;font-weight:800;font-size:13px}
+  table.gaps .barcell{width:30%}
+  table.gaps .valcell{font-size:13px;text-align:right;width:60px;font-weight:700;font-variant-numeric:tabular-nums}
+  table.gaps .gapcell{font-size:12px;text-align:right;width:70px;font-weight:800;font-variant-numeric:tabular-nums}
+  .minibar2{height:12px;background:var(--bg-2);position:relative;border:1.5px solid var(--line)}
+
+  /* Insights */
+  .insights{padding:64px 56px;background:var(--bg);color:var(--ink);border-bottom:1.5px solid var(--line)}
+  .insights .eyebrow{color:var(--ink);letter-spacing:0.5px}
+  .insights .rule{background:var(--ink);height:2px}
+  .insights h2{font-weight:900;font-size:clamp(40px,4.6vw,64px);line-height:.92;letter-spacing:-1px;margin:24px 0 12px;max-width:18ch}
+  .insights h2 .mark-bg{background:transparent;color:inherit;padding:0}
+  .insights .csub{color:var(--ink-2);font-size:15px;line-height:1.5;margin:0 0 40px;max-width:60ch;font-weight:500}
+  .insights-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .insight{background:var(--card);border:1.5px solid var(--line);padding:24px;display:flex;flex-direction:column;gap:14px;min-height:280px}
+  .insight.accent{background:var(--neon);color:var(--ink);border-color:var(--ink)}
+  .insight .itag{font-size:10px;letter-spacing:0.5px;text-transform:uppercase;font-weight:800;display:flex;align-items:center;gap:8px}
+  .insight h4{font-weight:900;font-size:22px;line-height:1.1;letter-spacing:-0.5px;margin:0}
+  .insight p{margin:0;font-size:13px;line-height:1.5;font-weight:500;color:var(--ink-2)}
+  .insight.accent p{color:var(--ink)}
+  .insight .action{margin-top:auto;font-size:11px;letter-spacing:0.5px;text-transform:uppercase;font-weight:800;border-top:1.5px solid var(--line);padding-top:12px}
+  .insight.accent .action{border-color:var(--ink)}
+
+  /* Tweaks */
+  #tweaks{
+    position:fixed;right:20px;bottom:20px;width:300px;background:var(--card);
+    border:1.5px solid var(--line);padding:20px;z-index:100;
+    display:none;flex-direction:column;gap:16px;font-size:13px;
+    box-shadow:6px 6px 0 var(--ink);
+  }
+  #tweaks.on{display:flex}
+  #tweaks h5{margin:0;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink);display:flex;justify-content:space-between;font-weight:800}
+  #tweaks .tw{display:flex;flex-direction:column;gap:8px}
+  #tweaks .tw label{font-size:11px;color:var(--mute);font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+  #tweaks .tw .row{display:flex;gap:6px;flex-wrap:wrap}
+  #tweaks .sw{width:32px;height:32px;border:1.5px solid var(--line);cursor:pointer;position:relative}
+  #tweaks .sw.on::after{content:"";position:absolute;inset:-5px;border:1.5px solid var(--ink);pointer-events:none}
+  #tweaks .closebtn{background:transparent;border:0;cursor:pointer;font-size:18px;font-weight:900;line-height:1}
+
+  /* Utilities */
+  .mark-bg{background:transparent;padding:0}
+  .noise::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.03;background-image:radial-gradient(#000 1px,transparent 1px);background-size:3px 3px}
+
+</style>
+</head>
+<body>
+
+<div id="app">
+  <aside>
+    <div class="brand">
+      <img src="assets/laborativo-logo.png" alt="Laborativo" style="width:100%;max-width:180px;height:auto;display:block;margin-left:-18px">
+    </div>
+
+    <nav>
+      <span class="group">Producto</span>
+      <button data-screen="landing" class="active"><span class="num">01</span> Landing</button>
+      <button data-screen="intake"><span class="num">02</span> Ingreso</button>
+      <button data-screen="question"><span class="num">03</span> Pregunta</button>
+      <button data-screen="results"><span class="num">04</span> Resultados</button>
+
+      <span class="group">Marco</span>
+      <button data-screen="about"><span class="num">·</span> Metodología</button>
+    </nav>
+
+    <div style="display:flex;flex-direction:column;gap:10px;margin-top:auto">
+      <span class="neon-dot"><i></i> Acento activo</span>
+      <div class="foot">
+        DIAG · V0.4<br>
+        LABORATIVO © MMXXVI<br>
+        BOGOTÁ — COLOMBIA
+      </div>
+    </div>
+  </aside>
+
+  <main>
+    <!-- ============ LANDING ============ -->
+    <section id="landing" class="screen active">
+      <div class="hero">
+        <div class="hero-top">
+          <div class="hero-meta">
+            <span style="letter-spacing:0.5px">Producto<b>Diagnóstico de Cultura Organizacional</b></span>
+            <span style="letter-spacing:0.5px">Formato<b>Mirada 360°</b></span>
+            <span style="letter-spacing:0.5px">Tiempo<b>12–18 minutos</b></span>
+          </div>
+          <div class="hero-num">
+            <b>04</b>
+            dimensiones<br>de análisis
+          </div>
+        </div>
+
+        <span class="eyebrow" style="letter-spacing:0.5px">Una experiencia laborativo.</span>
+        <div class="rule"></div>
+        <h1 style="margin-top:24px">las empresas son<br>personas, las personas emoción.</h1>
+
+        <div class="hero-sub">
+          <p>Un diagnóstico breve para ver con claridad cómo se comporta tu cultura hoy y dónde están las brechas entre lo que el líder cree, lo que el equipo vive, y lo que la organización realmente hace. <br><b>Un modelo de consultoría creativa basada en la emoción.</b></p>
+
+        </div>
+      </div>
+
+      <!-- Dimensiones -->
+      <div class="dims">
+        <div class="dims-head">
+          <div>
+            <span class="eyebrow" style="letter-spacing:0.5px">Contexto de diagnóstico.</span>
+            <div class="rule"></div>
+            <h2 style="margin-top:24px;width:1181.19px;max-width:100%">Cuatro dimensione para abordar <span class="mark-bg">cualquier reto.</span></h2>
+          </div>
+          <span class="chip">4 ejes · 18 preguntas</span>
+        </div>
+        <div class="dims-grid">
+          <div class="dim">
+            <span class="num">01</span>
+            <span class="idx">Intención</span>
+            <span class="swatch"></span>
+            <h3>Sentido</h3>
+            <span class="pair">A donde vamos?</span>
+            <p>El propósito compartido. Qué hace que este equipo exista y hacia qué horizonte se orienta.</p>
+          </div>
+          <div class="dim">
+            <span class="num">02</span>
+            <span class="idx">Motivación</span>
+            <span class="swatch"></span>
+            <h3>Energía</h3>
+            <span class="pair">Por qué?</span>
+            <p>Lo que enciende o apaga a las personas. Las razones internas detrás del esfuerzo cotidiano.</p>
+          </div>
+          <div class="dim">
+            <span class="num">03</span>
+            <span class="idx">Interacción</span>
+            <span class="swatch"></span>
+            <h3>Vínculos</h3>
+            <span class="pair">Con quién?</span>
+            <p>Cómo nos relacionamos. Calidad de la conversación, confianza y colaboración entre personas.</p>
+          </div>
+          <div class="dim">
+            <span class="num">04</span>
+            <span class="idx">Acción</span>
+            <span class="swatch"></span>
+            <h3>Comportamiento</h3>
+            <span class="pair">Qué?</span>
+            <p>Lo que se hace realmente —no lo que se dice—. Hábitos, decisiones y entregas visibles.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Proceso -->
+      <div class="process">
+        <div>
+          <span class="eyebrow" style="letter-spacing:0.5px">Paso a paso.</span>
+          <div class="rule"></div>
+          <h2 style="margin-top:24px">Cómo funciona el <span class="mark-bg">diagnóstico.</span></h2>
+        </div>
+        <div class="process-steps">
+          <div class="step">
+            <span class="n">01</span>
+            <div>
+              <h4>Invitación y roles</h4>
+              <p>Cada persona entra con un enlace único y selecciona su rol. El sistema sabe si responde como miembro, como líder o evaluando a otros.</p>
+            </div>
+            <span class="meta">2 min · administrativo</span>
+          </div>
+          <div class="step">
+            <span class="n">02</span>
+            <div>
+              <h4>Cuatro niveles de mirada</h4>
+              <p>Autoevaluación individual, autoevaluación del líder, líder evalúa al equipo y equipo evalúa al líder. De ahí nacen las brechas.</p>
+            </div>
+            <span class="meta">12–18 min · por persona</span>
+          </div>
+          <div class="step">
+            <span class="n">03</span>
+            <div>
+              <h4>Preguntas por dimensión</h4>
+              <p>Cada pregunta se ancla a una de las cuatro dimensiones. Las respuestas se cruzan entre niveles para detectar dónde la percepción no coincide con la vivencia.</p>
+            </div>
+            <span class="meta">4 dimensiones · 18 preguntas</span>
+          </div>
+          <div class="step" style="border-bottom:0">
+            <span class="n">04</span>
+            <div>
+              <h4>Mapa de brechas</h4>
+              <p>Entregamos un reporte visual con las brechas por dimensión, la salud cultural por rol, y acciones concretas para cerrar las distancias más críticas.</p>
+            </div>
+            <span class="meta">entrega inmediata · PDF + dashboard</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Niveles -->
+      <div class="levels">
+        <span class="eyebrow">Mirada 360°</span>
+        <div class="rule"></div>
+        <h2>Cuatro puntos de vista<br>sobre la misma cultura.</h2>
+        <p class="lede">Donde estas miradas coinciden, hay alineación. Donde no, hay una brecha —y ahí empieza el trabajo.</p>
+        <div class="levels-grid">
+          <div class="level">
+            <span class="tag">Nivel 01 · Individuo</span>
+            <h4>Autoevaluación personal</h4>
+            <p style="width:250px;max-width:100%">Cada miembro del equipo se observa a sí mismo en las cuatro dimensiones.</p>
+            <div class="viz">
+              <svg width="120" height="80" viewBox="0 0 120 80" fill="none" stroke="currentColor" stroke-width="1.5">
+                <circle cx="60" cy="42" r="10" fill="currentColor" stroke="none"/>
+                <path d="M60 24 C 90 24, 92 60, 60 60" stroke-linecap="round"/>
+                <path d="M60 60 L 54 56 M60 60 L 56 66" stroke-linecap="round"/>
+                <text x="60" y="77" text-anchor="middle" font-size="7" font-weight="700" font-family="Red Hat Display" fill="currentColor" stroke="none" letter-spacing=".5">YO → YO</text>
+              </svg>
+            </div>
+          </div>
+          <div class="level">
+            <span class="tag">Nivel 02 · Líder</span>
+            <h4>Autoevaluación del líder</h4>
+            <p style="width:250px;max-width:100%">El líder se observa con los mismos criterios que su equipo.</p>
+            <div class="viz">
+              <svg width="120" height="80" viewBox="0 0 120 80" fill="none" stroke="currentColor" stroke-width="1.5">
+                <rect x="48" y="30" width="24" height="24" fill="currentColor" stroke="none"/>
+                <path d="M44 26 L60 18 L76 26" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M72 30 C 96 30, 98 60, 60 60" stroke-linecap="round"/>
+                <path d="M60 60 L 55 56 M60 60 L 56 66" stroke-linecap="round"/>
+                <text x="60" y="77" text-anchor="middle" font-size="7" font-weight="700" font-family="Red Hat Display" fill="currentColor" stroke="none" letter-spacing=".5">LÍDER → LÍDER</text>
+              </svg>
+            </div>
+          </div>
+          <div class="level">
+            <span class="tag">Nivel 03 · Descendente</span>
+            <h4>Líder evalúa al equipo</h4>
+            <p style="width:250px;max-width:100%">La mirada del líder sobre las conductas colectivas que observa.</p>
+            <div class="viz">
+              <svg width="120" height="80" viewBox="0 0 120 80" fill="none" stroke="currentColor" stroke-width="1.5">
+                <rect x="6" y="28" width="20" height="20" fill="currentColor" stroke="none"/>
+                <path d="M2 24 L16 16 L30 24" stroke-linecap="round" stroke-linejoin="round"/>
+                <circle cx="94" cy="18" r="7"/>
+                <circle cx="100" cy="42" r="7"/>
+                <circle cx="94" cy="66" r="7"/>
+                <path d="M30 36 L86 20" stroke-linecap="round"/>
+                <path d="M30 38 L92 42" stroke-linecap="round"/>
+                <path d="M30 40 L86 64" stroke-linecap="round"/>
+                <path d="M86 20 L82 22 M86 20 L86 26" stroke-linecap="round"/>
+                <path d="M92 42 L88 40 M92 42 L88 46" stroke-linecap="round"/>
+                <path d="M86 64 L82 60 M86 64 L86 58" stroke-linecap="round"/>
+                <text x="60" y="77" text-anchor="middle" font-size="7" font-weight="700" font-family="Red Hat Display" fill="currentColor" stroke="none" letter-spacing=".5">LÍDER → EQUIPO</text>
+              </svg>
+            </div>
+          </div>
+          <div class="level">
+            <span class="tag">Nivel 04 · Ascendente</span>
+            <h4>Equipo evalúa al líder</h4>
+            <p style="width:250px;max-width:100%">El contrapeso. Cómo ve el equipo al liderazgo que recibe.</p>
+            <div class="viz">
+              <svg width="120" height="80" viewBox="0 0 120 80" fill="none" stroke="currentColor" stroke-width="1.5">
+                <circle cx="20" cy="18" r="7"/>
+                <circle cx="14" cy="42" r="7"/>
+                <circle cx="20" cy="66" r="7"/>
+                <rect x="94" y="28" width="20" height="20" fill="currentColor" stroke="none"/>
+                <path d="M88 24 L102 16 L116 24" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M27 20 L90 36" stroke-linecap="round"/>
+                <path d="M21 42 L90 38" stroke-linecap="round"/>
+                <path d="M27 64 L90 40" stroke-linecap="round"/>
+                <path d="M90 36 L86 32 M90 36 L84 36" stroke-linecap="round"/>
+                <path d="M90 38 L86 36 M90 38 L86 42" stroke-linecap="round"/>
+                <path d="M90 40 L86 42 M90 40 L84 40" stroke-linecap="round"/>
+                <text x="60" y="77" text-anchor="middle" font-size="7" font-weight="700" font-family="Red Hat Display" fill="currentColor" stroke="none" letter-spacing=".5">EQUIPO → LÍDER</text>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Closing -->
+      <div class="closing">
+        <span class="eyebrow soft">Empieza ahora</span>
+        <div class="rule"></div>
+        <h2>De la intuición<br>al <span class="mark-bg">mapa.</span></h2>
+        <div style="display:flex;gap:12px;flex-wrap:wrap">
+          <button class="btn primary" onclick="go('intake')">Iniciar diagnóstico →</button>
+          <button class="btn" onclick="go('results')">Ver reporte ejemplo</button>
+        </div>
+        <div class="closing-bottom">
+          <span>Laborativo / Consultoría Creativa Basada en la Emoción</span>
+          <span>Diag-2026 · V0.4</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ INTAKE ============ -->
+    <section id="intake" class="screen">
+      <div class="intake">
+        <div class="side">
+          <span class="eyebrow">Paso 01 / 02 — Registro</span>
+          <div class="rule"></div>
+          <h2>Antes de empezar,<br>cuéntanos quién responde.</h2>
+          <p>Esta información nos ayuda a cruzar tu respuesta con la de tu equipo. Nadie verá tus respuestas individuales, solo los resultados colectivos.</p>
+          <div style="margin-top:auto;display:flex;flex-direction:column;gap:12px">
+            <span class="chip"><span class="sq" style="background:var(--neon);border:1.5px solid var(--line)"></span> Anónimo · 100% confidencial</span>
+            <span class="eyebrow soft">≈ 6 minutos · 18 preguntas</span>
+          </div>
+        </div>
+        <div class="form">
+          <div class="field">
+            <label>Código del equipo</label>
+            <input type="text" value="LAB-0042" readonly style="color:var(--ink)">
+          </div>
+          <div class="field">
+            <label>Área / Unidad</label>
+            <input type="text" placeholder="Producto, Marketing, Operaciones…">
+          </div>
+
+          <div class="field" style="margin-top:15px">
+            <label>Tu rol en esta evaluación</label>
+            <div class="roles">
+              <div class="role sel" data-role="1">
+                <h5>Miembro del equipo</h5>
+                <p>Te autoevalúas y evalúas a tu líder.</p>
+              </div>
+              <div class="role" data-role="2">
+                <h5>Líder del equipo</h5>
+                <p>Te autoevalúas y evalúas al equipo.</p>
+              </div>
+            </div>
+          </div>
+
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:16px">
+            <button class="btn" onclick="go('landing')">← Volver</button>
+            <button class="btn primary" onclick="go('question')">Comenzar preguntas →</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ QUESTION ============ -->
+    <section id="question" class="screen">
+      <div class="qheader">
+        <div class="qprogress">
+          <span class="label">Pregunta <b id="q-idx">04</b> / 18</span>
+          <div class="bar"><i id="q-bar" style="width:22%"></i></div>
+        </div>
+        <div class="dimension">
+          <span class="sq" style="background:var(--neon);border:1.5px solid var(--line)"></span>
+          <span id="q-dim-label">Dimensión 01 · Intención / Sentido</span>
+        </div>
+      </div>
+
+      <div class="qbody">
+        <div class="qgrid">
+          <div>
+            <div class="qeyebrow">
+              <span class="n"><em>04</em></span>
+              <span class="lbl">
+                <span class="of">Nivel 02 · Autoevaluación del líder</span>
+                <span class="eyebrow">Intención — Sentido — A dónde vamos</span>
+              </span>
+            </div>
+
+            <h1 class="qtitle" id="q-title">Cuando tomo una decisión difícil, puedo conectar claramente esa decisión con el propósito compartido del equipo.</h1>
+            <p class="qctx" id="q-ctx">Piensa en las últimas tres decisiones complejas que tomaste. ¿Podrías explicárselas a un miembro nuevo del equipo anclándolas en un propósito más amplio, o se sostuvieron solo en urgencia o costo?</p>
+
+            <div class="scale" id="q-scale">
+              <div class="scale-opt" data-v="1">
+                <span class="s-num">1</span>
+                <span class="s-label">Casi nunca logro hacerlo</span>
+                <span class="s-desc">Rara vez · sin evidencia</span>
+              </div>
+              <div class="scale-opt" data-v="2">
+                <span class="s-num">2</span>
+                <span class="s-label">A veces, no de forma consistente</span>
+                <span class="s-desc">Ocasional · frágil</span>
+              </div>
+              <div class="scale-opt sel" data-v="3">
+                <span class="s-num">3</span>
+                <span class="s-label">En situaciones claras sí, en las ambiguas no</span>
+                <span class="s-desc">Parcial · contextual</span>
+              </div>
+              <div class="scale-opt" data-v="4">
+                <span class="s-num">4</span>
+                <span class="s-label">La mayoría del tiempo sí</span>
+                <span class="s-desc">Frecuente · visible</span>
+              </div>
+              <div class="scale-opt" data-v="5">
+                <span class="s-num">5</span>
+                <span class="s-label">Siempre — es un hábito establecido</span>
+                <span class="s-desc">Consistente · cultural</span>
+              </div>
+            </div>
+
+            <div class="field">
+              <label>Comentario opcional</label>
+              <input type="text" placeholder="Un ejemplo reciente que ilustre tu respuesta…">
+            </div>
+
+            <div class="qnav">
+              <div class="nav-left">
+                <button class="btn" onclick="prevQ()">← Anterior</button>
+                <button class="btn" style="border-color:transparent;color:var(--mute)">Omitir</button>
+              </div>
+              <button class="btn primary" onclick="nextQ()">Siguiente →</button>
+            </div>
+          </div>
+
+          <aside class="qsidebar">
+            <span class="eyebrow">Niveles de esta sesión</span>
+            <div class="levelpill done">
+              <span class="ln">01</span>
+              <span>Autoevaluación</span>
+              <span style="margin-left:auto;font-size:10px">✓</span>
+            </div>
+            <div class="levelpill active">
+              <span class="ln">02</span>
+              <span>Autoev. líder</span>
+              <span style="margin-left:auto;font-size:10px">4/5</span>
+            </div>
+            <div class="levelpill">
+              <span class="ln">03</span>
+              <span>Líder → Equipo</span>
+            </div>
+            <div class="levelpill">
+              <span class="ln">04</span>
+              <span>Equipo → Líder</span>
+            </div>
+
+            <span class="eyebrow" style="margin-top:16px">Dimensiones</span>
+            <div class="dimlist">
+              <div class="item"><span class="sq" style="background:var(--neon);border:1.5px solid var(--line)"></span>Intención <span class="v">4/5</span></div>
+              <div class="item"><span class="sq" style="background:var(--card);border:1.5px solid var(--line)"></span>Motivación <span class="v">0/4</span></div>
+              <div class="item"><span class="sq" style="background:var(--card);border:1.5px solid var(--line)"></span>Interacción <span class="v">0/5</span></div>
+              <div class="item"><span class="sq" style="background:var(--card);border:1.5px solid var(--line)"></span>Acción <span class="v">0/4</span></div>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ RESULTS ============ -->
+    <section id="results" class="screen">
+      <div class="rhead">
+        <div>
+          <span class="eyebrow">Reporte · Equipo LAB-0042 · 12 respuestas</span>
+          <div class="rule"></div>
+          <h1>El mapa de <span class="mark-bg">las brechas</span> de tu cultura.</h1>
+        </div>
+        <div class="rhead-meta">
+          <div class="row"><span>Equipo</span><b>Diseño · 12 personas</b></div>
+          <div class="row"><span>Participación</span><b>100% · 12 / 12</b></div>
+          <div class="row"><span>Fecha</span><b>19 abr 2026</b></div>
+          <div class="row"><span>Brecha mayor</span><b>Intención · Δ 1.8</b></div>
+        </div>
+      </div>
+
+      <div class="sectionbar">
+        <span>01 / Salud por dimensión</span>
+        <span>Escala 1–5 · promedios ponderados</span>
+      </div>
+
+      <div class="scores">
+        <div class="score">
+          <div class="top">
+            <div>
+              <span class="label">01 / Intención</span>
+              <h3>Sentido</h3>
+            </div>
+            <span class="gap high">Δ 1.8 · alta</span>
+          </div>
+          <div class="big">2.4</div>
+          <p class="tinynote">El líder se percibe con propósito claro (4.2); el equipo no lo recibe (2.4). Brecha crítica.</p>
+          <div class="minibar"><i style="width:48%"></i></div>
+        </div>
+        <div class="score">
+          <div class="top">
+            <div>
+              <span class="label">02 / Motivación</span>
+              <h3>Energía</h3>
+            </div>
+            <span class="gap med">Δ 0.9 · media</span>
+          </div>
+          <div class="big">3.1</div>
+          <p class="tinynote">La energía está fragmentada —fuerte en pares, débil al nivel de equipo.</p>
+          <div class="minibar"><i style="width:62%"></i></div>
+        </div>
+        <div class="score">
+          <div class="top">
+            <div>
+              <span class="label">03 / Interacción</span>
+              <h3>Vínculos</h3>
+            </div>
+            <span class="gap low">Δ 0.3 · baja</span>
+          </div>
+          <div class="big">4.0</div>
+          <p class="tinynote">Los vínculos son la fortaleza. Confianza y colaboración percibidas de forma similar.</p>
+          <div class="minibar"><i style="width:80%"></i></div>
+        </div>
+        <div class="score">
+          <div class="top">
+            <div>
+              <span class="label">04 / Acción</span>
+              <h3>Comporta-<br>miento</h3>
+            </div>
+            <span class="gap med">Δ 1.1 · media</span>
+          </div>
+          <div class="big">3.3</div>
+          <p class="tinynote">Se decide con claridad pero la ejecución se diluye en los mandos medios.</p>
+          <div class="minibar"><i style="width:66%"></i></div>
+        </div>
+      </div>
+
+      <div class="sectionbar">
+        <span>02 / Miradas cruzadas</span>
+        <span>Brechas entre autoev. y heteroev.</span>
+      </div>
+
+      <div class="charts">
+        <div class="chart-block">
+          <h2>Radar de percepción por nivel</h2>
+          <p class="csub">Cuatro miradas sobre las cuatro dimensiones. Donde las curvas se separan, hay brecha; donde coinciden, hay alineación.</p>
+          <div class="legend">
+            <span><i style="background:#0A0A0A"></i>Autoev. equipo</span>
+            <span><i style="background:var(--neon)"></i>Líder sobre sí mismo</span>
+            <span><i style="background:#fff;background-image:repeating-linear-gradient(45deg,#0A0A0A 0 2px,transparent 2px 5px)"></i>Líder → Equipo</span>
+            <span><i style="background:#fff"></i>Equipo → Líder</span>
+          </div>
+          <div class="chartbox" id="radar"></div>
+        </div>
+
+        <div class="chart-block">
+          <h2>Brechas por dimensión</h2>
+          <p class="csub">Diferencia entre cómo se percibe el líder y cómo lo percibe el equipo. Cuanto más larga la línea, más grande el desajuste.</p>
+          <div class="legend">
+            <span><i style="background:#0A0A0A;border-radius:50%"></i>Líder (auto)</span>
+            <span><i style="background:#fff;border:1.5px solid #0A0A0A;border-radius:50%"></i>Equipo → Líder</span>
+            <span><i style="background:var(--neon)"></i>Brecha</span>
+          </div>
+          <div class="chartbox" id="gapchart"></div>
+        </div>
+      </div>
+
+      <div class="sectionbar">
+        <span>03 / Detalle por pregunta</span>
+        <span>18 preguntas · cruce líder ↔ equipo</span>
+      </div>
+
+      <div class="gaptable">
+        <h2>Detalle por pregunta</h2>
+        <p class="csub">Cada fila cruza cómo se evaluó el líder (autopercepción) contra cómo lo evaluó el equipo. Ordenado por brecha descendente.</p>
+        <div class="gaps-wrap">
+          <table class="gaps" id="gaps-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Dimensión</th>
+                <th>Enunciado</th>
+                <th class="barcell">Líder ←→ Equipo</th>
+                <th style="text-align:right">Líder</th>
+                <th style="text-align:right">Equipo</th>
+                <th style="text-align:right">Δ</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="insights">
+        <span class="eyebrow">04 / Recomendaciones para dirección</span>
+        <div class="rule"></div>
+        <h2>Tres movimientos para<br>cerrar las brechas más <span class="mark-bg">críticas.</span></h2>
+        <p class="csub">Generadas a partir del patrón de respuestas. No son soluciones cerradas: son puntos de entrada a una conversación que debería liderar dirección o talento humano.</p>
+
+        <div class="insights-grid">
+          <div class="insight accent">
+            <span class="itag"><span class="sq" style="background:var(--ink)"></span>Intención · Δ 1.8</span>
+            <h4>Hacer visible el propósito detrás de cada decisión difícil.</h4>
+            <p>El líder conecta sus decisiones a un propósito, pero esa narrativa no llega al equipo. Falta el paso de traducción: explicitar, repetir, rodearlo de ejemplos.</p>
+            <span class="action">→ Taller Big Arrow · 4 semanas</span>
+          </div>
+          <div class="insight">
+            <span class="itag"><span class="sq" style="background:var(--neon)"></span>Motivación · Δ 0.9</span>
+            <h4>Convertir la energía individual en energía colectiva.</h4>
+            <p>La motivación existe pero es fragmentada. Hay que identificar los rituales pequeños que hoy apagan la energía compartida —y rediseñarlos.</p>
+            <span class="action">→ Ritmos &amp; Rituales · 2 semanas</span>
+          </div>
+          <div class="insight">
+            <span class="itag"><span class="sq" style="background:var(--neon)"></span>Acción · Δ 1.1</span>
+            <h4>Cerrar el ciclo decisión → ejecución en los mandos medios.</h4>
+            <p>Las decisiones se toman con claridad en la cabeza, pero se diluyen en el camino. El cuello de botella está en cómo se traducen a compromisos visibles.</p>
+            <span class="action">→ Consultoría Creativa · 6 semanas</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="closing" style="padding:56px">
+        <span class="eyebrow soft">Siguiente paso</span>
+        <div class="rule"></div>
+        <h2 style="font-size:clamp(40px,5vw,72px)">Hablemos<br>sobre estos <span class="mark-bg">resultados.</span></h2>
+        <div style="display:flex;gap:12px;flex-wrap:wrap">
+          <button class="btn primary">Agendar sesión de lectura →</button>
+          <button class="btn">Descargar reporte PDF</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ ABOUT ============ -->
+    <section id="about" class="screen">
+      <div class="hero">
+        <span class="eyebrow">Metodología</span>
+        <div class="rule"></div>
+        <h1 style="margin-top:24px">Transformando<br><span class="mark-bg">emoción</span> en acción.</h1>
+        <div class="hero-sub" style="grid-template-columns:1fr 1fr">
+          <p>En Laborativo hemos aprendido algo que suele pasarse por alto: muchos problemas que parecen de negocio tienen, en realidad, un origen profundamente humano.</p>
+          <p>Procesos, tecnología o más reuniones pueden ayudar… pero rara vez cambian la esencia. Por eso desarrollamos la <b>Consultoría Creativa Basada en la Emoción</b> (EBCC). La emoción es el elemento más inestable y poderoso de cualquier organización. Hemos aprendido a canalizar su fuerza para que impulse y sostenga lo que queremos construir.</p>
+        </div>
+      </div>
+      <div class="dims">
+        <div class="dims-head">
+          <div>
+            <span class="eyebrow soft">Para nuevos clientes</span>
+            <h2 style="margin-top:12px">El diagnóstico como<br><span class="mark-bg">puerta de entrada.</span></h2>
+          </div>
+        </div>
+        <div class="dims-grid" style="grid-template-columns:repeat(3,1fr)">
+          <div class="dim">
+            <span class="num">01</span>
+            <span class="idx">Ver antes de actuar</span>
+            <span class="swatch"></span>
+            <h3>Claridad</h3>
+            <p>Un objeto conversacional con valor propio, que ya entrega claridad antes de cualquier contrato.</p>
+          </div>
+          <div class="dim">
+            <span class="num">02</span>
+            <span class="idx">Escalable por defecto</span>
+            <span class="swatch"></span>
+            <h3>Autonomía</h3>
+            <p>Los equipos lo llenan en su tiempo. El reporte se genera solo y abre la conversación desde un lenguaje compartido.</p>
+          </div>
+          <div class="dim">
+            <span class="num">03</span>
+            <span class="idx">Ancla de venta</span>
+            <span class="swatch"></span>
+            <h3>Proyecto</h3>
+            <p>El reporte revela brechas específicas que son, a la vez, proyectos concretos que Laborativo puede abordar.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- Tweaks panel -->
+<div id="tweaks">
+  <h5>TWEAKS <button class="closebtn" onclick="document.getElementById('tweaks').classList.remove('on')">×</button></h5>
+  <div class="tw">
+    <label>Acento neón</label>
+    <div class="row">
+      <button class="sw on" data-neon="#D8FF00" style="background:#D8FF00"></button>
+      <button class="sw" data-neon="#00FF85" style="background:#00FF85"></button>
+      <button class="sw" data-neon="#00E5FF" style="background:#00E5FF"></button>
+      <button class="sw" data-neon="#FF3DFF" style="background:#FF3DFF"></button>
+      <button class="sw" data-neon="#FF4D00" style="background:#FF4D00"></button>
+      <button class="sw" data-neon="#FFFF00" style="background:#FFFF00"></button>
+    </div>
+  </div>
+  <div class="tw">
+    <label>Tema</label>
+    <div class="row">
+      <button class="sw on" data-theme="gray" style="background:#E6E6E6"></button>
+      <button class="sw" data-theme="white" style="background:#FFFFFF;border:1.5px solid #0A0A0A"></button>
+      <button class="sw" data-theme="black" style="background:#0A0A0A"></button>
+    </div>
+  </div>
+  <div class="tw">
+    <label>Peso titulares</label>
+    <div class="row">
+      <button class="sw on" data-weight="900" style="background:#fff;color:#000;display:grid;place-items:center;font-weight:900">Aa</button>
+      <button class="sw" data-weight="800" style="background:#fff;color:#000;display:grid;place-items:center;font-weight:800">Aa</button>
+      <button class="sw" data-weight="700" style="background:#fff;color:#000;display:grid;place-items:center;font-weight:700">Aa</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============ Navigation ============ */
+function go(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('active', b.dataset.screen===id));
+  window.scrollTo({top:0,behavior:'instant'});
+  localStorage.setItem('diag.screen', id);
+  if(id==='results') drawResults();
+}
+document.querySelectorAll('nav button').forEach(b=>{
+  b.addEventListener('click',()=>go(b.dataset.screen));
+});
+const saved = localStorage.getItem('diag.screen');
+if(saved && document.getElementById(saved)) go(saved);
+
+/* Role select */
+document.querySelectorAll('.role').forEach(r=>{
+  r.addEventListener('click',()=>{
+    document.querySelectorAll('.role').forEach(x=>x.classList.remove('sel'));
+    r.classList.add('sel');
+  });
+});
+
+/* Scale select */
+document.querySelectorAll('.scale-opt').forEach(o=>{
+  o.addEventListener('click',()=>{
+    document.querySelectorAll('.scale-opt').forEach(x=>x.classList.remove('sel'));
+    o.classList.add('sel');
+  });
+});
+
+/* Question navigation */
+let qIdx = 4;
+const totalQ = 18;
+function updateQ(){
+  document.getElementById('q-idx').textContent = String(qIdx).padStart(2,'0');
+  document.getElementById('q-bar').style.width = (qIdx/totalQ*100)+'%';
+}
+function nextQ(){ if(qIdx<totalQ){qIdx++;updateQ();} else go('results'); }
+function prevQ(){ if(qIdx>1){qIdx--;updateQ();} else go('intake'); }
+
+/* ============ Results charts ============ */
+const dims = [
+  {key:'int', label:'Intención'},
+  {key:'mot', label:'Motivación'},
+  {key:'vin', label:'Interacción'},
+  {key:'acc', label:'Acción'},
+];
+
+const perspectives = [
+  {name:'Autoev. equipo', stroke:'#0A0A0A', fill:'#0A0A0A', dash:'0',   vals:[2.4, 3.1, 4.0, 3.3]},
+  {name:'Autoev. líder',  stroke:'#0A0A0A', fill:'neon',    dash:'0',   vals:[4.2, 3.8, 4.3, 4.4]},
+  {name:'Líder → Equipo', stroke:'#0A0A0A', fill:'stripe',  dash:'5 3', vals:[3.5, 3.4, 4.1, 3.6]},
+  {name:'Equipo → Líder', stroke:'#0A0A0A', fill:'#ffffff', dash:'0',   vals:[2.6, 3.2, 4.0, 3.3]},
+];
+
+function drawResults(){ drawRadar(); drawGaps(); drawGapTable(); }
+
+function getNeon(){ return getComputedStyle(document.documentElement).getPropertyValue('--neon').trim() || '#D8FF00'; }
+
+function drawRadar(){
+  const neon = getNeon();
+  const size = 460, cx = size/2, cy = size/2 + 6;
+  const rMax = 160;
+  const N = dims.length;
+  const angleFor = i => -Math.PI/2 + (i*2*Math.PI)/N;
+
+  let svg = `<svg viewBox="0 0 ${size} ${size}" width="100%" style="display:block">`;
+  svg += `<defs><pattern id="stripe" patternUnits="userSpaceOnUse" width="6" height="6" patternTransform="rotate(45)"><rect width="6" height="6" fill="#ffffff"/><rect width="2" height="6" fill="#0A0A0A"/></pattern></defs>`;
+
+  for(let r=1;r<=5;r++){
+    const rr = (r/5)*rMax;
+    let pts = [];
+    for(let i=0;i<N;i++){
+      const a = angleFor(i);
+      pts.push([cx+Math.cos(a)*rr, cy+Math.sin(a)*rr]);
+    }
+    svg += `<polygon points="${pts.map(p=>p.join(',')).join(' ')}" fill="none" stroke="rgba(10,10,10,.18)" stroke-width="1"/>`;
+  }
+  for(let i=0;i<N;i++){
+    const a = angleFor(i);
+    const x2 = cx+Math.cos(a)*rMax, y2=cy+Math.sin(a)*rMax;
+    svg += `<line x1="${cx}" y1="${cy}" x2="${x2}" y2="${y2}" stroke="rgba(10,10,10,.25)" stroke-width="1"/>`;
+    const lx = cx+Math.cos(a)*(rMax+30), ly = cy+Math.sin(a)*(rMax+30);
+    svg += `<text x="${lx}" y="${ly}" text-anchor="middle" dominant-baseline="middle" font-family="Red Hat Display" font-weight="800" font-size="13" fill="#0A0A0A" letter-spacing="-.02em">${dims[i].label.toUpperCase()}</text>`;
+  }
+  svg += `<text x="${cx+4}" y="${cy-4}" font-family="Red Hat Display" font-weight="600" font-size="10" fill="#7A7A7A">1</text>`;
+  svg += `<text x="${cx+4}" y="${cy-rMax+12}" font-family="Red Hat Display" font-weight="600" font-size="10" fill="#7A7A7A">5</text>`;
+
+  perspectives.forEach(p=>{
+    let pts=[];
+    p.vals.forEach((v,i)=>{
+      const a = angleFor(i);
+      const rr = (v/5)*rMax;
+      pts.push([cx+Math.cos(a)*rr, cy+Math.sin(a)*rr]);
+    });
+    let fill;
+    if(p.fill==='neon') fill = neon;
+    else if(p.fill==='stripe') fill = 'url(#stripe)';
+    else fill = p.fill;
+    const op = p.fill==='neon' ? 0.5 : p.fill==='stripe' ? 0.6 : p.fill==='#ffffff' ? 0.3 : 0.08;
+    svg += `<polygon points="${pts.map(q=>q.join(',')).join(' ')}" fill="${fill}" fill-opacity="${op}" stroke="${p.stroke}" stroke-width="1.8" stroke-dasharray="${p.dash}" stroke-linejoin="miter"/>`;
+    pts.forEach(([x,y])=>{ svg += `<circle cx="${x}" cy="${y}" r="3.5" fill="${p.fill==='#ffffff'?'#ffffff':p.stroke}" stroke="${p.stroke}" stroke-width="1.5"/>`; });
+  });
+
+  svg += `</svg>`;
+  document.getElementById('radar').innerHTML = svg;
+}
+
+function drawGaps(){
+  const neon = getNeon();
+  const w = 560, rowH = 82, padL = 120, padR = 32, rows = dims.length;
+  const h = rows*rowH + 28;
+  let svg = `<svg viewBox="0 0 ${w} ${h}" width="100%" style="display:block">`;
+  for(let v=1;v<=5;v++){
+    const x = padL + ((v-1)/4)*(w-padL-padR);
+    svg += `<line x1="${x}" y1="20" x2="${x}" y2="${h-16}" stroke="rgba(10,10,10,.1)" stroke-width="1"/>`;
+    svg += `<text x="${x}" y="12" text-anchor="middle" font-family="Red Hat Display" font-weight="700" font-size="10" fill="#7A7A7A">${v}</text>`;
+  }
+  dims.forEach((d,i)=>{
+    const y = 36 + i*rowH;
+    const leader = perspectives[1].vals[i];
+    const teamOnLeader = perspectives[3].vals[i];
+    const xL = padL + ((leader-1)/4)*(w-padL-padR);
+    const xT = padL + ((teamOnLeader-1)/4)*(w-padL-padR);
+    svg += `<text x="${padL-16}" y="${y+4}" text-anchor="end" font-family="Red Hat Display" font-weight="900" font-size="15" fill="#0A0A0A" letter-spacing="-.02em">${d.label.toUpperCase()}</text>`;
+    svg += `<text x="${padL-16}" y="${y+22}" text-anchor="end" font-family="Red Hat Display" font-weight="700" font-size="10" fill="#7A7A7A" letter-spacing=".1em">Δ ${Math.abs(leader-teamOnLeader).toFixed(1)}</text>`;
+
+    const xMin = Math.min(xL,xT), xMax = Math.max(xL,xT);
+    svg += `<rect x="${xMin}" y="${y-3}" width="${xMax-xMin}" height="8" fill="${neon}" stroke="#0A0A0A" stroke-width="1.5"/>`;
+    svg += `<circle cx="${xL}" cy="${y+1}" r="7" fill="#0A0A0A" stroke="#0A0A0A" stroke-width="1.5"/>`;
+    svg += `<circle cx="${xT}" cy="${y+1}" r="7" fill="#ffffff" stroke="#0A0A0A" stroke-width="1.5"/>`;
+
+    const self = perspectives[0].vals[i];
+    const down = perspectives[2].vals[i];
+    const xSelf = padL + ((self-1)/4)*(w-padL-padR);
+    const xDown = padL + ((down-1)/4)*(w-padL-padR);
+    svg += `<circle cx="${xSelf}" cy="${y+30}" r="3.5" fill="#0A0A0A"/>`;
+    svg += `<circle cx="${xDown}" cy="${y+30}" r="3.5" fill="#ffffff" stroke="#0A0A0A" stroke-width="1.5"/>`;
+    svg += `<text x="${padL-16}" y="${y+34}" text-anchor="end" font-family="Red Hat Display" font-weight="600" font-size="9" fill="#7A7A7A">autoev. eq. / líder→eq.</text>`;
+
+    if(i<rows-1) svg += `<line x1="20" y1="${y+rowH-24}" x2="${w-16}" y2="${y+rowH-24}" stroke="rgba(10,10,10,.08)"/>`;
+  });
+  svg += `</svg>`;
+  document.getElementById('gapchart').innerHTML = svg;
+}
+
+const sampleQuestions = [
+  {dim:'Intención', q:'Conecto decisiones difíciles con el propósito compartido.', l:4.4, e:2.3},
+  {dim:'Intención', q:'El equipo puede describir el horizonte al que nos dirigimos.', l:4.1, e:2.4},
+  {dim:'Acción',    q:'Los compromisos se cumplen en los plazos acordados.', l:4.3, e:3.0},
+  {dim:'Motivación',q:'Reconozco la energía del equipo y la cuido intencionalmente.', l:3.9, e:2.9},
+  {dim:'Intención', q:'El propósito del equipo se renueva y no solo se repite.', l:4.0, e:2.6},
+  {dim:'Acción',    q:'Las decisiones se traducen en acciones visibles para todos.', l:4.1, e:3.1},
+  {dim:'Interacción',q:'Los desacuerdos se conversan directamente y sin rodeos.', l:4.2, e:3.9},
+  {dim:'Motivación',q:'Entiendo qué motiva a cada persona más allá del rol.', l:3.8, e:3.2},
+  {dim:'Interacción',q:'La confianza permite hablar de errores sin consecuencias.', l:4.3, e:4.0},
+];
+
+function drawGapTable(){
+  const neon = getNeon();
+  const tb = document.querySelector('#gaps-table tbody');
+  const rows = sampleQuestions.map(r=>({...r, d: r.l - r.e})).sort((a,b)=>Math.abs(b.d)-Math.abs(a.d));
+  tb.innerHTML = rows.map((r,i)=>{
+    const lP = ((r.l-1)/4)*100, eP = ((r.e-1)/4)*100;
+    const minP = Math.min(lP,eP), w = Math.abs(lP-eP);
+    const gapColor = Math.abs(r.d)>1.3 ? neon : Math.abs(r.d)>0.7 ? 'var(--bg-2)' : 'var(--card)';
+    return `
+      <tr>
+        <td style="color:var(--mute);width:30px;font-weight:600">${String(i+1).padStart(2,'0')}</td>
+        <td><span class="dimcell"><span class="sq" style="background:${neon};border:1.5px solid var(--line)"></span>${r.dim}</span></td>
+        <td style="max-width:420px;font-weight:500">${r.q}</td>
+        <td class="barcell">
+          <div class="minibar2">
+            <i style="position:absolute;left:${minP}%;width:${w}%;top:0;height:100%;background:${gapColor}"></i>
+            <i style="position:absolute;left:calc(${lP}% - 5px);top:-4px;width:10px;height:16px;background:#0A0A0A"></i>
+            <i style="position:absolute;left:calc(${eP}% - 5px);top:-4px;width:10px;height:16px;background:#fff;border:1.5px solid #0A0A0A"></i>
+          </div>
+        </td>
+        <td class="valcell">${r.l.toFixed(1)}</td>
+        <td class="valcell">${r.e.toFixed(1)}</td>
+        <td class="gapcell">Δ ${r.d.toFixed(1)}</td>
+      </tr>
+    `;
+  }).join('');
+}
+
+/* ============ Tweaks ============ */
+const TWEAKS = /*EDITMODE-BEGIN*/{
+  "neon": "#FF3DFF",
+  "theme": "white",
+  "weight": "900"
+}/*EDITMODE-END*/;
+
+function applyTweaks(t){
+  document.documentElement.style.setProperty('--neon', t.neon);
+  if(t.theme==='gray'){
+    document.documentElement.style.setProperty('--bg','#E6E6E6');
+    document.documentElement.style.setProperty('--bg-2','#DADADA');
+    document.documentElement.style.setProperty('--paper','#F2F2F2');
+    document.documentElement.style.setProperty('--card','#FFFFFF');
+    document.documentElement.style.setProperty('--ink','#0A0A0A');
+    document.documentElement.style.setProperty('--ink-2','#1A1A1A');
+    document.documentElement.style.setProperty('--mute','#7A7A7A');
+    document.documentElement.style.setProperty('--line','#0A0A0A');
+    document.documentElement.style.setProperty('--line-soft','rgba(10,10,10,.14)');
+  }
+  if(t.theme==='white'){
+    document.documentElement.style.setProperty('--bg','#FFFFFF');
+    document.documentElement.style.setProperty('--bg-2','#ECECEC');
+    document.documentElement.style.setProperty('--paper','#F6F6F6');
+    document.documentElement.style.setProperty('--card','#FFFFFF');
+    document.documentElement.style.setProperty('--ink','#0A0A0A');
+    document.documentElement.style.setProperty('--ink-2','#1A1A1A');
+    document.documentElement.style.setProperty('--mute','#7A7A7A');
+    document.documentElement.style.setProperty('--line','#0A0A0A');
+    document.documentElement.style.setProperty('--line-soft','rgba(10,10,10,.14)');
+  }
+  if(t.theme==='black'){
+    document.documentElement.style.setProperty('--bg','#0A0A0A');
+    document.documentElement.style.setProperty('--bg-2','#1A1A1A');
+    document.documentElement.style.setProperty('--paper','#141414');
+    document.documentElement.style.setProperty('--card','#1A1A1A');
+    document.documentElement.style.setProperty('--ink','#FFFFFF');
+    document.documentElement.style.setProperty('--ink-2','#EAEAEA');
+    document.documentElement.style.setProperty('--mute','#8A8A8A');
+    document.documentElement.style.setProperty('--line','#FFFFFF');
+    document.documentElement.style.setProperty('--line-soft','rgba(255,255,255,.14)');
+  }
+  document.querySelectorAll('h1,h2,h3,h4').forEach(el=>el.style.fontWeight=t.weight);
+  if(document.getElementById('results').classList.contains('active')) drawResults();
+}
+applyTweaks(TWEAKS);
+
+window.addEventListener('message',(e)=>{
+  if(!e.data) return;
+  if(e.data.type==='__activate_edit_mode') document.getElementById('tweaks').classList.add('on');
+  if(e.data.type==='__deactivate_edit_mode') document.getElementById('tweaks').classList.remove('on');
+});
+window.parent.postMessage({type:'__edit_mode_available'},'*');
+
+document.querySelectorAll('#tweaks [data-neon]').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('#tweaks [data-neon]').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on');
+  TWEAKS.neon=b.dataset.neon; applyTweaks(TWEAKS);
+  window.parent.postMessage({type:'__edit_mode_set_keys',edits:{neon:TWEAKS.neon}},'*');
+}));
+document.querySelectorAll('#tweaks [data-theme]').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('#tweaks [data-theme]').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on');
+  TWEAKS.theme=b.dataset.theme; applyTweaks(TWEAKS);
+  window.parent.postMessage({type:'__edit_mode_set_keys',edits:{theme:TWEAKS.theme}},'*');
+}));
+document.querySelectorAll('#tweaks [data-weight]').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('#tweaks [data-weight]').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on');
+  TWEAKS.weight=b.dataset.weight; applyTweaks(TWEAKS);
+  window.parent.postMessage({type:'__edit_mode_set_keys',edits:{weight:TWEAKS.weight}},'*');
+}));
+</script>
+</body>
+</html>

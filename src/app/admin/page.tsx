@@ -1,14 +1,23 @@
 import { supabase } from '@/lib/supabase'
 import Link from 'next/link'
 import { Diagnostico } from '@/types'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+
+export const revalidate = 0
 
 const ESTADO_LABEL: Record<string, string> = {
-  borrador:   'Borrador',
-  activo:     'Activo',
+  borrador: 'Borrador',
+  activo: 'Activo',
   completado: 'Completado',
 }
 
-export const revalidate = 0
+const ESTADO_VARIANT: Record<string, 'default' | 'secondary' | 'outline'> = {
+  borrador: 'outline',
+  activo: 'default',
+  completado: 'secondary',
+}
 
 export default async function AdminPage() {
   const { data: diagnosticos } = await supabase
@@ -17,60 +26,53 @@ export default async function AdminPage() {
     .order('created_at', { ascending: false })
 
   return (
-    <div>
-      <div className="flex items-end justify-between mb-10">
+    <div style={{ fontFamily: "'Red Hat Display', sans-serif" }}>
+      <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: 40 }}>
         <div>
-          <p className="text-xs tracking-widest uppercase mb-2" style={{ color: 'var(--gray-mid)' }}>
-            Panel
-          </p>
-          <div style={{ borderBottom: '2px solid var(--black)', width: 32, marginBottom: 12 }} />
-          <h1 className="text-5xl font-black">Diagnósticos</h1>
+          <p style={{ fontSize: 10, letterSpacing: '.1em', textTransform: 'uppercase', color: 'var(--mute)', fontWeight: 600, margin: '0 0 10px' }}>Panel</p>
+          <div style={{ width: 24, height: 2, background: 'var(--ink)', marginBottom: 12 }} />
+          <h1 style={{ fontSize: 48, fontWeight: 900, letterSpacing: '-1.5px', lineHeight: 1, margin: 0 }}>Diagnósticos</h1>
         </div>
-        <Link href="/admin/nuevo"
-          className="font-black text-sm px-6 py-3 transition-opacity hover:opacity-70 border-2 border-black"
-          style={{ background: '#000', color: '#fff' }}>
-          + NUEVO
-        </Link>
+        <Button asChild>
+          <Link href="/admin/nuevo">+ Nuevo</Link>
+        </Button>
       </div>
 
       {!diagnosticos?.length ? (
-        <div className="py-20 border-t border-black">
-          <p className="text-lg font-bold">Aún no hay diagnósticos.</p>
-          <p className="text-sm mt-1" style={{ color: 'var(--gray-mid)' }}>Crea el primero para comenzar.</p>
-        </div>
+        <p style={{ color: 'var(--mute)', fontSize: 14, fontWeight: 500 }}>Aún no hay diagnósticos.</p>
       ) : (
-        <div className="flex flex-col">
-          {/* Header tabla */}
-          <div className="grid grid-cols-12 py-2 border-t border-b border-black text-xs font-black uppercase tracking-widest"
-            style={{ color: 'var(--gray-mid)' }}>
-            <span className="col-span-4">Compañía</span>
-            <span className="col-span-3">Contacto</span>
-            <span className="col-span-2">Estado</span>
-            <span className="col-span-2">Fecha</span>
-            <span className="col-span-1">Neón</span>
-          </div>
-
-          {diagnosticos.map((d: Diagnostico) => (
-            <Link key={d.id} href={`/admin/${d.id}`}
-              className="grid grid-cols-12 py-4 border-b border-black hover:bg-black hover:text-white transition-colors items-center group">
-              <span className="col-span-4 font-black">{d.nombre_compania}</span>
-              <span className="col-span-3 text-sm" style={{ color: 'var(--gray-mid)' }}>
-                <span className="group-hover:text-white transition-colors">{d.contacto_nombre}</span>
-              </span>
-              <span className="col-span-2 text-xs font-bold uppercase tracking-wide">
-                {ESTADO_LABEL[d.estado]}
-              </span>
-              <span className="col-span-2 text-xs" style={{ color: 'var(--gray-mid)' }}>
-                <span className="group-hover:text-white transition-colors">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Compañía</TableHead>
+              <TableHead>Contacto</TableHead>
+              <TableHead>Estado</TableHead>
+              <TableHead>Fecha</TableHead>
+              <TableHead>Neón</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {diagnosticos.map((d: Diagnostico) => (
+              <TableRow key={d.id}>
+                <TableCell>
+                  <Link href={`/admin/${d.id}`} style={{ textDecoration: 'none', color: 'inherit', fontWeight: 800, fontSize: 15 }}>
+                    {d.nombre_compania}
+                  </Link>
+                </TableCell>
+                <TableCell style={{ fontWeight: 500, fontSize: 13 }}>{d.contacto_nombre}</TableCell>
+                <TableCell>
+                  <Badge variant={ESTADO_VARIANT[d.estado]}>{ESTADO_LABEL[d.estado]}</Badge>
+                </TableCell>
+                <TableCell style={{ fontSize: 12, color: 'var(--mute)', fontWeight: 500 }}>
                   {new Date(d.created_at).toLocaleDateString('es-CO', { day: 'numeric', month: 'short', year: 'numeric' })}
-                </span>
-              </span>
-              <span className="col-span-1">
-                <span className="w-4 h-4 block rounded-sm" style={{ background: d.color_neon }} />
-              </span>
-            </Link>
-          ))}
-        </div>
+                </TableCell>
+                <TableCell>
+                  <span style={{ width: 14, height: 14, background: d.color_neon, border: '1.5px solid var(--ink)', display: 'inline-block' }} />
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
       )}
     </div>
   )

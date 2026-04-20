@@ -83,17 +83,13 @@ create policy "diagnosticos_publico_participacion" on diagnosticos for select us
 create policy "preguntas_admin"   on preguntas for all using (auth.role() = 'authenticated');
 create policy "preguntas_publico" on preguntas for select using (true);
 
--- Participantes: inserción pública (anónimos), admin lee todo
+-- Participantes: inserción pública, lectura pública (para contar en resultados)
 create policy "participantes_insert" on participantes for insert with check (true);
-create policy "participantes_admin"  on participantes for select using (auth.role() = 'authenticated');
+create policy "participantes_select" on participantes for select using (true);
 
--- Respuestas: inserción pública, admin lee todo
-create policy "respuestas_insert"    on respuestas for insert with check (true);
-create policy "respuestas_select_admin" on respuestas for select using (auth.role() = 'authenticated');
--- Participante puede leer sus propias respuestas
-create policy "respuestas_select_propio" on respuestas for select using (
-  participante_id in (select id from participantes where id = participante_id)
-);
+-- Respuestas: inserción pública, lectura pública (resultados son públicos por diseño)
+create policy "respuestas_insert" on respuestas for insert with check (true);
+create policy "respuestas_select" on respuestas for select using (true);
 
 -- =============================================
 -- Índices

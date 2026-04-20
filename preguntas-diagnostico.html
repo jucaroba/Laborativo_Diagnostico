@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Laborativo Diagnóstico — Banco de Preguntas</title>
+<style>
+  @media print {
+    .no-print { display: none; }
+    body { font-size: 11pt; }
+    .dimension-block { page-break-inside: avoid; }
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+    background: #fff;
+    color: #000;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 60px 40px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* HEADER */
+  .doc-header {
+    border-bottom: 3px solid #000;
+    padding-bottom: 24px;
+    margin-bottom: 48px;
+  }
+
+  .doc-eyebrow {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #666;
+    margin-bottom: 8px;
+  }
+
+  .doc-title {
+    font-size: 36px;
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+    margin-bottom: 8px;
+  }
+
+  .doc-meta {
+    font-size: 12px;
+    color: #666;
+    margin-top: 12px;
+  }
+
+  /* INTRO */
+  .intro {
+    background: #F5F5F5;
+    border-left: 4px solid #000;
+    padding: 20px 24px;
+    margin-bottom: 48px;
+  }
+
+  .intro p {
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+    margin-bottom: 8px;
+  }
+
+  .intro p:last-child { margin-bottom: 0; }
+
+  /* ROLES */
+  .roles-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 48px;
+  }
+
+  .role-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 16px;
+    border: 1px solid #000;
+  }
+
+  .role-letter {
+    width: 32px;
+    height: 32px;
+    background: #000;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+
+  .role-name { font-weight: 900; font-size: 13px; margin-bottom: 2px; }
+  .role-desc { font-size: 11px; color: #666; }
+
+  /* PERFIL */
+  .perfil-box {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 48px;
+  }
+
+  .perfil-card {
+    padding: 16px;
+    border: 2px solid #000;
+  }
+
+  .perfil-title { font-weight: 900; font-size: 14px; margin-bottom: 6px; }
+  .perfil-responde { font-size: 11px; color: #666; }
+  .perfil-responde span { font-weight: 700; color: #000; }
+
+  /* DIMENSION */
+  .dimension-block {
+    margin-bottom: 48px;
+  }
+
+  .dimension-header {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #000;
+    margin-bottom: 24px;
+  }
+
+  .dimension-number {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #999;
+  }
+
+  .dimension-name { font-size: 22px; font-weight: 900; }
+  .dimension-sub { font-size: 13px; color: #666; }
+  .dimension-pregunta { font-size: 13px; color: #666; font-style: italic; margin-left: auto; }
+
+  /* TEMA */
+  .tema-block {
+    margin-bottom: 24px;
+    border: 1px solid #D9D9D9;
+  }
+
+  .tema-header {
+    background: #F5F5F5;
+    padding: 10px 16px;
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    border-bottom: 1px solid #D9D9D9;
+  }
+
+  .pregunta-row {
+    display: grid;
+    grid-template-columns: 90px 1fr;
+    border-bottom: 1px solid #F0F0F0;
+  }
+
+  .pregunta-row:last-child { border-bottom: none; }
+
+  .pregunta-rol {
+    padding: 12px 16px;
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #666;
+    border-right: 1px solid #F0F0F0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .pregunta-rol-letter { font-size: 16px; color: #000; line-height: 1; }
+
+  .pregunta-texto {
+    padding: 12px 16px;
+    font-size: 13px;
+    line-height: 1.5;
+    color: #000;
+  }
+
+  /* PRINT BUTTON */
+  .print-btn {
+    position: fixed;
+    bottom: 32px;
+    right: 32px;
+    background: #000;
+    color: #fff;
+    border: none;
+    padding: 14px 24px;
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+
+  .print-btn:hover { opacity: 0.75; }
+
+  /* FOOTER */
+  .doc-footer {
+    margin-top: 60px;
+    padding-top: 20px;
+    border-top: 1px solid #000;
+    font-size: 11px;
+    color: #999;
+    display: flex;
+    justify-content: space-between;
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="doc-header">
+  <div class="doc-eyebrow">Laborativo · Consultoría Creativa</div>
+  <div class="doc-title">Banco de Preguntas<br>Diagnóstico Organizacional</div>
+  <div class="doc-meta">
+    64 preguntas · 4 dimensiones · 4 perspectivas · 4 temas por dimensión · Escala 1–10
+  </div>
+</div>
+
+<!-- INTRO -->
+<div class="intro">
+  <p>Este diagnóstico evalúa la situación cultural de una organización a través de <strong>4 dimensiones</strong> (Intención, Motivación, Interacción, Acción), cada una explorada desde <strong>4 perspectivas</strong> distintas.</p>
+  <p>Cada tema dentro de una dimensión tiene <strong>la misma pregunta formulada desde cada rol</strong>, lo que permite identificar con precisión las brechas de percepción entre líderes y equipos.</p>
+</div>
+
+<!-- ROLES -->
+<div style="margin-bottom:16px;">
+  <div class="doc-eyebrow">Perspectivas / Roles</div>
+</div>
+<div class="roles-grid">
+  <div class="role-item">
+    <div class="role-letter">A</div>
+    <div>
+      <div class="role-name">Equipo</div>
+      <div class="role-desc">Auto-evaluación del equipo</div>
+    </div>
+  </div>
+  <div class="role-item">
+    <div class="role-letter">B</div>
+    <div>
+      <div class="role-name">Líder → Equipo</div>
+      <div class="role-desc">El líder evalúa al equipo</div>
+    </div>
+  </div>
+  <div class="role-item">
+    <div class="role-letter">C</div>
+    <div>
+      <div class="role-name">Equipo → Líder</div>
+      <div class="role-desc">El equipo evalúa al líder</div>
+    </div>
+  </div>
+  <div class="role-item">
+    <div class="role-letter">D</div>
+    <div>
+      <div class="role-name">Líder auto</div>
+      <div class="role-desc">Auto-evaluación del líder</div>
+    </div>
+  </div>
+</div>
+
+<!-- PERFILES -->
+<div style="margin-bottom:16px;">
+  <div class="doc-eyebrow">Perfiles de participante</div>
+</div>
+<div class="perfil-box" style="margin-bottom:48px;">
+  <div class="perfil-card">
+    <div class="perfil-title">Soy del equipo</div>
+    <div class="perfil-responde">Responde: <span>A (auto) + C (evalúa al líder)</span><br>32 preguntas en total</div>
+  </div>
+  <div class="perfil-card">
+    <div class="perfil-title">Soy líder</div>
+    <div class="perfil-responde">Responde: <span>D (auto) + B (evalúa al equipo)</span><br>32 preguntas en total</div>
+  </div>
+</div>
+
+
+<!-- ======================== DIMENSIÓN 1 ======================== -->
+<div class="dimension-block">
+  <div class="dimension-header">
+    <span class="dimension-number">01</span>
+    <span class="dimension-name">Intención</span>
+    <span class="dimension-sub">Sentido</span>
+    <span class="dimension-pregunta">¿A dónde vamos?</span>
+  </div>
+
+  <div class="tema-block">
+    <div class="tema-header">Tema 1 — Claridad de dirección</div>
+    <div class="pregunta-row">
+      <div class="pregunta-rol"><span class="pregunta-rol-letter">A</span>Equipo auto</div>
+      <div class="pregunta-texto">Tengo claridad sobre hacia dónde va la organización</div>
+    </div>
+    <div class="pregunta-row">
+      <div class="pregunta-rol"><span class="pregunta-rol-letter">C</span>Eq. → Líder</div>
+      <div class="pregunta-texto">Mi líder nos comunica con claridad hacia dónde vamos</div>
+    </div>
+    <div class="pregunta-row">
+      <div class="pregunta-rol"><span class="pregunta-rol-letter">D</span>Líder auto</div>
+      <div class="pregunta-texto">Comunico con claridad hacia dónde vamos como equipo</div>
+    </div>
+    <div class="pregunta-row">
+      <div class="pregunta-rol"><span class="pregunta-rol-letter">B</span>Líder → Eq.</div>
+      <div class="pregunta-texto">El equipo tiene claridad sobre hacia dónde va la organización</div>
+    </div>
+  </div>
+
+  <div class="tema-block">
+    <div class="tema-header">Tema 2 — Conexión propósito-trabajo</div>
+    <div class="pregunta-row">
+      <div class="pregunta-rol"><span class="pregunta-rol-letter">A</span>Equipo auto</div>
+      <div class="pregunta-texto">Entiendo cómo mi trabajo aporta al propósito de la organización</div>
+    </div>
+    <div class="pregunta-row">
+      <div class="pregunta-rol"><span class="pregunta-rol-letter">C</span>Eq. → Líder</div>
+      <div class="pregunta-texto">Mi líder conecta nuestro trabajo con el propósito de la empresa</div>
+    </div>
+    <div class="pregunta-row">
+      <div class="pregunta-rol"><span class="pregunta-rol-letter">D</span>Líder auto</div>
+      <div class="pregunta-texto">Logro conectar el trabajo diario del equipo con el propósito mayor</div>
+    </div>
+    <div class="pregunta-row">
+      <div class="pregunta-rol"><span class="pregunta-rol-letter">B</span>Líder → Eq.</div>
+      <div class="pregunta-texto">El equipo conecta su trabajo diario con el propósito de la empresa</div>
+    </div>
+  </div>
+
+  <div class="tema-block">
+    <div class="tema-header">Tema 3 — Coherencia entre lo que se dice y lo que se hace</div>
+    <div class="pregunta-row">
+      <div class="pregunta-rol"><span class="pregunta-rol-letter">A</span>Equipo auto</div>
+      <div class="pregunta-texto">Las decisiones que se toman en mi equipo van en línea con la dirección declarada</div>
+    </div>
+    <div class="pregunta-row">
+      <div class="pregunta-rol"><span class="pregunta-rol-letter">C</span>Eq. → Líder</div>
+      <div class="pregunta-texto">Mi líder toma decisiones coherentes con la dirección que declara</div>
+    </div>
+    <div class="pregunta-row">
+      <div class="pregunta-rol"><span class="pregunta-rol-letter">D</span>Líder auto</div>
+      <div class="pregunta-texto">Mis decisiones son coherentes con la visión que comunico</div>
+    </div>
+    <div class="pregunta-row">
+      <div class="pregunta-rol"><span class="pregunta-rol-letter">B</span>Líder → Eq.</div>
+      <div class="pregunta-texto">El equipo actúa de manera coherente con la dirección estratégica</div>
+    </div>
+  </div>
+
+  <div class="tema-block">
+    <div class="tema-header">Tema 4 — Claridad en la incertidumbre</div>
+    <div class="pregunta-row">
+      <div class="pregunta-rol"><span class="pregunta-rol-letter">A</span>Equipo auto</div>
+      <div class="pregunta-texto">Cuando hay incertidumbre, sé cómo orientar mis decisiones</div>
+    </div>
+    <div class="pregunta-row">
+      <div class="pregunta-rol"><span class="pregunta-rol-letter">C</span>Eq. → Líder</div>
+      <div class="pregunta-texto">Cuando hay incertidumbre, mi líder nos da claridad sobre el rumbo</div>
+    </div>
+    <div class="pregunta-row">
+      <div class="pregunta-rol"><span class="pregunta-rol-letter">D</span>Líder auto</div>
+      <div class="pregunta-texto">En momentos de incertidumbre, soy capaz de dar dirección clara a mi equipo</div>
+    </div>
+    <div class="pregunta-row">
+      <div class="pregunta-rol"><span class="pregunta-rol-letter">B</span>Líder → Eq.</div>
+      <div class="pregunta-texto">Cuando hay incertidumbre, el equipo sabe cómo orientar sus decisiones</div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ======================== DIMENSIÓN 2 ======================== -->
+<div class="dimension-block">
+  <div class="dimension-header">
+    <span class="dimension-number">02</span>
+    <span class="dimension-name">Motivación</span>
+    <span class="dimension-sub">Energía</span>
+    <span class="dimension-pregunta">¿Por qué?</span>
+  </div>
+
+  <div class="tema-block">
+    <div class="tema-header">Tema 1 — Entusiasmo y ganas</div>
+    <div class="pregunta-row">
+      <div class="pregunta-rol"><span class="pregunta-rol-letter">A</span>Equipo auto</div>
+      <div class="pregunta-texto">Me siento con energía y ganas de aportar en esta organización</div>
+    </div>
+    <div class="pregunta-row">
+      <div class="pregunta-rol"><span class="pregunta-rol-letter">C</span>Eq. → Líder</div>
+      <div class="pregunta-texto">Mi líder transmite energía y entusiasmo genuino por el trabajo</div>
+    </div>
+    <div class="pregunta-row">
+      <div class="pregunta-rol"><span class="pregunta-rol-letter">D</span>Líder auto</div>
+      <div class="pregunta-texto">Transmito energía y entusiasmo genuino a mi equipo</div>
+    </div>
+    <div class="pregunta-row">
+      <div class="pregunta-rol"><span class="pregunta-rol-letter">B</span>Líder → Eq.</div>
+      <div class="pregunta-texto">El equipo muestra entusiasmo genuino por su trabajo</div>
+    </div>
+  </div>
+
+  <div class="tema-block">
+    <div class="tema-header">Tema 2 — Conexión emocional con el propósito</div>
+    <div class="pregunta-row">
+      <div class="pregunta-rol"><span class="pregunta-rol-letter">A</span>Equipo auto</div>
+      <div class="pregunta-texto">Siento que lo que hago aquí tiene sentido y vale la pena</div>
+    </div>
+    <div class="pregunta-row">
+      <div class="pregunta-rol"><span class="pregunta-rol-letter">C</span>Eq. → Líder</div>
+      <div class="pregunta-texto">Mi líder nos ayuda a encontrar sentido en lo que hacemos</div>
+    </div>
+    <div class="pregunta-row">
+      <div class="pregunta-rol"><span class="pregunta-rol-letter">D</span>Líder auto</div>
+      <div class="pregunta-texto">Ayudo a mi equipo a encontrar sentido en lo que hacemos</div>
+    </div>
+    <div class="pregunta-row">
+      <div class="pregunta-rol"><span class="pregunta-rol-letter">B</span>Líder → Eq.</div>
+      <div class="pregunta-texto">El equipo encuentra sentido y significado en su trabajo</div>
+    </div>
+  </div>
+
+  <div class="tema-block">
+    <div class="tema-header">Tema 3 — Sostenibilidad de la motivación</div>
+    <div class="pregunta-row">
+      <div class="pregunta-rol"><span class="pregunta-rol-letter">A</span>Equipo auto</div>
+      <div class="pregunta-texto">Mantengo mi motivación incluso en momentos difíciles o de alta presión</div>
+    </div>
+    <div class="pregunta-row">
+      <div class="pregunta-rol"><span class="pregunta-rol-letter">C</span>Eq. → Líder</div>
+      <div class="pregunta-texto">Mi líder nos sostiene emocionalmente en los momentos difíciles</div>
+    </div>
+    <div class="pregunta-row">
+      <div class="pregunta-rol"><span class="pregunta-rol-letter">D</span>Líder auto</div>
+      <div class="pregunta-texto">Sostengo la motivación de mi equipo en los momentos difíciles</div>
+    </div>
+    <div class="pregunta-row">
+      <div class="pregunta-rol"><span class="pregunta-rol-letter">B</span>Líder → Eq.</div>
+      <div class="pregunta-texto">El equipo mantiene su motivación incluso bajo presión o adversidad</div>
+    </div>
+  </div>
+
+  <div class="tema-block">
+    <div class="tema-header">Tema 4 — Reconocimiento</div>
+    <div class="pregunta-row">
+      <div class="pregunta-rol"><span class="pregunta-rol-letter">A</span>Equipo auto</div>
+      <div class="pregunta-texto">Siento que mi esfuerzo y contribución son reconocidos</div>
+    </div>
+    <div class="pregunta-row">
+      <div class="pregunta-rol"><span class="pregunta-rol-letter">C</span>Eq. → Líder</div>
+      <div class="pregunta-texto">Mi líder reconoce oportunamente el esfuerzo y los logros del equipo</div>
+    </div>
+    <div class="pregunta-row">
+      <div class="pregunta-rol"><span class="pregunta-rol-letter">D</span>Líder auto</div>
+      <div class="pregunta-texto">Reconozco oportunamente el esfuerzo y los logros de mi equipo</div>
+    </div>
+    <div class="pregunta-row">
+      <div class="pregunta-rol"><span class="pregunta-rol-letter">B</span>Líder → Eq.</div>
+      <div class="pregunta-texto">El equipo se siente reconocido por su esfuerzo y contribución</div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ======================== DIMENSIÓN 3 ======================== -->
+<div class="dimension-block">
+  <div class="dimension-header">
+    <span class="dimension-number">03</span>
+    <span class="dimension-name">Interacción</span>
+    <span class="dimension-sub">Vínculos</span>
+    <span class="dimension-pregunta">¿Con quién?</span>
+  </div>
+
+  <div class="tema-block">
+    <div class="tema-header">Tema 1 — Confianza</div>
+    <div class="pregunta-row">
+      <div class="pregunta-rol"><span class="pregunta-rol-letter">A</span>Equipo auto</div>
+      <div class="pregunta-texto">Confío en las personas con las que trabajo en este equipo</div>
+    </div>
+    <div class="pregunta-row">
+      <div class="pregunta-rol"><span class="pregunta-rol-letter">C</span>Eq. → Líder</div>
+      <div class="pregunta-texto">Mi líder genera un ambiente de confianza genuina en el equipo</div>
+    </div>
+    <div class="pregunta-row">
+      <div class="pregunta-rol"><span class="pregunta-rol-letter">D</span>Líder auto</div>
+      <div class="pregunta-texto">Genero un ambiente donde mi equipo puede actuar con confianza</div>
+    </div>
+    <div class="pregunta-row">
+      <div class="pregunta-rol"><span class="pregunta-rol-letter">B</span>Líder → Eq.</div>
+      <div class="pregunta-texto">El equipo opera desde la confianza mutua entre sus integrantes</div>
+    </div>
+  </div>
+
+  <div class="tema-block">
+    <div class="tema-header">Tema 2 — Comunicación</div>
+    <div class="pregunta-row">
+      <div class="pregunta-rol"><span class="pregunta-rol-letter">A</span>Equipo auto</div>
+      <div class="pregunta-texto">En este equipo nos comunicamos de forma abierta y honesta</div>
+    </div>
+    <div class="pregunta-row">
+      <div class="pregunta-rol"><span class="pregunta-rol-letter">C</span>Eq. → Líder</div>
+      <div class="pregunta-texto">Mi líder se comunica con claridad, apertura y honestidad</div>
+    </div>
+    <div class="pregunta-row">
+      <div class="pregunta-rol"><span class="pregunta-rol-letter">D</span>Líder auto</div>
+      <div class="pregunta-texto">Me comunico con mi equipo de forma abierta y honesta</div>
+    </div>
+    <div class="pregunta-row">
+      <div class="pregunta-rol"><span class="pregunta-rol-letter">B</span>Líder → Eq.</div>
+      <div class="pregunta-texto">El equipo se comunica de forma abierta y honesta entre sí</div>
+    </div>
+  </div>
+
+  <div class="tema-block">
+    <div class="tema-header">Tema 3 — Colaboración</div>
+    <div class="pregunta-row">
+      <div class="pregunta-rol"><span class="pregunta-rol-letter">A</span>Equipo auto</div>
+      <div class="pregunta-texto">Colaboramos bien entre nosotros cuando enfrentamos retos</div>
+    </div>
+    <div class="pregunta-row">
+      <div class="pregunta-rol"><span class="pregunta-rol-letter">C</span>Eq. → Líder</div>
+      <div class="pregunta-texto">Mi líder facilita que el equipo trabaje de forma colaborativa</div>
+    </div>
+    <div class="pregunta-row">
+      <div class="pregunta-rol"><span class="pregunta-rol-letter">D</span>Líder auto</div>
+      <div class="pregunta-texto">Facilito que mi equipo colabore y se apoye mutuamente</div>
+    </div>
+    <div class="pregunta-row">
+      <div class="pregunta-rol"><span class="pregunta-rol-letter">B</span>Líder → Eq.</div>
+      <div class="pregunta-texto">El equipo colabora efectivamente cuando enfrenta retos</div>
+    </div>
+  </div>
+
+  <div class="tema-block">
+    <div class="tema-header">Tema 4 — Gestión del conflicto</div>
+    <div class="pregunta-row">
+      <div class="pregunta-rol"><span class="pregunta-rol-letter">A</span>Equipo auto</div>
+      <div class="pregunta-texto">En este equipo los conflictos se abordan de forma constructiva</div>
+    </div>
+    <div class="pregunta-row">
+      <div class="pregunta-rol"><span class="pregunta-rol-letter">C</span>Eq. → Líder</div>
+      <div class="pregunta-texto">Mi líder maneja los conflictos del equipo de forma constructiva</div>
+    </div>
+    <div class="pregunta-row">
+      <div class="pregunta-rol"><span class="pregunta-rol-letter">D</span>Líder auto</div>
+      <div class="pregunta-texto">Manejo los conflictos de mi equipo de forma constructiva</div>
+    </div>
+    <div class="pregunta-row">
+      <div class="pregunta-rol"><span class="pregunta-rol-letter">B</span>Líder → Eq.</div>
+      <div class="pregunta-texto">El equipo resuelve sus conflictos de forma constructiva sin evitarlos</div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ======================== DIMENSIÓN 4 ======================== -->
+<div class="dimension-block">
+  <div class="dimension-header">
+    <span class="dimension-number">04</span>
+    <span class="dimension-name">Acción</span>
+    <span class="dimension-sub">Comportamiento</span>
+    <span class="dimension-pregunta">¿Qué?</span>
+  </div>
+
+  <div class="tema-block">
+    <div class="tema-header">Tema 1 — Cumplimiento de compromisos</div>
+    <div class="pregunta-row">
+      <div class="pregunta-rol"><span class="pregunta-rol-letter">A</span>Equipo auto</div>
+      <div class="pregunta-texto">Cumplo con los compromisos que adquiero con mi equipo y organización</div>
+    </div>
+    <div class="pregunta-row">
+      <div class="pregunta-rol"><span class="pregunta-rol-letter">C</span>Eq. → Líder</div>
+      <div class="pregunta-texto">Mi líder cumple con los compromisos que adquiere con el equipo</div>
+    </div>
+    <div class="pregunta-row">
+      <div class="pregunta-rol"><span class="pregunta-rol-letter">D</span>Líder auto</div>
+      <div class="pregunta-texto">Cumplo con los compromisos que adquiero con mi equipo</div>
+    </div>
+    <div class="pregunta-row">
+      <div class="pregunta-rol"><span class="pregunta-rol-letter">B</span>Líder → Eq.</div>
+      <div class="pregunta-texto">El equipo cumple consistentemente con los compromisos que adquiere</div>
+    </div>
+  </div>
+
+  <div class="tema-block">
+    <div class="tema-header">Tema 2 — Toma de decisiones</div>
+    <div class="pregunta-row">
+      <div class="pregunta-rol"><span class="pregunta-rol-letter">A</span>Equipo auto</div>
+      <div class="pregunta-texto">Tomo decisiones con agilidad cuando la situación lo requiere</div>
+    </div>
+    <div class="pregunta-row">
+      <div class="pregunta-rol"><span class="pregunta-rol-letter">C</span>Eq. → Líder</div>
+      <div class="pregunta-texto">Mi líder toma decisiones con claridad y en el momento oportuno</div>
+    </div>
+    <div class="pregunta-row">
+      <div class="pregunta-rol"><span class="pregunta-rol-letter">D</span>Líder auto</div>
+      <div class="pregunta-texto">Tomo decisiones con claridad y en el momento que el equipo necesita</div>
+    </div>
+    <div class="pregunta-row">
+      <div class="pregunta-rol"><span class="pregunta-rol-letter">B</span>Líder → Eq.</div>
+      <div class="pregunta-texto">El equipo toma decisiones con agilidad sin depender siempre del líder</div>
+    </div>
+  </div>
+
+  <div class="tema-block">
+    <div class="tema-header">Tema 3 — Autonomía e iniciativa</div>
+    <div class="pregunta-row">
+      <div class="pregunta-rol"><span class="pregunta-rol-letter">A</span>Equipo auto</div>
+      <div class="pregunta-texto">Actúo con iniciativa sin esperar que me digan qué hacer en cada momento</div>
+    </div>
+    <div class="pregunta-row">
+      <div class="pregunta-rol"><span class="pregunta-rol-letter">C</span>Eq. → Líder</div>
+      <div class="pregunta-texto">Mi líder me da la autonomía para actuar y tomar iniciativa</div>
+    </div>
+    <div class="pregunta-row">
+      <div class="pregunta-rol"><span class="pregunta-rol-letter">D</span>Líder auto</div>
+      <div class="pregunta-texto">Doy autonomía a mi equipo para actuar sin supervisión constante</div>
+    </div>
+    <div class="pregunta-row">
+      <div class="pregunta-rol"><span class="pregunta-rol-letter">B</span>Líder → Eq.</div>
+      <div class="pregunta-texto">El equipo actúa con iniciativa sin necesidad de supervisión constante</div>
+    </div>
+  </div>
+
+  <div class="tema-block">
+    <div class="tema-header">Tema 4 — Adaptación y aprendizaje</div>
+    <div class="pregunta-row">
+      <div class="pregunta-rol"><span class="pregunta-rol-letter">A</span>Equipo auto</div>
+      <div class="pregunta-texto">Me adapto con agilidad ante los cambios y aprendo de los errores</div>
+    </div>
+    <div class="pregunta-row">
+      <div class="pregunta-rol"><span class="pregunta-rol-letter">C</span>Eq. → Líder</div>
+      <div class="pregunta-texto">Mi líder nos impulsa a adaptarnos y aprender ante los cambios</div>
+    </div>
+    <div class="pregunta-row">
+      <div class="pregunta-rol"><span class="pregunta-rol-letter">D</span>Líder auto</div>
+      <div class="pregunta-texto">Impulso a mi equipo a adaptarse rápido y aprender de los errores</div>
+    </div>
+    <div class="pregunta-row">
+      <div class="pregunta-rol"><span class="pregunta-rol-letter">B</span>Líder → Eq.</div>
+      <div class="pregunta-texto">El equipo se adapta con agilidad ante los cambios y aprende de los errores</div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="doc-footer">
+  <span>Laborativo · Diagnóstico Organizacional</span>
+  <span>64 preguntas · Versión 1.0 · 2026</span>
+</div>
+
+<!-- PRINT BUTTON -->
+<button class="print-btn no-print" onclick="window.print()">Guardar como PDF →</button>
+
+</body>
+</html>
