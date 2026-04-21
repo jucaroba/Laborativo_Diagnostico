@@ -27,24 +27,19 @@ export default async function LandingPage({ params }: { params: Promise<{ codigo
 
       {/* Hero */}
       <div style={{ padding: '48px 56px 64px', borderBottom: '1.5px solid var(--ink)', position: 'relative' }}>
-        <div style={{ marginBottom: 72 }}>
-          <Image src="/brand/laborativo-logo.png" alt="Laborativo" width={154} height={39} style={{ objectFit: 'contain', display: 'block', marginBottom: 24, marginLeft: -15 }} />
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 72 }}>
+          <Image src="/brand/laborativo-logo.png" alt="Laborativo" width={154} height={39} style={{ objectFit: 'contain', display: 'block', marginLeft: -15, flexShrink: 0, marginTop: 15 }} />
           <div style={{ display: 'flex', gap: 32 }}>
-            <span style={{ fontSize: 10, letterSpacing: '.12em', textTransform: 'uppercase', color: 'var(--mute)', fontWeight: 600 }}>
+            <span style={{ fontSize: 10, letterSpacing: '.12em', textTransform: 'uppercase', color: 'var(--mute)', fontWeight: 600, textAlign: 'right' }}>
               Producto<b style={{ display: 'block', fontSize: 12, color: 'var(--ink)', marginTop: 6, fontWeight: 700, letterSpacing: '.04em' }}>Diagnóstico de Cultura</b>
             </span>
-            <span style={{ fontSize: 10, letterSpacing: '.12em', textTransform: 'uppercase', color: 'var(--mute)', fontWeight: 600 }}>
+            <span style={{ fontSize: 10, letterSpacing: '.12em', textTransform: 'uppercase', color: 'var(--mute)', fontWeight: 600, textAlign: 'right' }}>
               Formato<b style={{ display: 'block', fontSize: 12, color: 'var(--ink)', marginTop: 6, fontWeight: 700, letterSpacing: '.04em' }}>Mirada 360°</b>
             </span>
-            <span style={{ fontSize: 10, letterSpacing: '.12em', textTransform: 'uppercase', color: 'var(--mute)', fontWeight: 600 }}>
+            <span style={{ fontSize: 10, letterSpacing: '.12em', textTransform: 'uppercase', color: 'var(--mute)', fontWeight: 600, textAlign: 'right' }}>
               Tiempo<b style={{ display: 'block', fontSize: 12, color: 'var(--ink)', marginTop: 6, fontWeight: 700, letterSpacing: '.04em' }}>12–18 minutos</b>
             </span>
           </div>
-        </div>
-
-        <div style={{ position: 'absolute', right: 56, top: 48, textAlign: 'right', fontSize: 10, color: 'var(--mute)', letterSpacing: '.1em', textTransform: 'uppercase', fontWeight: 600 }}>
-          <b style={{ display: 'block', fontWeight: 900, fontSize: 56, color: 'var(--ink)', lineHeight: 1, marginBottom: 6, letterSpacing: '-.04em' }}>04</b>
-          dimensiones<br />de análisis
         </div>
 
         <span className="eyebrow">Una experiencia laborativo.</span>
@@ -125,7 +120,7 @@ export default async function LandingPage({ params }: { params: Promise<{ codigo
                 <h4 style={{ margin: '0 0 6px', fontSize: 20, fontWeight: 800, letterSpacing: '-.02em' }}>{s.h}</h4>
                 <p style={{ margin: 0, fontSize: 14, color: 'var(--ink-2)', lineHeight: 1.5, maxWidth: '50ch', fontWeight: 500 }}>{s.p}</p>
               </div>
-              <span style={{ fontSize: 10, letterSpacing: '.1em', textTransform: 'uppercase', color: neon, textAlign: 'right', fontWeight: 600, display: 'flex', flexDirection: 'column', gap: 4 }}>
+              <span style={{ fontSize: 10, letterSpacing: '.1em', textTransform: 'uppercase', color: neon, textAlign: 'right', fontWeight: 600, display: 'flex', flexDirection: 'column', gap: 4, paddingTop: 4 }}>
                 {s.meta.split(' · ').map((part, i) => <span key={i}>{part}</span>)}
               </span>
             </div>

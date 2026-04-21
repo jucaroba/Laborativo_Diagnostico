@@ -88,11 +88,11 @@ button { font-family: inherit; }
   transition: background .15s ease, color .15s ease, border-color .15s ease;
   letter-spacing: -0.01em;
 }
-.btn:hover { background: var(--ink); color: var(--bg); }
+.btn:hover { background: #fff; color: var(--ink); border-color: var(--ink); }
 .btn.primary { background: var(--ink); color: var(--bg); }
-.btn.primary:hover { background: var(--neon); color: var(--ink); border-color: var(--neon); }
+.btn.primary:hover { background: #fff; color: var(--ink); border-color: var(--ink); }
 .btn.neon { background: var(--neon); border-color: var(--ink); color: var(--ink); }
-.btn.neon:hover { background: var(--ink); color: var(--neon); }
+.btn.neon:hover { background: #fff; color: var(--ink); border-color: var(--ink); }
 
 /* Eyebrow */
 .eyebrow {
