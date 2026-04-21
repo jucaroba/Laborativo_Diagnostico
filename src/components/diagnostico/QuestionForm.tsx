@@ -169,16 +169,16 @@ export default function QuestionForm({ diagnosticoId, codigo, idx, neon }: {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: 24, borderTop: '1.5px solid var(--ink)' }}>
           <div style={{ display: 'flex', gap: 10 }}>
             {!esPrimera && (
-              <button className="btn primary" onClick={() => router.push(`/d/${codigo}/q/${idx - 1}`)}><ArrowLeft size={15} strokeWidth={2.5} /> Anterior</button>
+              <button className="btn primary" onClick={() => router.push(`/d/${codigo}/q/${idx - 1}`)} style={{ justifyContent: 'center', padding: '14px 14px', width: 140 }}><span style={{ display: 'flex', alignItems: 'center', gap: 8 }}><ArrowLeft size={15} strokeWidth={2.5} /> Anterior</span></button>
             )}
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
             {errorSeleccion && (
-              <span style={{ fontSize: 12, color: 'var(--mute)', fontWeight: 600, letterSpacing: '.04em' }}>
+              <span style={{ fontSize: 12, color: 'var(--mute)', fontWeight: 600, letterSpacing: '.03em' }}>
                 Debes seleccionar una opción antes de continuar
               </span>
             )}
-            <button className="btn primary" onClick={siguiente} disabled={guardando}>
+            <button className="btn primary" onClick={siguiente} disabled={guardando} style={{ justifyContent: 'center', padding: '14px 14px', width: 140 }}>
               {guardando ? 'Guardando…' : <>{esUltima ? 'Finalizar' : 'Siguiente'} <ArrowRight size={15} strokeWidth={2.5} /></>}
             </button>
           </div>
