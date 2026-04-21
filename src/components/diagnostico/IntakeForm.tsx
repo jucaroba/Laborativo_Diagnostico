@@ -47,19 +47,15 @@ export default function IntakeForm({ diagnosticoId, nombreCompania, codigo }: {
       <div style={{ padding: 56, borderRight: '1.5px solid var(--ink)', display: 'flex', flexDirection: 'column', gap: 24, background: 'var(--bg)' }}>
         <span className="eyebrow">Paso 01 / 02 — Registro</span>
         <div className="rule" />
-        <h2 style={{ fontWeight: 900, fontSize: 64, lineHeight: .92, letterSpacing: -1, marginTop: 24 }}>
+        <div style={{ fontSize: 13, color: 'var(--neon)', fontWeight: 700, marginTop: 24, textTransform: 'uppercase', letterSpacing: '.08em' }}>{nombreCompania}</div>
+        <h2 style={{ fontWeight: 900, fontSize: 64, lineHeight: .92, letterSpacing: -1 }}>
           Antes de empezar,<br />cuéntanos quién responde.
         </h2>
-        <p style={{ color: 'var(--ink-2)', lineHeight: 1.5, maxWidth: '42ch', fontWeight: 500, fontSize: 15, margin: 0 }}>
-          Esta información nos ayuda a cruzar tu respuesta con la de tu equipo. Nadie verá tus respuestas individuales, solo los resultados colectivos.
+        <p style={{ color: 'var(--ink-2)', lineHeight: 1.5, maxWidth: 'calc(42ch + 50px)', fontWeight: 500, fontSize: 15, margin: 0 }}>
+          Esta información nos ayuda a cruzar tu respuesta con la de tu equipo.<br />Nadie verá tus respuestas individuales, solo los resultados colectivos.
         </p>
-        <div style={{ fontSize: 13, color: 'var(--mute)', fontWeight: 500 }}>{nombreCompania}</div>
 
-        <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: 12 }}>
-          <span className="chip">
-            <span style={{ width: 10, height: 10, background: 'var(--neon)', border: '1.5px solid var(--ink)', display: 'inline-block' }} />
-            Anónimo · 100% confidencial
-          </span>
+        <div style={{ marginTop: 'auto' }}>
           <span className="eyebrow soft">≈ 12–18 min · 32 preguntas</span>
         </div>
       </div>

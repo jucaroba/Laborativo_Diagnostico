@@ -28,7 +28,7 @@ export default async function LandingPage({ params }: { params: Promise<{ codigo
       {/* Hero */}
       <div style={{ padding: '48px 56px 64px', borderBottom: '1.5px solid var(--ink)', position: 'relative' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 72 }}>
-          <Image src="/brand/laborativo-logo.png" alt="Laborativo" width={154} height={39} style={{ objectFit: 'contain', display: 'block', marginLeft: -15, flexShrink: 0, marginTop: 15 }} />
+          <Image src="/brand/laborativo-logo.png" alt="Laborativo" width={200} height={51} style={{ objectFit: 'contain', display: 'block', marginLeft: -15, flexShrink: 0, marginTop: 15 }} />
           <div style={{ display: 'flex', gap: 32 }}>
             <span style={{ fontSize: 10, letterSpacing: '.12em', textTransform: 'uppercase', color: 'var(--mute)', fontWeight: 600, textAlign: 'right' }}>
               Producto<b style={{ display: 'block', fontSize: 12, color: 'var(--ink)', marginTop: 6, fontWeight: 700, letterSpacing: '.04em' }}>Diagnóstico de Cultura</b>
@@ -50,12 +50,12 @@ export default async function LandingPage({ params }: { params: Promise<{ codigo
 
         <div style={{ display: 'flex', gap: 40, marginTop: 72, alignItems: 'flex-end' }}>
           <p style={{ fontSize: 17, lineHeight: 1.45, width: '46ch', flexShrink: 0, color: 'var(--ink)', margin: 0, fontWeight: 500 }}>
-            Un diagnóstico breve para ver con claridad cómo se comporta tu cultura hoy y dónde están las brechas entre lo que el líder cree, lo que el equipo vive, y lo que la organización realmente hace.{' '}
+            Un diagnóstico breve para ver con claridad cómo se comporta tu cultura hoy y dónde están las brechas entre lo que el líder cree, lo que el equipo vive, y lo que la organización realmente hace.<br />
             <b style={{ fontWeight: 800 }}>Un modelo de consultoría creativa basada en la emoción.</b>
           </p>
-          <div style={{ width: 1, background: 'var(--ink)', alignSelf: 'stretch', flexShrink: 0 }} />
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 16, alignItems: 'flex-start' }}>
-            <span style={{ fontSize: 13, color: 'var(--mute)', fontWeight: 500 }}>{diag.nombre_compania}</span>
+          <div style={{ width: 1, background: 'var(--ink)', alignSelf: 'stretch', flexShrink: 0, marginLeft: -25 }} />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16, alignItems: 'flex-start', marginLeft: 10 }}>
+
             <Link href={`/d/${codigo}/intake`} className="btn primary">Iniciar diagnóstico <ArrowRight size={15} strokeWidth={2.5} /></Link>
           </div>
         </div>
