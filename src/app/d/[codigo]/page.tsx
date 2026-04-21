@@ -87,12 +87,14 @@ export default async function LandingPage({ params }: { params: Promise<{ codigo
           ].map((d, i) => (
             <div key={d.n} className="dim-card" style={{
               borderRight: i < 3 ? '1.5px solid var(--ink)' : 'none',
-              padding: '28px 24px 32px', position: 'relative',
+              padding: '28px 24px 32px',
               minHeight: 250, display: 'flex', flexDirection: 'column', gap: 14,
               background: 'var(--card)',
             }}>
-              <span style={{ position: 'absolute', top: 16, right: 20, fontWeight: 900, fontSize: 14, color: neon }}>{d.n}</span>
-              <span style={{ fontSize: 11, letterSpacing: .5, textTransform: 'uppercase', color: 'var(--mute)', fontWeight: 700 }}>{d.idx}</span>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: 11, letterSpacing: .5, textTransform: 'uppercase', color: 'var(--mute)', fontWeight: 700 }}>{d.idx}</span>
+                <span style={{ fontWeight: 900, fontSize: 14, color: neon }}>{d.n}</span>
+              </div>
               <div style={{ width: 56, height: 8, background: 'var(--ink)' }} />
               <h3 style={{ fontWeight: 900, fontSize: 26, letterSpacing: -.5, lineHeight: 1, marginTop: 15 }}>{d.h} / {d.pair}</h3>
               <p style={{ fontSize: 14, lineHeight: 1.45, color: 'var(--ink-2)', margin: '8px 0 0', maxWidth: '30ch', fontWeight: 500, whiteSpace: 'pre-line' }}>{d.p}</p>
@@ -170,7 +172,7 @@ export default async function LandingPage({ params }: { params: Promise<{ codigo
         <span className="eyebrow">Empieza ahora</span>
         <div className="rule" />
         <h2 style={{ fontWeight: 900, fontSize: 'clamp(48px,6.5vw,96px)', lineHeight: .88, letterSpacing: '-.045em', margin: '12px 0 32px', maxWidth: '14ch' }}>
-          De la intuición<br />al mapa.
+          De la intuición<br />a la data.
         </h2>
         <Link href={`/d/${codigo}/intake`} className="btn primary">Iniciar diagnóstico <ArrowRight size={15} strokeWidth={2.5} /></Link>
         <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 72, fontSize: 10, color: 'var(--mute)', letterSpacing: '.12em', textTransform: 'uppercase', fontWeight: 600 }}>
