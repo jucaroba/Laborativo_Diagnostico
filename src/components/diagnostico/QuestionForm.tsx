@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { PREGUNTAS_BASE } from '@/lib/preguntas-base'
 import { DIMENSIONES, Rol } from '@/types'
-import { ArrowRight } from 'lucide-react'
+import { ArrowRight, ArrowLeft } from 'lucide-react'
 
 const ESCALA = [
   { n: 1, label: 'Muy bajo', desc: 'Totalmente en desacuerdo' },
@@ -31,6 +31,7 @@ export default function QuestionForm({ diagnosticoId, codigo, idx, neon }: {
   const [preguntas, setPreguntas] = useState<{ id: string; texto: string; dimension_id: number; rol: Rol; orden: number }[]>([])
   const [valor, setValor] = useState<number | null>(null)
   const [guardando, setGuardando] = useState(false)
+  const [errorSeleccion, setErrorSeleccion] = useState(false)
 
   useEffect(() => {
     const storedPid = sessionStorage.getItem('pid')
@@ -81,7 +82,9 @@ export default function QuestionForm({ diagnosticoId, codigo, idx, neon }: {
   const esUltima = idx === total
 
   async function siguiente() {
-    if (!valor || !pid) return
+    if (!valor) { setErrorSeleccion(true); return }
+    setErrorSeleccion(false)
+    if (!pid) return
     setGuardando(true)
 
     await supabase.from('respuestas').upsert({
@@ -109,10 +112,10 @@ export default function QuestionForm({ diagnosticoId, codigo, idx, neon }: {
         background: 'var(--bg)', position: 'sticky', top: 0, zIndex: 10,
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
+          <span style={{ fontSize: 11, color: 'var(--ink)', fontWeight: 700, letterSpacing: .5 }}>{idx} / {total}</span>
           <div style={{ width: 240, height: 4, background: 'var(--bg-2)', position: 'relative', border: '1.5px solid var(--ink)' }}>
             <div style={{ position: 'absolute', left: 0, top: 0, height: '100%', background: 'var(--ink)', width: `${progreso}%`, transition: 'width .4s ease' }} />
           </div>
-          <span style={{ fontSize: 11, color: 'var(--ink)', fontWeight: 700, letterSpacing: .5 }}>{idx} / {total}</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 11, letterSpacing: .5, fontWeight: 700, textTransform: 'uppercase' }}>
           <span style={{ width: 8, height: 8, background: neon, border: '1.5px solid var(--ink)', display: 'inline-block' }} />
@@ -137,18 +140,18 @@ export default function QuestionForm({ diagnosticoId, codigo, idx, neon }: {
         </div>
 
         {/* Pregunta */}
-        <h2 style={{ fontWeight: 900, fontSize: 40, lineHeight: 1.05, letterSpacing: -1, margin: '0 0 40px', maxWidth: '22ch' }}>
+        <h2 style={{ fontWeight: 900, fontSize: 36, lineHeight: 1.05, letterSpacing: -1, margin: '0 0 40px', maxWidth: '40ch' }}>
           {pregunta.texto}
         </h2>
 
         {/* Escala 1-10 */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(10, 1fr)', gap: 6, marginBottom: 12 }}>
           {Array.from({ length: 10 }, (_, i) => i + 1).map(n => (
-            <div key={n} onClick={() => setValor(n)}
+            <div key={n} onClick={() => { setValor(n); setErrorSeleccion(false) }}
               style={{
-                border: '1.5px solid var(--ink)', padding: '18px 8px', cursor: 'pointer',
-                display: 'flex', flexDirection: 'column', gap: 8, minHeight: 100,
-                alignItems: 'center', justifyContent: 'flex-start',
+                border: '1.5px solid var(--ink)', cursor: 'pointer',
+                display: 'flex', flexDirection: 'column', gap: 8, aspectRatio: '1 / 1',
+                alignItems: 'center', justifyContent: 'center',
                 background: valor === n ? 'var(--ink)' : 'var(--card)',
                 color: valor === n ? 'var(--bg)' : 'var(--ink)',
                 transition: 'background .12s ease',
@@ -157,7 +160,7 @@ export default function QuestionForm({ diagnosticoId, codigo, idx, neon }: {
             </div>
           ))}
         </div>
-        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: 'var(--mute)', fontWeight: 600, letterSpacing: .5, textTransform: 'uppercase', marginBottom: 40 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: 'var(--ink)', fontWeight: 600, letterSpacing: .5, textTransform: 'uppercase', marginBottom: 40 }}>
           <span>Totalmente en desacuerdo</span>
           <span>Totalmente de acuerdo</span>
         </div>
@@ -166,14 +169,19 @@ export default function QuestionForm({ diagnosticoId, codigo, idx, neon }: {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: 24, borderTop: '1.5px solid var(--ink)' }}>
           <div style={{ display: 'flex', gap: 10 }}>
             {!esPrimera && (
-              <button className="btn" onClick={() => router.push(`/d/${codigo}/q/${idx - 1}`)}>← Anterior</button>
+              <button className="btn primary" onClick={() => router.push(`/d/${codigo}/q/${idx - 1}`)}><ArrowLeft size={15} strokeWidth={2.5} /> Anterior</button>
             )}
           </div>
-          <button className="btn primary" onClick={siguiente}
-            disabled={!valor || guardando}
-            style={{ opacity: (!valor || guardando) ? .4 : 1, cursor: (!valor || guardando) ? 'not-allowed' : 'pointer' }}>
-            {guardando ? 'Guardando…' : <>{esUltima ? 'Finalizar' : 'Siguiente'} <ArrowRight size={15} strokeWidth={2.5} /></>}
-          </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+            {errorSeleccion && (
+              <span style={{ fontSize: 12, color: 'var(--mute)', fontWeight: 600, letterSpacing: '.04em' }}>
+                Debes seleccionar una opción antes de continuar
+              </span>
+            )}
+            <button className="btn primary" onClick={siguiente} disabled={guardando}>
+              {guardando ? 'Guardando…' : <>{esUltima ? 'Finalizar' : 'Siguiente'} <ArrowRight size={15} strokeWidth={2.5} /></>}
+            </button>
+          </div>
         </div>
       </div>
     </div>
