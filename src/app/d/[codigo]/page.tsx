@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import { ArrowRight } from 'lucide-react'
+import EstadoNoDisponible from '@/components/diagnostico/EstadoNoDisponible'
 
 export default async function LandingPage({ params }: { params: Promise<{ codigo: string }> }) {
   const { codigo } = await params
@@ -13,7 +14,10 @@ export default async function LandingPage({ params }: { params: Promise<{ codigo
     .eq('codigo_participacion', codigo)
     .single()
 
-  if (!diag || diag.estado !== 'activo') notFound()
+  if (!diag) notFound()
+  if (diag.estado !== 'activo') {
+    return <EstadoNoDisponible estado={diag.estado as 'borrador' | 'completado'} nombreCompania={diag.nombre_compania} neon={diag.color_neon || undefined} />
+  }
 
   const { count: totalPreguntas } = await supabase
     .from('preguntas')
