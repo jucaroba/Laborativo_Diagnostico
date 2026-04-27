@@ -52,13 +52,31 @@ export default async function DiagnosticoPage({ params }: { params: Promise<{ id
           { label: 'Link de participación', url: `${BASE_URL}/d/${d.codigo_participacion}`, href: `${BASE_URL}/d/${d.codigo_participacion}` },
           { label: 'Link de resultados', url: `${BASE_URL}/r/${d.codigo_resultados}`, href: `${BASE_URL}/r/${d.codigo_resultados}` },
         ].map(l => (
-          <div key={l.label}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
-              <a href={l.href} target="_blank" rel="noopener noreferrer" className="page-header__eyebrow" style={{ margin: 0, textDecoration: 'none', color: 'var(--mute)' }}>{l.label}</a>
-              <a href={l.href} target="_blank" rel="noopener noreferrer" style={{ display: 'flex', color: d.color_neon, lineHeight: 1 }}>
-                <ArrowUpRight size={14} strokeWidth={2.5} />
-              </a>
-            </div>
+          <div key={l.label} style={{
+            border: '1.5px solid var(--ink)',
+            padding: '12px 16px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 6,
+          }}>
+            <a
+              href={l.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: 12,
+                color: 'var(--ink)',
+                textDecoration: 'none',
+              }}
+            >
+              <span style={{ fontSize: 13, fontWeight: 800, letterSpacing: '-.01em' }}>
+                {l.label}
+              </span>
+              <ArrowUpRight size={16} strokeWidth={2.5} />
+            </a>
             <CopiarLink url={l.url} />
           </div>
         ))}
