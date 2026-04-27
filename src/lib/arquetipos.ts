@@ -184,9 +184,11 @@ const DIM_TEXTOS: Record<number, Omit<Arquetipo, 'patron' | 'tag'>> = {
 }
 
 export function evaluarRelaciones(ctx: ArquetipoCtx): Arquetipo {
-  const conValor = DIMENSIONES
-    .map(d => ({ id: d.id, val: ctx.promedioDim[d.id] }))
-    .filter((x): x is { id: number; val: number } => typeof x.val === 'number')
+  const conValor: Array<{ id: number; val: number }> = []
+  for (const d of DIMENSIONES) {
+    const val = ctx.promedioDim[d.id]
+    if (typeof val === 'number') conValor.push({ id: d.id, val })
+  }
 
   if (conValor.length === 0) {
     return {
