@@ -29,7 +29,7 @@ export default function SeleccionRol({ diagnosticoId }: { diagnosticoId: string 
 
   return (
     <div className="flex flex-col gap-3">
-      {(['A', 'B', 'C', 'D'] as Rol[]).map(rol => {
+      {(['A', 'C', 'D', 'B'] as Rol[]).map(rol => {
         const info = ROL_INFO[rol]
         const activo = seleccionado === rol
         return (

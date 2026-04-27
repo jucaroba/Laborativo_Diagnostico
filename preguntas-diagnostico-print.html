@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Preguntas Base — Diagnóstico Laborativo</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@400;500;600&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #F5F0E8;
+    color: #1a1a1a;
+    padding: 40px;
+  }
+
+  .header {
+    text-align: center;
+    margin-bottom: 48px;
+    padding-bottom: 24px;
+    border-bottom: 2px solid #1a1a1a;
+  }
+
+  .header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    margin-bottom: 6px;
+  }
+
+  .header p {
+    font-size: 13px;
+    color: #666;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  .roles-legend {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 40px;
+  }
+
+  .rol-pill {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    background: white;
+    border: 1px solid #e0d8cc;
+  }
+
+  .rol-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .rol-pill-text { font-size: 12px; line-height: 1.4; }
+  .rol-pill-text strong { display: block; font-size: 13px; }
+
+  .dimension {
+    margin-bottom: 36px;
+    page-break-inside: avoid;
+  }
+
+  .dimension-header {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 16px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #c8bfb0;
+  }
+
+  .dimension-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 36px;
+    font-weight: 700;
+    color: #c8bfb0;
+    line-height: 1;
+  }
+
+  .dimension-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 700;
+  }
+
+  .dimension-sub {
+    font-size: 12px;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .roles-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+  }
+
+  .rol-block {
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid #e0d8cc;
+  }
+
+  .rol-block-header {
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .rol-letter {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .rol-block-header span {
+    font-size: 11px;
+    font-weight: 600;
+    color: #555;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+
+  .preguntas-list {
+    padding: 10px 14px 14px;
+    list-style: none;
+    border-top: 1px solid #f0e8dc;
+  }
+
+  .preguntas-list li {
+    font-size: 12.5px;
+    line-height: 1.55;
+    padding: 7px 0;
+    border-bottom: 1px solid #f5f0e8;
+    display: flex;
+    gap: 8px;
+    color: #2a2a2a;
+  }
+
+  .preguntas-list li:last-child { border-bottom: none; }
+
+  .q-num {
+    font-size: 11px;
+    font-weight: 600;
+    color: #bbb;
+    flex-shrink: 0;
+    padding-top: 1px;
+  }
+
+  .footer {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid #c8bfb0;
+    text-align: center;
+    font-size: 11px;
+    color: #999;
+    letter-spacing: 0.3px;
+  }
+
+  /* Colores por rol */
+  .color-A { background-color: #4A7FA5; }
+  .color-B { background-color: #8B7355; }
+  .color-C { background-color: #7D3C3C; }
+  .color-D { background-color: #3D6B4F; }
+
+  .bg-A { background-color: #EFF4F8; }
+  .bg-B { background-color: #F5F1EC; }
+  .bg-C { background-color: #F5ECEC; }
+  .bg-D { background-color: #ECF2EE; }
+
+  @media print {
+    body { background: white; padding: 20px; }
+    .dimension { page-break-inside: avoid; }
+  }
+
+  @page { margin: 20mm; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Diagnóstico Laborativo</h1>
+  <p>Preguntas Base — 4 Dimensiones × 4 Roles × 3 Preguntas = 48 total</p>
+</div>
+
+<div class="roles-legend">
+  <div class="rol-pill">
+    <div class="rol-dot color-A"></div>
+    <div class="rol-pill-text"><strong>Rol A</strong>Equipo (auto-evaluación)</div>
+  </div>
+  <div class="rol-pill">
+    <div class="rol-dot color-B"></div>
+    <div class="rol-pill-text"><strong>Rol B</strong>Líder → Equipo</div>
+  </div>
+  <div class="rol-pill">
+    <div class="rol-dot color-C"></div>
+    <div class="rol-pill-text"><strong>Rol C</strong>Equipo → Líder</div>
+  </div>
+  <div class="rol-pill">
+    <div class="rol-dot color-D"></div>
+    <div class="rol-pill-text"><strong>Rol D</strong>Líder (auto-evaluación)</div>
+  </div>
+</div>
+
+<!-- DIMENSIÓN 1 -->
+<div class="dimension">
+  <div class="dimension-header">
+    <span class="dimension-num">1</span>
+    <div>
+      <div class="dimension-title">Intención</div>
+      <div class="dimension-sub">Sentido — ¿A dónde vamos?</div>
+    </div>
+  </div>
+  <div class="roles-grid">
+    <div class="rol-block">
+      <div class="rol-block-header bg-A">
+        <div class="rol-letter color-A">A</div>
+        <span>Equipo</span>
+      </div>
+      <ul class="preguntas-list">
+        <li><span class="q-num">1</span>Tengo claridad sobre hacia dónde se dirige nuestra organización</li>
+        <li><span class="q-num">2</span>El propósito de la empresa resuena con mis valores personales</li>
+        <li><span class="q-num">3</span>El equipo comparte una visión común del futuro</li>
+      </ul>
+    </div>
+    <div class="rol-block">
+      <div class="rol-block-header bg-B">
+        <div class="rol-letter color-B">B</div>
+        <span>Líder → Equipo</span>
+      </div>
+      <ul class="preguntas-list">
+        <li><span class="q-num">4</span>El equipo comprende claramente los objetivos estratégicos de la organización</li>
+        <li><span class="q-num">5</span>Las personas del equipo alinean su trabajo diario con la visión de la empresa</li>
+        <li><span class="q-num">6</span>El equipo actúa con sentido de propósito compartido</li>
+      </ul>
+    </div>
+    <div class="rol-block">
+      <div class="rol-block-header bg-C">
+        <div class="rol-letter color-C">C</div>
+        <span>Equipo → Líder</span>
+      </div>
+      <ul class="preguntas-list">
+        <li><span class="q-num">7</span>Mi líder comunica con claridad hacia dónde vamos como organización</li>
+        <li><span class="q-num">8</span>Mi líder conecta el trabajo del equipo con el propósito mayor de la empresa</li>
+        <li><span class="q-num">9</span>Mi líder inspira con su visión del futuro</li>
+      </ul>
+    </div>
+    <div class="rol-block">
+      <div class="rol-block-header bg-D">
+        <div class="rol-letter color-D">D</div>
+        <span>Líder auto</span>
+      </div>
+      <ul class="preguntas-list">
+        <li><span class="q-num">10</span>Comunico con claridad la dirección estratégica a mi equipo</li>
+        <li><span class="q-num">11</span>Conecto consistentemente el trabajo diario con el propósito de la organización</li>
+        <li><span class="q-num">12</span>Tengo una visión clara de hacia dónde quiero llevar a mi equipo</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- DIMENSIÓN 2 -->
+<div class="dimension">
+  <div class="dimension-header">
+    <span class="dimension-num">2</span>
+    <div>
+      <div class="dimension-title">Motivación</div>
+      <div class="dimension-sub">Energía — ¿Por qué?</div>
+    </div>
+  </div>
+  <div class="roles-grid">
+    <div class="rol-block">
+      <div class="rol-block-header bg-A">
+        <div class="rol-letter color-A">A</div>
+        <span>Equipo</span>
+      </div>
+      <ul class="preguntas-list">
+        <li><span class="q-num">13</span>Me siento motivado para dar lo mejor de mí en esta organización</li>
+        <li><span class="q-num">14</span>Encuentro energía y significado en el trabajo que realizo</li>
+        <li><span class="q-num">15</span>Las condiciones de trabajo me permiten mantener mi motivación</li>
+      </ul>
+    </div>
+    <div class="rol-block">
+      <div class="rol-block-header bg-B">
+        <div class="rol-letter color-B">B</div>
+        <span>Líder → Equipo</span>
+      </div>
+      <ul class="preguntas-list">
+        <li><span class="q-num">16</span>El equipo muestra genuino entusiasmo por su trabajo</li>
+        <li><span class="q-num">17</span>Las personas del equipo van más allá de lo estrictamente requerido</li>
+        <li><span class="q-num">18</span>El equipo mantiene su energía incluso en momentos de dificultad</li>
+      </ul>
+    </div>
+    <div class="rol-block">
+      <div class="rol-block-header bg-C">
+        <div class="rol-letter color-C">C</div>
+        <span>Equipo → Líder</span>
+      </div>
+      <ul class="preguntas-list">
+        <li><span class="q-num">19</span>Mi líder reconoce y celebra los logros del equipo</li>
+        <li><span class="q-num">20</span>Mi líder genera condiciones para que el equipo se sienta motivado</li>
+        <li><span class="q-num">21</span>Mi líder muestra genuino interés por el bienestar del equipo</li>
+      </ul>
+    </div>
+    <div class="rol-block">
+      <div class="rol-block-header bg-D">
+        <div class="rol-letter color-D">D</div>
+        <span>Líder auto</span>
+      </div>
+      <ul class="preguntas-list">
+        <li><span class="q-num">22</span>Genero activamente condiciones para que mi equipo se mantenga motivado</li>
+        <li><span class="q-num">23</span>Reconozco oportunamente los logros y esfuerzos de las personas</li>
+        <li><span class="q-num">24</span>Mi propio nivel de energía y motivación impulsa positivamente al equipo</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- DIMENSIÓN 3 -->
+<div class="dimension">
+  <div class="dimension-header">
+    <span class="dimension-num">3</span>
+    <div>
+      <div class="dimension-title">Interacción</div>
+      <div class="dimension-sub">Vínculos — ¿Con quién?</div>
+    </div>
+  </div>
+  <div class="roles-grid">
+    <div class="rol-block">
+      <div class="rol-block-header bg-A">
+        <div class="rol-letter color-A">A</div>
+        <span>Equipo</span>
+      </div>
+      <ul class="preguntas-list">
+        <li><span class="q-num">25</span>La comunicación dentro del equipo es abierta y fluida</li>
+        <li><span class="q-num">26</span>Existe confianza entre los miembros del equipo</li>
+        <li><span class="q-num">27</span>Los conflictos se abordan de manera constructiva en el equipo</li>
+      </ul>
+    </div>
+    <div class="rol-block">
+      <div class="rol-block-header bg-B">
+        <div class="rol-letter color-B">B</div>
+        <span>Líder → Equipo</span>
+      </div>
+      <ul class="preguntas-list">
+        <li><span class="q-num">28</span>El equipo colabora efectivamente entre sí</li>
+        <li><span class="q-num">29</span>Las personas del equipo se apoyan mutuamente en los momentos difíciles</li>
+        <li><span class="q-num">30</span>El equipo construye relaciones de confianza con otras áreas</li>
+      </ul>
+    </div>
+    <div class="rol-block">
+      <div class="rol-block-header bg-C">
+        <div class="rol-letter color-C">C</div>
+        <span>Equipo → Líder</span>
+      </div>
+      <ul class="preguntas-list">
+        <li><span class="q-num">31</span>Mi líder es accesible y está disponible cuando lo necesitamos</li>
+        <li><span class="q-num">32</span>Mi líder escucha activamente las ideas y preocupaciones del equipo</li>
+        <li><span class="q-num">33</span>Mi líder construye relaciones de confianza con el equipo</li>
+      </ul>
+    </div>
+    <div class="rol-block">
+      <div class="rol-block-header bg-D">
+        <div class="rol-letter color-D">D</div>
+        <span>Líder auto</span>
+      </div>
+      <ul class="preguntas-list">
+        <li><span class="q-num">34</span>Mantengo canales de comunicación abiertos con mi equipo</li>
+        <li><span class="q-num">35</span>Escucho activamente antes de tomar decisiones que afectan al equipo</li>
+        <li><span class="q-num">36</span>Gestiono los conflictos del equipo de manera constructiva</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- DIMENSIÓN 4 -->
+<div class="dimension">
+  <div class="dimension-header">
+    <span class="dimension-num">4</span>
+    <div>
+      <div class="dimension-title">Acción</div>
+      <div class="dimension-sub">Comportamiento — ¿Qué?</div>
+    </div>
+  </div>
+  <div class="roles-grid">
+    <div class="rol-block">
+      <div class="rol-block-header bg-A">
+        <div class="rol-letter color-A">A</div>
+        <span>Equipo</span>
+      </div>
+      <ul class="preguntas-list">
+        <li><span class="q-num">37</span>El equipo cumple consistentemente con los compromisos adquiridos</li>
+        <li><span class="q-num">38</span>Tomamos decisiones con agilidad cuando la situación lo requiere</li>
+        <li><span class="q-num">39</span>Aprendemos y nos adaptamos rápido ante los errores o cambios</li>
+      </ul>
+    </div>
+    <div class="rol-block">
+      <div class="rol-block-header bg-B">
+        <div class="rol-letter color-B">B</div>
+        <span>Líder → Equipo</span>
+      </div>
+      <ul class="preguntas-list">
+        <li><span class="q-num">40</span>El equipo ejecuta con disciplina y consistencia</li>
+        <li><span class="q-num">41</span>Las personas del equipo toman iniciativa sin necesidad de supervisión constante</li>
+        <li><span class="q-num">42</span>El equipo se adapta rápidamente a los cambios y nuevas demandas</li>
+      </ul>
+    </div>
+    <div class="rol-block">
+      <div class="rol-block-header bg-C">
+        <div class="rol-letter color-C">C</div>
+        <span>Equipo → Líder</span>
+      </div>
+      <ul class="preguntas-list">
+        <li><span class="q-num">43</span>Mi líder toma decisiones con claridad y oportunidad</li>
+        <li><span class="q-num">44</span>Mi líder nos da autonomía para actuar y experimentar</li>
+        <li><span class="q-num">45</span>Mi líder modela con su comportamiento lo que espera del equipo</li>
+      </ul>
+    </div>
+    <div class="rol-block">
+      <div class="rol-block-header bg-D">
+        <div class="rol-letter color-D">D</div>
+        <span>Líder auto</span>
+      </div>
+      <ul class="preguntas-list">
+        <li><span class="q-num">46</span>Tomo decisiones con la información disponible sin paralizarme</li>
+        <li><span class="q-num">47</span>Doy autonomía a mi equipo para actuar y aprender de los errores</li>
+        <li><span class="q-num">48</span>Mi comportamiento es coherente con los valores que declaro</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  Laborativo · Diagnóstico Organizacional · laborativo.com
+</div>
+
+</body>
+</html>

@@ -45,7 +45,7 @@ export default function EstadoNoDisponible({ estado, nombreCompania, neon = '#D8
           {titulo}
         </h1>
         {copy.eyebrow && nombreCompania && (
-          <span style={{ fontSize: 11, letterSpacing: '.12em', textTransform: 'uppercase', color: 'var(--mute)', fontWeight: 700, marginBottom: 24 }}>
+          <span style={{ fontSize: 11, letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--mute)', fontWeight: 700, marginBottom: 24 }}>
             {nombreCompania}
           </span>
         )}
@@ -54,7 +54,7 @@ export default function EstadoNoDisponible({ estado, nombreCompania, neon = '#D8
         </p>
       </div>
 
-      <div style={{ padding: '24px 56px', borderTop: '1.5px solid var(--ink)', display: 'flex', justifyContent: 'space-between', fontSize: 10, color: 'var(--mute)', letterSpacing: '.12em', textTransform: 'uppercase', fontWeight: 600 }}>
+      <div style={{ padding: '24px 56px', borderTop: '1.5px solid var(--ink)', display: 'flex', justifyContent: 'space-between', fontSize: 10, color: 'var(--mute)', letterSpacing: '.08em', textTransform: 'uppercase', fontWeight: 600 }}>
         <span>Laborativo / Consultoría Creativa Basada en la Emoción</span>
         <span>Diag · V1.0</span>
       </div>

@@ -11,8 +11,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <header style={{ borderBottom: '1.5px solid var(--ink)', background: '#ffffff', padding: '14px 40px', display: 'flex', alignItems: 'center' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
           <Image src="/brand/laborativo-logo.png" alt="Laborativo" width={154} height={39} style={{ objectFit: 'contain' }} />
-          <span style={{ color: 'var(--mute)', fontSize: 14 }}>/</span>
-          <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--mute)', letterSpacing: '.04em' }}>Diagnóstico Admin</span>
+          <span style={{ color: 'var(--mute)', fontSize: 14, marginTop: 5 }}>/</span>
+          <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--ink)', letterSpacing: '.04em', marginTop: 5 }}>Diagnóstico Admin</span>
         </div>
       </header>
       <div style={{ position: 'relative', maxWidth: 960, margin: '0 auto', padding: '48px 40px' }}>

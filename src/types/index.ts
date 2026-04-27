@@ -2,7 +2,7 @@ export type Rol = 'A' | 'B' | 'C' | 'D'
 export type EstadoDiagnostico = 'borrador' | 'activo' | 'completado'
 
 export const ROL_INFO: Record<Rol, { label: string; descripcion: string; color: string }> = {
-  A: { label: 'Equipo',          descripcion: 'Auto-evaluación del equipo',          color: '#4A7FA5' },
+  A: { label: 'Equipo auto',     descripcion: 'Auto-evaluación del equipo',          color: '#4A7FA5' },
   B: { label: 'Líder → Equipo', descripcion: 'El líder evalúa al equipo',           color: '#8B7355' },
   C: { label: 'Equipo → Líder', descripcion: 'El equipo evalúa al líder',           color: '#7D3C3C' },
   D: { label: 'Líder auto',     descripcion: 'Auto-evaluación del líder',           color: '#3D6B4F' },

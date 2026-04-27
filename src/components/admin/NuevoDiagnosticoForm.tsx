@@ -216,7 +216,7 @@ export default function NuevoDiagnosticoForm() {
             <div key={dim.id} style={{ marginBottom: 40, borderTop: dimIdx === 0 ? 'none' : '2px solid var(--ink)', paddingTop: 16 }}>
               <p className="page-header__eyebrow" style={{ margin: '0 0 4px' }}>{dim.subtitulo}</p>
               <h3 style={{ fontSize: 20, fontWeight: 900, letterSpacing: '0', margin: '0 0 20px', fontFamily: 'Red Hat Display, sans-serif' }}>{dim.nombre}</h3>
-              {(['A', 'B', 'C', 'D'] as Rol[]).map(rol => {
+              {(['A', 'C', 'D', 'B'] as Rol[]).map(rol => {
                 const grupo = preguntas.map((p, i) => ({ ...p, idx: i })).filter(p => p.dimension_id === dim.id && p.rol === rol)
                 return (
                   <div key={rol} style={{ marginBottom: 20 }}>

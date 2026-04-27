@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "seed": "node --env-file=.env.local --experimental-strip-types --no-warnings scripts/seed-data.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.90.0",
