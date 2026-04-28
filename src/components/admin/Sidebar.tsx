@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutGrid, FileText, type LucideIcon } from 'lucide-react'
+import { LayoutGrid, FileText, Users, type LucideIcon } from 'lucide-react'
 
 type Item = {
   label: string
@@ -22,7 +22,10 @@ const SECTIONS: Section[] = [
         label: 'Diagnósticos',
         href: '/admin',
         icon: LayoutGrid,
-        match: p => p === '/admin' || p.startsWith('/admin/') && !p.startsWith('/admin/preguntas-base'),
+        match: p => p === '/admin'
+          || (p.startsWith('/admin/')
+            && !p.startsWith('/admin/preguntas-base')
+            && !p.startsWith('/admin/usuarios')),
       },
     ],
   },
@@ -33,6 +36,12 @@ const SECTIONS: Section[] = [
         href: '/admin/preguntas-base',
         icon: FileText,
         match: p => p.startsWith('/admin/preguntas-base'),
+      },
+      {
+        label: 'Usuarios',
+        href: '/admin/usuarios',
+        icon: Users,
+        match: p => p.startsWith('/admin/usuarios'),
       },
     ],
   },
@@ -53,11 +62,6 @@ export default function Sidebar() {
       display: 'flex',
       flexDirection: 'column',
       gap: 8,
-      position: 'sticky',
-      top: 0,
-      alignSelf: 'flex-start',
-      maxHeight: '100vh',
-      overflowY: 'auto',
     }}>
       {SECTIONS.map((section, sIdx) => (
         <div key={sIdx}>
