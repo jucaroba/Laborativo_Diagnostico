@@ -133,6 +133,34 @@ export default function NuevoDiagnosticoForm() {
   return (
     <div>
 
+      {/* Header de página + acciones (en revisión) */}
+      <div className="page-header" style={{ marginBottom: 16 }}>
+        <span className="page-header__eyebrow">Nuevo diagnóstico</span>
+        <div className="page-header__rule" />
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'flex-end',
+          gap: 16,
+          flexWrap: 'wrap',
+        }}>
+          <h1 className="page-header__title">Configuración</h1>
+          {paso === 'revision' && (
+            <div style={{ display: 'flex', gap: 8, paddingBottom: 4 }}>
+              <Button variant="outline" onClick={() => setPaso('preguntas-opcion')} disabled={guardando}>
+                <ArrowRight size={15} strokeWidth={2.5} style={{ transform: 'rotate(180deg)' }} /> Cambiar preguntas
+              </Button>
+              <Button onClick={guardar} disabled={guardando}>{guardando ? 'Guardando…' : 'Guardar diagnóstico'}</Button>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div style={{ maxWidth: 720 }}>
+      <div style={{ background: 'var(--ink)', padding: '10px 16px', marginBottom: 12 }}>
+        <h2 style={{ fontSize: 20, fontWeight: 900, letterSpacing: '0', margin: 0, color: '#fff', fontFamily: 'Red Hat Display, sans-serif' }}>Características del diagnóstico</h2>
+      </div>
+
       {/* PASO 1: Datos */}
       {paso === 'datos' && (
         <div>
@@ -257,6 +285,7 @@ export default function NuevoDiagnosticoForm() {
           </Actions>
         </div>
       )}
+      </div>
     </div>
   )
 }

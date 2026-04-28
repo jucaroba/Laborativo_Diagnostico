@@ -74,7 +74,7 @@ export default function GrupoPreguntas({ grupo, rol, diagnosticoId, dimensionId,
           onClick={() => { setAgregando(true); setTextoNuevo('') }}
           style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4, padding: '2px 4px', color: neonColor }}
         >
-          <Plus size={13} strokeWidth={2.5} />
+          <Plus size={14} strokeWidth={3.5} />
         </button>
       </div>
 
