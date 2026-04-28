@@ -6,18 +6,21 @@ import { Pregunta, Rol, ROL_INFO } from '@/types'
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table'
 import { Pencil, Trash2, Plus, Check, X } from 'lucide-react'
 
+type PreguntaItem = Omit<Pregunta, 'diagnostico_id'> & { diagnostico_id?: string }
+
 interface Props {
-  grupo: Pregunta[]
+  grupo: PreguntaItem[]
   rol: Rol
-  diagnosticoId: string
   dimensionId: number
   maxOrden: number
+  tabla?: 'preguntas' | 'preguntas_base'
+  diagnosticoId?: string
   neonColor?: string
 }
 
-export default function GrupoPreguntas({ grupo, rol, diagnosticoId, dimensionId, maxOrden, neonColor = '#D8FF00' }: Props) {
+export default function GrupoPreguntas({ grupo, rol, diagnosticoId, dimensionId, maxOrden, tabla = 'preguntas', neonColor = '#D8FF00' }: Props) {
   const router = useRouter()
-  const [preguntas, setPreguntas] = useState<Pregunta[]>(grupo)
+  const [preguntas, setPreguntas] = useState<PreguntaItem[]>(grupo)
   const [editandoId, setEditandoId] = useState<string | null>(null)
   const [textoEdit, setTextoEdit] = useState('')
   const [agregando, setAgregando] = useState(false)
@@ -26,28 +29,33 @@ export default function GrupoPreguntas({ grupo, rol, diagnosticoId, dimensionId,
 
   async function guardarEdit(id: string) {
     if (!textoEdit.trim()) return
-    await supabase.from('preguntas').update({ texto: textoEdit.trim() }).eq('id', id)
-    setPreguntas(prev => prev.map(p => p.id === id ? { ...p, texto: textoEdit.trim() } : p))
+    const texto = textoEdit.trim()
+    const { error } = await supabase.from(tabla).update({ texto }).eq('id', id)
+    if (error) { alert(`No se pudo guardar la pregunta: ${error.message}`); return }
+    setPreguntas(prev => prev.map(p => p.id === id ? { ...p, texto } : p))
     setEditandoId(null)
   }
 
   async function eliminar(id: string) {
-    await supabase.from('preguntas').delete().eq('id', id)
+    const { error } = await supabase.from(tabla).delete().eq('id', id)
+    if (error) { alert(`No se pudo eliminar la pregunta: ${error.message}`); return }
     setPreguntas(prev => prev.filter(p => p.id !== id))
   }
 
   async function agregar() {
     if (!textoNuevo.trim()) return
     const orden = nextOrden + 1
-    const { data } = await supabase.from('preguntas').insert({
-      diagnostico_id: diagnosticoId,
+    const payload: Record<string, unknown> = {
       dimension_id: dimensionId,
       rol,
       texto: textoNuevo.trim(),
       orden,
-    }).select().single()
+    }
+    if (tabla === 'preguntas') payload.diagnostico_id = diagnosticoId
+    const { data, error } = await supabase.from(tabla).insert(payload).select().single()
+    if (error) { alert(`No se pudo agregar la pregunta: ${error.message}`); return }
     if (data) {
-      setPreguntas(prev => [...prev, data as Pregunta])
+      setPreguntas(prev => [...prev, data as PreguntaItem])
       setNextOrden(orden)
     }
     setTextoNuevo('')

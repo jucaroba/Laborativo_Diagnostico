@@ -2,7 +2,6 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
-import { PREGUNTAS_BASE } from '@/lib/preguntas-base'
 import { DIMENSIONES, Rol } from '@/types'
 import { ArrowRight, ArrowLeft } from 'lucide-react'
 

@@ -2,7 +2,6 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
-import { PREGUNTAS_BASE } from '@/lib/preguntas-base'
 import { DIMENSIONES, ROL_INFO, Rol } from '@/types'
 import NeonPicker from './NeonPicker'
 import { Button } from '@/components/ui/button'
@@ -80,12 +79,21 @@ export default function NuevoDiagnosticoForm() {
   const [iaConfig, setIaConfig] = useState({ vertical: '', contexto: '' })
   const [preguntas, setPreguntas] = useState<PreguntaEditable[]>([])
 
-  function cargarBase() {
-    const ps: PreguntaEditable[] = []
-    let orden = 0
-    for (const grupo of PREGUNTAS_BASE)
-      for (const texto of grupo.preguntas)
-        ps.push({ dimension_id: grupo.dimension_id, rol: grupo.rol, texto, orden: orden++ })
+  async function cargarBase() {
+    setError('')
+    const { data, error: err } = await supabase
+      .from('preguntas_base')
+      .select('dimension_id, rol, texto, orden')
+      .order('dimension_id')
+      .order('rol')
+      .order('orden')
+    if (err || !data) { setError('No se pudieron cargar las preguntas base.'); return }
+    const ps: PreguntaEditable[] = data.map((p, i) => ({
+      dimension_id: p.dimension_id,
+      rol: p.rol as Rol,
+      texto: p.texto,
+      orden: i,
+    }))
     setPreguntas(ps); setPaso('revision')
   }
 
