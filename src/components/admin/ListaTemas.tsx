@@ -80,7 +80,7 @@ export default function ListaTemas({ temas }: Props) {
           placeholder="Nombre del tema"
           style={{ flex: 1, height: 36 }}
         />
-        <Button onClick={crear} disabled={!nombreNuevo.trim()}>Crear</Button>
+        <Button onClick={crear}>Crear</Button>
       </div>
 
       {error && <p style={{ fontSize: 12, fontWeight: 700, color: 'var(--destructive)', margin: '0 0 12px' }}>{error}</p>}
@@ -92,7 +92,7 @@ export default function ListaTemas({ temas }: Props) {
           <TableHeader>
             <TableRow style={{ background: '#0A0A0A', borderBottom: 'none' }}>
               {['Tema', 'Preguntas', 'Creado', ''].map(h => (
-                <TableHead key={h} style={{ color: '#fff', fontWeight: 700, fontSize: 12, letterSpacing: '.06em', textTransform: 'uppercase', background: 'transparent' }}>{h}</TableHead>
+                <TableHead key={h} style={{ color: '#fff', fontWeight: 700, fontSize: 12, letterSpacing: '.06em', textTransform: 'uppercase', background: 'transparent', height: 44, padding: '0 16px' }}>{h}</TableHead>
               ))}
             </TableRow>
           </TableHeader>
