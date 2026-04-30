@@ -28,9 +28,6 @@ export default async function PreguntasBasePage() {
         <span className="page-header__eyebrow">Configuración</span>
         <div className="page-header__rule" />
         <h1 className="page-header__title">Preguntas base</h1>
-        <p className="page-header__subtitle">
-          Plantillas organizadas por tema. Cada tema contiene 4 dimensiones × 4 roles. Al crear un diagnóstico eliges qué tema usar y se copian sus preguntas.
-        </p>
       </div>
 
       <ListaTemas temas={items} />

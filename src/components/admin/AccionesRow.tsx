@@ -6,11 +6,7 @@ import { Pencil, Trash2 } from 'lucide-react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 
-const iconBtn = {
-  background: 'transparent', border: 'none', cursor: 'pointer',
-  padding: '6px', display: 'inline-flex', alignItems: 'center', color: 'var(--mute)',
-  transition: 'color .15s',
-}
+const iconBtn: React.CSSProperties = { background: 'none', border: 'none', cursor: 'pointer', padding: 2, display: 'flex' }
 
 export default function AccionesRow({ id }: { id: string }) {
   const router = useRouter()
@@ -25,18 +21,12 @@ export default function AccionesRow({ id }: { id: string }) {
   }
 
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-      <button style={iconBtn} title="Ver / Editar"
-        onClick={() => router.push(`/admin/${id}`)}
-        onMouseEnter={e => (e.currentTarget.style.color = 'var(--ink)')}
-        onMouseLeave={e => (e.currentTarget.style.color = 'var(--mute)')}>
-        <Pencil size={15} />
+    <div style={{ display: 'flex', alignItems: 'center', gap: 12, justifyContent: 'flex-end' }}>
+      <button style={{ ...iconBtn, color: 'var(--ink)' }} title="Editar diagnóstico" onClick={() => router.push(`/admin/${id}`)}>
+        <Pencil size={14} strokeWidth={2} />
       </button>
-      <button style={iconBtn} title="Eliminar"
-        onClick={() => setOpen(true)}
-        onMouseEnter={e => (e.currentTarget.style.color = 'var(--destructive)')}
-        onMouseLeave={e => (e.currentTarget.style.color = 'var(--mute)')}>
-        <Trash2 size={15} />
+      <button style={iconBtn} title="Eliminar" onClick={() => setOpen(true)}>
+        <Trash2 size={14} strokeWidth={2} color="#FF3366" />
       </button>
 
       <Dialog open={open} onOpenChange={setOpen}>

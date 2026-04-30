@@ -140,9 +140,9 @@ export default async function ResultadosPage({ params }: { params: Promise<{ cod
 
       {/* Título del diagnóstico */}
       <div style={{ padding: '40px 56px 32px', borderBottom: '1.5px solid var(--ink)' }}>
-        <span className="eyebrow">Diagnóstico organizacional</span>
-        <div className="rule" />
-        <h1 className="page-header__title" style={{ marginTop: 16, fontSize: 'clamp(32px,4vw,48px)' }}>
+        <span className="page-header__eyebrow">Diagnóstico organizacional</span>
+        <div className="page-header__rule" />
+        <h1 className="page-header__title" style={{ fontSize: 'clamp(32px,4vw,48px)' }}>
           {diag.nombre_compania}
         </h1>
       </div>
