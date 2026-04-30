@@ -88,7 +88,7 @@ export default async function LandingPage({ params }: { params: Promise<{ codigo
             <span className="eyebrow">Contexto de diagnóstico.</span>
             <div className="rule" />
             <h2 style={{ fontWeight: 900, fontSize: 'clamp(36px,4.2vw,56px)', lineHeight: .95, letterSpacing: '-.035em', maxWidth: '26ch', marginTop: 24 }}>
-              Cuatro dimensiones para<br />abordar cualquier reto.
+              cuatro dimensiones para<br />abordar cualquier reto.
             </h2>
           </div>
           <span className="chip">4 ejes · {totalPreguntas ?? 0} preguntas</span>
@@ -123,7 +123,7 @@ export default async function LandingPage({ params }: { params: Promise<{ codigo
         <span className="eyebrow">Mirada 360°</span>
         <div className="rule" />
         <h2 style={{ fontWeight: 900, fontSize: 'clamp(36px,4.2vw,56px)', lineHeight: .92, letterSpacing: '-.035em', margin: '16px 0 8px' }}>
-          Cuatro puntos de vista<br />sobre la misma cultura.
+          cuatro puntos de vista<br />sobre la misma cultura.
         </h2>
         <p style={{ color: 'var(--ink-2)', maxWidth: '56ch', margin: '0 0 40px', fontSize: 16, lineHeight: 1.5, fontWeight: 500 }}>
           Donde estas miradas coinciden, hay alineación.<br />Donde no, hay una brecha y ahí empieza el trabajo.
@@ -158,7 +158,7 @@ export default async function LandingPage({ params }: { params: Promise<{ codigo
           <span className="eyebrow">Paso a paso.</span>
           <div className="rule" />
           <h2 style={{ fontWeight: 900, fontSize: 'clamp(36px,4vw,56px)', lineHeight: .92, letterSpacing: '-.035em', marginTop: 24 }}>
-            Cuatro momentos del diagnóstico.
+            cuatro fases del diagnóstico.
           </h2>
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', marginLeft: 25 }}>
@@ -189,7 +189,7 @@ export default async function LandingPage({ params }: { params: Promise<{ codigo
         <span className="eyebrow">Empieza ahora</span>
         <div className="rule" />
         <h2 style={{ fontWeight: 900, fontSize: 'clamp(48px,6.5vw,96px)', lineHeight: .88, letterSpacing: '-.045em', margin: '12px 0 32px', maxWidth: '14ch' }}>
-          De la intuición<br />a la data.
+          de la intuición<br />a la data.
         </h2>
         <Link href={`/d/${codigo}/intake`} className="btn primary">Iniciar diagnóstico <ArrowRight size={15} strokeWidth={2.5} /></Link>
         <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 72, fontSize: 10, color: 'var(--mute)', letterSpacing: '.08em', textTransform: 'uppercase', fontWeight: 600 }}>
