@@ -6,20 +6,17 @@ function getClient() {
 }
 
 export async function generarPreguntas(params: {
-  nombreCompania: string
+  tema: string
   vertical: string
   contexto: string
-  infoWeb?: string
 }): Promise<PreguntasGeneradas[]> {
-  const { nombreCompania, vertical, contexto, infoWeb } = params
+  const { tema, vertical, contexto } = params
 
   const prompt = `Eres un experto en cultura organizacional y diagnóstico de equipos.
 
-Vas a generar preguntas de diagnóstico para la empresa "${nombreCompania}" del sector "${vertical}".
+Vas a generar preguntas de diagnóstico para el tema "${tema}"${vertical ? ` aplicado al sector "${vertical}"` : ''}.
 
-${contexto ? `Contexto específico de la organización:\n${contexto}\n` : ''}
-${infoWeb ? `Información pública sobre la empresa:\n${infoWeb}\n` : ''}
-
+${contexto ? `Contexto y enfoque del tema:\n${contexto}\n` : ''}
 El diagnóstico evalúa 4 dimensiones desde 4 perspectivas (roles):
 - Rol A: Equipo haciendo auto-evaluación
 - Rol B: Líder evaluando al equipo
@@ -36,7 +33,7 @@ Genera 3 preguntas por cada combinación dimensión × rol (48 preguntas en tota
 Las preguntas deben:
 - Responderse en escala 1-10
 - Ser afirmaciones que el participante evalúa (no preguntas abiertas)
-- Estar contextualizadas al sector y situación de la empresa
+- Estar contextualizadas al tema${vertical ? ` y al sector` : ''}
 - Variar en perspectiva según el rol (misma temática, diferente ángulo)
 
 Responde ÚNICAMENTE con un JSON con esta estructura exacta:
@@ -57,9 +54,13 @@ Responde ÚNICAMENTE con un JSON con esta estructura exacta:
   const content = response.content[0]
   if (content.type !== 'text') throw new Error('Respuesta inesperada de Claude')
 
-  const json = JSON.parse(content.text.trim())
+  const cleaned = content.text
+    .trim()
+    .replace(/^```(?:json)?\s*/i, '')
+    .replace(/\s*```\s*$/, '')
+    .trim()
+  const json = JSON.parse(cleaned)
 
-  // Agrupar por dimension_id + rol
   const mapa: Record<string, PreguntasGeneradas> = {}
   for (const p of json.preguntas) {
     const key = `${p.dimension_id}-${p.rol}`
@@ -68,18 +69,4 @@ Responde ÚNICAMENTE con un JSON con esta estructura exacta:
   }
 
   return Object.values(mapa)
-}
-
-export async function buscarInfoEmpresa(nombreCompania: string): Promise<string> {
-  const response = await getClient().messages.create({
-    model: 'claude-sonnet-4-6',
-    max_tokens: 1000,
-    messages: [{
-      role: 'user',
-      content: `Busca y resume información relevante sobre la empresa "${nombreCompania}" para un diagnóstico de cultura organizacional. Incluye: sector, tamaño aproximado, productos/servicios, cultura conocida, retos o noticias recientes. Sé conciso (máximo 300 palabras). Si no tienes información confiable, indícalo claramente.`
-    }],
-  })
-
-  const content = response.content[0]
-  return content.type === 'text' ? content.text : ''
 }

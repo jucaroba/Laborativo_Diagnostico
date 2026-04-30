@@ -18,11 +18,10 @@ const ESCALA = [
   { n: 10, label: '', desc: '' },
 ]
 
-export default function QuestionForm({ diagnosticoId, codigo, idx, neon }: {
+export default function QuestionForm({ diagnosticoId, codigo, idx }: {
   diagnosticoId: string
   codigo: string
   idx: number
-  neon: string
 }) {
   const router = useRouter()
   const [pid, setPid] = useState<string | null>(null)
@@ -117,7 +116,7 @@ export default function QuestionForm({ diagnosticoId, codigo, idx, neon }: {
           </div>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 11, letterSpacing: .5, fontWeight: 700, textTransform: 'uppercase' }}>
-          <span style={{ width: 8, height: 8, background: neon, border: '1.5px solid var(--ink)', display: 'inline-block' }} />
+          <span style={{ width: 8, height: 8, background: 'var(--ink)', border: '1.5px solid var(--ink)', display: 'inline-block' }} />
           {dimension?.nombre}
         </div>
       </div>

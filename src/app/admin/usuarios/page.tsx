@@ -168,7 +168,7 @@ export default function UsuariosPage() {
       <div style={{ border: '1.5px solid var(--ink)' }}>
         <div style={{ background: 'var(--ink)', padding: '10px 16px', display: 'flex', alignItems: 'center', gap: 10 }}>
           <h2 style={{ fontSize: 20, fontWeight: 900, letterSpacing: '0', margin: 0, color: '#fff', fontFamily: 'Red Hat Display, sans-serif' }}>Usuarios</h2>
-          <span style={{ fontSize: 20, fontWeight: 900, letterSpacing: '0', color: 'var(--neon)', fontFamily: 'Red Hat Display, sans-serif' }}>
+          <span style={{ fontSize: 20, fontWeight: 900, letterSpacing: '0', color: '#fff', fontFamily: 'Red Hat Display, sans-serif' }}>
             {usuarios.length}
           </span>
         </div>

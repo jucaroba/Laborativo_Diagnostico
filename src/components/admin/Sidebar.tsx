@@ -87,16 +87,15 @@ export default function Sidebar() {
                       gap: 12,
                       padding: '10px 24px',
                       textDecoration: 'none',
-                      color: active ? 'var(--ink)' : 'var(--ink-2, var(--ink))',
-                      background: active ? 'var(--bg-2, #F0F0F0)' : 'transparent',
-                      fontWeight: active ? 800 : 600,
+                      color: 'var(--ink)',
+                      background: 'transparent',
+                      fontWeight: active ? 900 : 600,
                       fontSize: 14,
                       letterSpacing: '-.01em',
-                      borderLeft: active ? '3px solid var(--ink)' : '3px solid transparent',
-                      transition: 'background .15s, border-color .15s',
+                      transition: 'font-weight .15s',
                     }}
                   >
-                    <Icon size={16} strokeWidth={active ? 2.5 : 2} />
+                    <Icon size={16} strokeWidth={active ? 3 : 2} />
                     {item.label}
                   </Link>
                 </li>

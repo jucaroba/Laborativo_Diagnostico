@@ -18,9 +18,5 @@ export default async function QuestionPage({ params }: { params: Promise<{ codig
     return <EstadoNoDisponible estado={diag.estado as 'borrador' | 'completado'} nombreCompania={diag.nombre_compania} neon={diag.color_neon || undefined} />
   }
 
-  return (
-    <div style={{ ['--neon' as string]: diag.color_neon || '#D8FF00' }}>
-      <QuestionForm diagnosticoId={diag.id} codigo={codigo} idx={numIdx} neon={diag.color_neon || '#D8FF00'} />
-    </div>
-  )
+  return <QuestionForm diagnosticoId={diag.id} codigo={codigo} idx={numIdx} />
 }

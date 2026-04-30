@@ -24,10 +24,8 @@ export default async function LandingPage({ params }: { params: Promise<{ codigo
     .select('*', { count: 'exact', head: true })
     .eq('diagnostico_id', diag.id)
 
-  const neon = diag.color_neon || '#D8FF00'
-
   return (
-    <div style={{ ['--neon' as string]: neon, background: 'var(--bg)', minHeight: '100vh', fontFamily: "'Red Hat Display', sans-serif" }}>
+    <div style={{ background: 'var(--bg)', minHeight: '100vh', fontFamily: "'Red Hat Display', sans-serif" }}>
 
       {/* Hero */}
       <div style={{ padding: '48px 56px 64px', borderBottom: '1.5px solid var(--ink)', position: 'relative' }}>
@@ -92,7 +90,7 @@ export default async function LandingPage({ params }: { params: Promise<{ codigo
             }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <span style={{ fontSize: 11, letterSpacing: .5, textTransform: 'uppercase', color: 'var(--mute)', fontWeight: 700 }}>{d.idx}</span>
-                <span style={{ fontWeight: 900, fontSize: 14, color: neon }}>{d.n}</span>
+                <span style={{ fontWeight: 900, fontSize: 14, color: 'var(--ink)' }}>{d.n}</span>
               </div>
               <div style={{ width: 56, height: 8, background: 'var(--ink)' }} />
               <h3 style={{ fontWeight: 900, fontSize: 26, letterSpacing: -.5, lineHeight: 1, marginTop: 15 }}>{d.h} / {d.pair}</h3>
@@ -124,7 +122,7 @@ export default async function LandingPage({ params }: { params: Promise<{ codigo
                 <h4 style={{ margin: '0 0 6px', fontSize: 20, fontWeight: 800, letterSpacing: '-.02em' }}>{s.h}</h4>
                 <p style={{ margin: 0, fontSize: 14, color: 'var(--ink-2)', lineHeight: 1.5, maxWidth: '50ch', fontWeight: 500 }}>{s.p}</p>
               </div>
-              <span style={{ fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase', color: neon, textAlign: 'right', fontWeight: 600, display: 'flex', flexDirection: 'column', gap: 4, paddingTop: 4 }}>
+              <span style={{ fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--mute)', textAlign: 'right', fontWeight: 600, display: 'flex', flexDirection: 'column', gap: 4, paddingTop: 4 }}>
                 {s.meta.split(' · ').map((part, i) => <span key={i}>{part}</span>)}
               </span>
             </div>
@@ -152,11 +150,11 @@ export default async function LandingPage({ params }: { params: Promise<{ codigo
             <div key={l.tag} style={{
               border: '1.5px solid var(--ink)', padding: 22,
               display: 'flex', flexDirection: 'column', gap: 14, minHeight: 156,
-              background: l.accent ? neon : 'var(--card)',
+              background: 'var(--card)',
               color: 'var(--ink)',
             }}>
               <span style={{ fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase', fontWeight: 700, color: 'var(--mute)' }}>
-                <span style={{ color: neon }}>{l.tag.split(' · ')[0]}</span>
+                <span style={{ color: 'var(--ink)' }}>{l.tag.split(' · ')[0]}</span>
                 {' · '}{l.tag.split(' · ')[1]}
               </span>
               <h4 style={{ fontWeight: 900, fontSize: 22, letterSpacing: '-.02em', lineHeight: 1.05, margin: 0 }}>{l.h}</h4>

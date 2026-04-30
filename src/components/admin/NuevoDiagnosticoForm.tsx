@@ -1,23 +1,15 @@
 'use client'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
-import { DIMENSIONES, ROL_INFO, Rol } from '@/types'
-import NeonPicker from './NeonPicker'
+import { DIMENSIONES, ROL_INFO, Rol, Tema } from '@/types'
+import ColorPickerHex from './ColorPickerHex'
 import { Button } from '@/components/ui/button'
 import { ArrowRight, Plus as PlusIcon, Pencil, Trash2, Check, X } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
-const VERTICALES = [
-  'Tecnología', 'Retail', 'Salud', 'Manufactura', 'Educación',
-  'Servicios financieros', 'Construcción', 'Medios y entretenimiento',
-  'Logística', 'Consultoría', 'Otro',
-]
-
-type Paso = 'datos' | 'preguntas-opcion' | 'ia-config' | 'revision'
+type Paso = 'datos' | 'revision'
 interface PreguntaEditable { dimension_id: number; rol: Rol; texto: string; orden: number }
 
 function Row({ label, children }: { label: string; children: React.ReactNode }) {
@@ -67,7 +59,6 @@ export default function NuevoDiagnosticoForm() {
   const router = useRouter()
   const [paso, setPaso] = useState<Paso>('datos')
   const [guardando, setGuardando] = useState(false)
-  const [generando, setGenerando] = useState(false)
   const [error, setError] = useState('')
 
   const [intentoContinuar, setIntentoContinuar] = useState(false)
@@ -76,17 +67,34 @@ export default function NuevoDiagnosticoForm() {
     nombre_compania: '', contacto_nombre: '', contacto_cargo: '',
     contacto_email: '', color_neon: '#39FF14',
   })
-  const [iaConfig, setIaConfig] = useState({ vertical: '', contexto: '' })
   const [preguntas, setPreguntas] = useState<PreguntaEditable[]>([])
+  const [temas, setTemas] = useState<Tema[]>([])
+  const [cargandoTemas, setCargandoTemas] = useState(true)
+  const [temaSeleccionadoId, setTemaSeleccionadoId] = useState<string | null>(null)
+  const [cargandoBase, setCargandoBase] = useState(false)
 
-  async function cargarBase() {
+  useEffect(() => {
+    let cancelado = false
+    supabase.from('temas').select('*').order('created_at').then(({ data, error: err }) => {
+      if (cancelado) return
+      if (err) { setError('No se pudieron cargar los temas.'); setCargandoTemas(false); return }
+      setTemas((data ?? []) as Tema[])
+      setCargandoTemas(false)
+    })
+    return () => { cancelado = true }
+  }, [])
+
+  async function cargarBase(temaId: string) {
     setError('')
+    setCargandoBase(true)
     const { data, error: err } = await supabase
       .from('preguntas_base')
       .select('dimension_id, rol, texto, orden')
+      .eq('tema_id', temaId)
       .order('dimension_id')
       .order('rol')
       .order('orden')
+    setCargandoBase(false)
     if (err || !data) { setError('No se pudieron cargar las preguntas base.'); return }
     const ps: PreguntaEditable[] = data.map((p, i) => ({
       dimension_id: p.dimension_id,
@@ -97,18 +105,12 @@ export default function NuevoDiagnosticoForm() {
     setPreguntas(ps); setPaso('revision')
   }
 
-  async function generarConIA() {
-    setGenerando(true); setError('')
-    try {
-      const res = await fetch('/api/generar-preguntas', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ nombreCompania: datos.nombre_compania, vertical: iaConfig.vertical, contexto: iaConfig.contexto }),
-      })
-      if (!res.ok) throw new Error()
-      const { preguntas: generadas } = await res.json()
-      setPreguntas(generadas); setPaso('revision')
-    } catch { setError('No se pudieron generar las preguntas.') }
-    finally { setGenerando(false) }
+  function continuar() {
+    if (!datosValidos || !temaSeleccionadoId) {
+      setIntentoContinuar(true)
+      return
+    }
+    cargarBase(temaSeleccionadoId)
   }
 
   async function guardar() {
@@ -117,7 +119,7 @@ export default function NuevoDiagnosticoForm() {
       const { data: diag, error: diagErr } = await supabase.from('diagnosticos').insert({
         nombre_compania: datos.nombre_compania, contacto_nombre: datos.contacto_nombre,
         contacto_cargo: datos.contacto_cargo, contacto_email: datos.contacto_email,
-        color_neon: datos.color_neon, vertical: iaConfig.vertical || null, contexto_ia: iaConfig.contexto || null,
+        color_neon: datos.color_neon,
       }).select().single()
       if (diagErr || !diag) throw new Error(diagErr?.message)
       const { error: pregErr } = await supabase.from('preguntas')
@@ -133,35 +135,46 @@ export default function NuevoDiagnosticoForm() {
   return (
     <div>
 
-      {/* Header de página + acciones (en revisión) */}
+      {/* Header de página */}
       <div className="page-header" style={{ marginBottom: 16 }}>
         <span className="page-header__eyebrow">Nuevo diagnóstico</span>
         <div className="page-header__rule" />
-        <div style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'flex-end',
-          gap: 16,
-          flexWrap: 'wrap',
-        }}>
-          <h1 className="page-header__title">Configuración</h1>
-          {paso === 'revision' && (
-            <div style={{ display: 'flex', gap: 8, paddingBottom: 4 }}>
-              <Button variant="outline" onClick={() => setPaso('preguntas-opcion')} disabled={guardando}>
-                <ArrowRight size={15} strokeWidth={2.5} style={{ transform: 'rotate(180deg)' }} /> Cambiar preguntas
-              </Button>
-              <Button onClick={guardar} disabled={guardando}>{guardando ? 'Guardando…' : 'Guardar diagnóstico'}</Button>
-            </div>
-          )}
-        </div>
+        <h1 className="page-header__title">Configuración</h1>
       </div>
 
       <div style={{ maxWidth: 720 }}>
-      <div style={{ background: 'var(--ink)', padding: '10px 16px', marginBottom: 12 }}>
-        <h2 style={{ fontSize: 20, fontWeight: 900, letterSpacing: '0', margin: 0, color: '#fff', fontFamily: 'Red Hat Display, sans-serif' }}>Características del diagnóstico</h2>
+      <div style={{
+        background: 'var(--ink)',
+        padding: '10px 16px',
+        marginBottom: 12,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        gap: 12,
+        flexWrap: 'wrap',
+      }}>
+        <h2 style={{ fontSize: 20, fontWeight: 900, letterSpacing: '0', margin: 0, color: '#fff', fontFamily: 'Red Hat Display, sans-serif' }}>Datos de la empresa</h2>
+        {paso === 'revision' && (
+          <div style={{ display: 'flex', gap: 8 }}>
+            <Button
+              onClick={() => setPaso('datos')}
+              disabled={guardando}
+              style={{ background: 'transparent', color: '#fff', border: '1.5px solid #fff' }}
+            >
+              <ArrowRight size={15} strokeWidth={2.5} style={{ transform: 'rotate(180deg)' }} /> Cambiar tema
+            </Button>
+            <Button
+              onClick={guardar}
+              disabled={guardando}
+              style={{ background: '#fff', color: 'var(--ink)', border: '1.5px solid #fff' }}
+            >
+              {guardando ? 'Guardando…' : 'Guardar diagnóstico'}
+            </Button>
+          </div>
+        )}
       </div>
 
-      {/* PASO 1: Datos */}
+      {/* PASO 1: Datos + selección de tema */}
       {paso === 'datos' && (
         <div>
           <Row label="Compañía">
@@ -176,76 +189,62 @@ export default function NuevoDiagnosticoForm() {
           <Row label="Email">
             <Input type="email" value={datos.contacto_email} onChange={e => setDatos(d => ({ ...d, contacto_email: e.target.value }))} placeholder="correo@empresa.com" />
           </Row>
-          <Row label="Color neón">
-            <NeonPicker value={datos.color_neon} onChange={c => setDatos(d => ({ ...d, color_neon: c }))} />
+          <Row label="Color del diagnóstico">
+            <ColorPickerHex value={datos.color_neon} onChange={c => setDatos(d => ({ ...d, color_neon: c }))} />
           </Row>
-          <div className="form-row">
-            <div />
-            <div style={{ paddingTop: 8, display: 'flex', alignItems: 'center', gap: 16 }}>
-              <Button onClick={() => { if (datosValidos) setPaso('preguntas-opcion'); else setIntentoContinuar(true) }}>Continuar <ArrowRight size={15} strokeWidth={2.5} /></Button>
-              {intentoContinuar && !datosValidos && <span style={{ fontSize: 12, color: 'var(--mute)', fontWeight: 500 }}>Completa los campos para seguir</span>}
-            </div>
-          </div>
-        </div>
-      )}
 
-      {/* PASO 2: Tipo de preguntas */}
-      {paso === 'preguntas-opcion' && (
-        <div>
-          <div className="form-row" style={{ gridTemplateColumns: '1fr', padding: '6px 0' }}>
-            <p style={{ fontSize: 14, fontWeight: 800, color: 'var(--ink)', margin: '20px 0 8px' }}>
-              ¿Cómo configuramos las preguntas para {datos.nombre_compania}?
-            </p>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-              {[
-                { label: 'Preguntas base', desc: <>Preguntas genéricas de Laborativo.<br />Editables antes de guardar.</>, action: cargarBase },
-                { label: 'Contextualizar con IA ✦', desc: <>Claude investiga la empresa y<br />ajusta las preguntas al contexto.</>
-, action: () => setPaso('ia-config') },
-              ].map((opt, i) => (
-                <button key={i} onClick={opt.action} style={{
-                  textAlign: 'left', padding: '16px 20px',
-                  border: '1px solid var(--border)', background: 'var(--card)',
-                  cursor: 'pointer', display: 'flex', flexDirection: 'column', gap: 4,
-                  transition: 'border-color .15s, background .15s',
-                }}
-                  onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--ink)' }}
-                  onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)' }}>
-                  <span style={{ fontWeight: 800, fontSize: 14 }}>{opt.label}</span>
-                  <span className="text-mute" style={{ fontSize: 12 }}>{opt.desc}</span>
-                </button>
-              ))}
+          <div style={{ marginTop: 24 }}>
+            <div style={{ background: 'var(--ink)', padding: '10px 16px', marginBottom: 27 }}>
+              <h2 style={{ fontSize: 20, fontWeight: 900, letterSpacing: '0', margin: 0, color: '#fff', fontFamily: 'Red Hat Display, sans-serif' }}>Set de preguntas</h2>
             </div>
+            {cargandoTemas ? (
+              <p className="text-mute" style={{ fontSize: 13 }}>Cargando temas…</p>
+            ) : !temas.length ? (
+              <p className="text-mute" style={{ fontSize: 13 }}>
+                Aún no hay temas. Crea uno en <strong>Preguntas base</strong>.
+              </p>
+            ) : (
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                {temas.map(t => {
+                  const seleccionado = temaSeleccionadoId === t.id
+                  return (
+                    <button
+                      key={t.id}
+                      type="button"
+                      onClick={() => setTemaSeleccionadoId(t.id)}
+                      style={{
+                        textAlign: 'left', padding: '16px 20px',
+                        border: seleccionado ? '2px solid var(--ink)' : '1px solid var(--border)',
+                        background: seleccionado ? '#fff' : 'var(--card)',
+                        cursor: 'pointer',
+                        display: 'flex', flexDirection: 'column', gap: 4,
+                        transition: 'border-color .15s, background .15s',
+                      }}
+                      onMouseEnter={e => { if (!seleccionado) e.currentTarget.style.borderColor = 'var(--ink)' }}
+                      onMouseLeave={e => { if (!seleccionado) e.currentTarget.style.borderColor = 'var(--border)' }}
+                    >
+                      <span style={{ fontWeight: 800, fontSize: 14 }}>{t.nombre}</span>
+                      {t.descripcion && <span style={{ fontSize: 12, color: seleccionado ? 'var(--ink)' : 'var(--mute)' }}>{t.descripcion}</span>}
+                    </button>
+                  )
+                })}
+              </div>
+            )}
           </div>
-          <Actions>
-            <Button variant="outline" onClick={() => setPaso('datos')}>← Volver</Button>
-          </Actions>
-        </div>
-      )}
 
-      {/* PASO 3: Config IA */}
-      {paso === 'ia-config' && (
-        <div>
-          <Row label="Vertical / Industria">
-            <Select value={iaConfig.vertical} onValueChange={(v: string | null) => setIaConfig(c => ({ ...c, vertical: v ?? '' }))}>
-              <SelectTrigger><SelectValue placeholder="Selecciona un sector" /></SelectTrigger>
-              <SelectContent>{VERTICALES.map(v => <SelectItem key={v} value={v}>{v}</SelectItem>)}</SelectContent>
-            </Select>
-          </Row>
-          <Row label="Contexto adicional">
-            <Textarea value={iaConfig.contexto} onChange={e => setIaConfig(c => ({ ...c, contexto: e.target.value }))}
-              placeholder="Retos de cultura, situación actual..." rows={4} />
-          </Row>
           {error && <p style={{ fontSize: 12, fontWeight: 700, color: 'var(--destructive)', paddingTop: 12, margin: 0 }}>{error}</p>}
-          <Actions>
-            <Button onClick={generarConIA} disabled={!iaConfig.vertical || generando}>
-              {generando ? 'Generando…' : '✦ Generar preguntas'}
+
+          <div style={{ marginTop: 24, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 16 }}>
+            {intentoContinuar && !datosValidos && <span style={{ fontSize: 12, color: 'var(--mute)', fontWeight: 500 }}>Completa los campos para seguir</span>}
+            {intentoContinuar && datosValidos && !temaSeleccionadoId && <span style={{ fontSize: 12, color: 'var(--mute)', fontWeight: 500 }}>Selecciona un tema para seguir</span>}
+            <Button onClick={continuar} disabled={cargandoBase}>
+              {cargandoBase ? 'Cargando…' : 'Continuar'} <ArrowRight size={15} strokeWidth={2.5} />
             </Button>
-            <Button variant="outline" onClick={() => setPaso('preguntas-opcion')} disabled={generando}>← Volver</Button>
-          </Actions>
+          </div>
         </div>
       )}
 
-      {/* PASO 4: Revisión de preguntas */}
+      {/* PASO 3: Revisión de preguntas */}
       {paso === 'revision' && (
         <div>
           {DIMENSIONES.map((dim, dimIdx) => (
@@ -259,7 +258,7 @@ export default function NuevoDiagnosticoForm() {
                     <div style={{ background: 'var(--bg-2)', padding: '6px 12px', marginBottom: 4, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                       <span className="page-header__eyebrow" style={{ margin: 0, color: 'var(--ink)', fontWeight: 800 }}>{rol} / {ROL_INFO[rol].label}</span>
                       <button onClick={() => setPreguntas(prev => [...prev, { dimension_id: dim.id, rol, texto: '', orden: prev.length + 1 }])}
-                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: datos.color_neon, display: 'flex', padding: '2px 4px' }}>
+                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--ink)', display: 'flex', padding: '2px 4px' }}>
                         <PlusIcon size={13} strokeWidth={2.5} />
                       </button>
                     </div>
@@ -279,10 +278,31 @@ export default function NuevoDiagnosticoForm() {
             </div>
           ))}
           {error && <p style={{ fontSize: 12, fontWeight: 700, color: 'var(--destructive)', paddingTop: 12, margin: 0 }}>{error}</p>}
-          <Actions>
-            <Button variant="outline" onClick={() => setPaso('preguntas-opcion')} disabled={guardando}><ArrowRight size={15} strokeWidth={2.5} style={{ transform: 'rotate(180deg)' }} /> Cambiar preguntas</Button>
-            <Button onClick={guardar} disabled={guardando}>{guardando ? 'Guardando…' : 'Guardar diagnóstico'}</Button>
-          </Actions>
+          <div style={{
+            background: 'var(--ink)',
+            padding: '10px 16px',
+            marginTop: 24,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'flex-end',
+            gap: 8,
+            flexWrap: 'wrap',
+          }}>
+            <Button
+              onClick={() => setPaso('datos')}
+              disabled={guardando}
+              style={{ background: 'transparent', color: '#fff', border: '1.5px solid #fff' }}
+            >
+              <ArrowRight size={15} strokeWidth={2.5} style={{ transform: 'rotate(180deg)' }} /> Cambiar tema
+            </Button>
+            <Button
+              onClick={guardar}
+              disabled={guardando}
+              style={{ background: '#fff', color: 'var(--ink)', border: '1.5px solid #fff' }}
+            >
+              {guardando ? 'Guardando…' : 'Guardar diagnóstico'}
+            </Button>
+          </div>
         </div>
       )}
       </div>

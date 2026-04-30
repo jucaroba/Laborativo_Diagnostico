@@ -41,7 +41,7 @@ export default async function DiagnosticoPage({ params }: { params: Promise<{ id
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
           <EditarDiagnostico diagnostico={d} />
-          <EliminarDiagnostico id={d.id} neonColor={d.color_neon} />
+          <EliminarDiagnostico id={d.id} />
           <AccionesDiagnostico diagnostico={d} />
         </div>
       </div>
@@ -103,7 +103,7 @@ export default async function DiagnosticoPage({ params }: { params: Promise<{ id
       <div>
         <div style={{ background: 'var(--ink)', padding: '10px 16px', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 10 }}>
           <h2 style={{ fontSize: 20, fontWeight: 900, letterSpacing: '0', margin: 0, color: '#fff', fontFamily: 'Red Hat Display, sans-serif' }}>Preguntas</h2>
-          <span style={{ fontSize: 20, fontWeight: 900, letterSpacing: '0', color: d.color_neon, fontFamily: 'Red Hat Display, sans-serif' }}>{ps.length}</span>
+          <span style={{ fontSize: 20, fontWeight: 900, letterSpacing: '0', color: '#fff', fontFamily: 'Red Hat Display, sans-serif' }}>{ps.length}</span>
         </div>
         {DIMENSIONES.map((dim, idx) => (
           <div key={dim.id} style={{ marginBottom: 40, borderTop: idx === 0 ? 'none' : '2px solid var(--ink)', paddingTop: idx === 0 ? 16 : 16 }}>
@@ -120,8 +120,8 @@ export default async function DiagnosticoPage({ params }: { params: Promise<{ id
                   diagnosticoId={d.id}
                   dimensionId={dim.id}
                   maxOrden={maxOrden}
-                  neonColor={d.color_neon}
                 />
+
               )
             })}
           </div>

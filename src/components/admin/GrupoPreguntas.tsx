@@ -15,10 +15,10 @@ interface Props {
   maxOrden: number
   tabla?: 'preguntas' | 'preguntas_base'
   diagnosticoId?: string
-  neonColor?: string
+  temaId?: string
 }
 
-export default function GrupoPreguntas({ grupo, rol, diagnosticoId, dimensionId, maxOrden, tabla = 'preguntas', neonColor = '#D8FF00' }: Props) {
+export default function GrupoPreguntas({ grupo, rol, diagnosticoId, temaId, dimensionId, maxOrden, tabla = 'preguntas' }: Props) {
   const router = useRouter()
   const [preguntas, setPreguntas] = useState<PreguntaItem[]>(grupo)
   const [editandoId, setEditandoId] = useState<string | null>(null)
@@ -52,6 +52,7 @@ export default function GrupoPreguntas({ grupo, rol, diagnosticoId, dimensionId,
       orden,
     }
     if (tabla === 'preguntas') payload.diagnostico_id = diagnosticoId
+    if (tabla === 'preguntas_base') payload.tema_id = temaId
     const { data, error } = await supabase.from(tabla).insert(payload).select().single()
     if (error) { alert(`No se pudo agregar la pregunta: ${error.message}`); return }
     if (data) {
@@ -72,7 +73,7 @@ export default function GrupoPreguntas({ grupo, rol, diagnosticoId, dimensionId,
         </span>
         <button
           onClick={() => { setAgregando(true); setTextoNuevo('') }}
-          style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4, padding: '2px 4px', color: neonColor }}
+          style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4, padding: '2px 4px', color: 'var(--ink)' }}
         >
           <Plus size={14} strokeWidth={3.5} />
         </button>

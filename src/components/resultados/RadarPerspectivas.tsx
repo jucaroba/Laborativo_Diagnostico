@@ -108,12 +108,13 @@ export default function RadarPerspectivas({ promediosPorRol, promedioGlobalPorRo
                 lineHeight: 1.15,
                 letterSpacing: '-.02em',
                 whiteSpace: 'nowrap',
-                textDecoration: activo ? 'underline' : 'none',
-                textDecorationColor: ROL_NEON[rol],
-                textDecorationThickness: 5,
-                textUnderlineOffset: 5,
               }}>
-                {ROL_INFO[rol].label}
+                <span style={{
+                  borderBottom: activo ? '4px solid var(--ink)' : 'none',
+                  paddingBottom: 4,
+                }}>
+                  {ROL_INFO[rol].label}
+                </span>
               </span>
               <span style={{
                 fontWeight: 900,

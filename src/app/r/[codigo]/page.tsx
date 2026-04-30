@@ -155,7 +155,7 @@ export default async function ResultadosPage({ params }: { params: Promise<{ cod
       <div style={{ padding: '20px 56px 32px', borderBottom: '1.5px solid var(--ink)' }}>
 
         {/* Stats top row — 4 indicadores en línea, mismo formato */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', marginBottom: 28 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', marginBottom: 28, marginLeft: -56, marginRight: -56 }}>
           {[
             { label: 'Participantes',    count: totalParticipantes, color: null },
             { label: 'Personas equipo',  count: personasEquipo,     color: ROL_NEON.A },
@@ -182,7 +182,7 @@ export default async function ResultadosPage({ params }: { params: Promise<{ cod
           <span style={{ fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--ink)', fontWeight: 700 }}>
             Cobertura por dimensión
           </span>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', border: '1.5px solid var(--ink)', marginTop: 12 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', border: '1.5px solid var(--ink)', marginTop: 12, marginLeft: -56, marginRight: -56 }}>
             {resultados.map((dim, i) => {
               const completa = dim.rolesConRespuesta.length === 4
               return (
@@ -313,6 +313,21 @@ export default async function ResultadosPage({ params }: { params: Promise<{ cod
                 {/* Línea base */}
                 <div style={{ position: 'relative', height: 24 }}>
                   <div style={{ position: 'absolute', top: '50%', left: 0, right: 0, height: 1.5, background: 'var(--ink)', opacity: .25 }} />
+                  {(() => {
+                    const valores = ROL_ORDEN.map(r => dim.promedios[r]).filter((v): v is number => typeof v === 'number')
+                    if (valores.length < 2) return null
+                    const min = Math.min(...valores)
+                    const max = Math.max(...valores)
+                    return (
+                      <div style={{
+                        position: 'absolute', top: '50%',
+                        left: `${((min - 1) / 9) * 100}%`,
+                        width: `${((max - min) / 9) * 100}%`,
+                        height: 1.5, background: 'var(--ink)',
+                        transform: 'translateY(-50%)',
+                      }} />
+                    )
+                  })()}
                   {ROL_ORDEN.map(rol => {
                     const val = dim.promedios[rol]
                     if (val === undefined) return null

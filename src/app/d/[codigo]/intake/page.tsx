@@ -17,9 +17,5 @@ export default async function IntakePage({ params }: { params: Promise<{ codigo:
     return <EstadoNoDisponible estado={diag.estado as 'borrador' | 'completado'} nombreCompania={diag.nombre_compania} neon={diag.color_neon || undefined} />
   }
 
-  return (
-    <div style={{ ['--neon' as string]: diag.color_neon || '#D8FF00' }}>
-      <IntakeForm diagnosticoId={diag.id} nombreCompania={diag.nombre_compania} codigo={codigo} />
-    </div>
-  )
+  return <IntakeForm diagnosticoId={diag.id} nombreCompania={diag.nombre_compania} codigo={codigo} />
 }

@@ -39,6 +39,13 @@ export interface Pregunta {
   orden: number
 }
 
+export interface Tema {
+  id: string
+  nombre: string
+  descripcion: string | null
+  created_at: string
+}
+
 export interface Participante {
   id: string
   diagnostico_id: string

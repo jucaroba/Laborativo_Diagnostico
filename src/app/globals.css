@@ -91,8 +91,6 @@ button { font-family: inherit; }
 .btn:hover { background: #fff; color: var(--ink); border-color: var(--ink); }
 .btn.primary { background: var(--ink); color: var(--bg); }
 .btn.primary:hover { background: #fff; color: var(--ink); border-color: var(--ink); }
-.btn.neon { background: var(--neon); border-color: var(--ink); color: var(--ink); }
-.btn.neon:hover { background: #fff; color: var(--ink); border-color: var(--ink); }
 
 /* Eyebrow */
 .eyebrow {
@@ -126,7 +124,7 @@ button { font-family: inherit; }
 .page-header { margin-bottom: 40px; }
 .page-header__eyebrow {
   font-size: 10px; font-weight: 600; letter-spacing: .1em;
-  text-transform: uppercase; color: var(--mute);
+  text-transform: uppercase; color: var(--ink);
   display: block; margin-bottom: 10px;
 }
 .page-header__rule { width: 24px; height: 2px; background: var(--ink); margin-bottom: 12px; }
@@ -161,7 +159,6 @@ button { font-family: inherit; }
 
 /* Hover cards en landing diagnóstico */
 .dim-card { transition: background .2s ease; }
-.dim-card:hover { background: var(--neon) !important; }
 .nivel-card { transition: background .2s ease; }
 
 /* Acciones de fila — visibles solo en hover */

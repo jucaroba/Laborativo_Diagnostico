@@ -44,7 +44,7 @@ export default function IntakeForm({ diagnosticoId, nombreCompania, codigo }: {
     <div style={{ minHeight: '100vh', fontFamily: "'Red Hat Display', sans-serif", padding: 56, display: 'flex', flexDirection: 'column', gap: 24, background: 'var(--bg)', maxWidth: 720 }}>
       <span className="eyebrow">Paso 01 / 02 — Registro</span>
       <div className="rule" />
-      <div style={{ fontSize: 13, color: 'var(--neon)', fontWeight: 700, marginTop: 24, textTransform: 'uppercase', letterSpacing: '.08em' }}>{nombreCompania}</div>
+      <div style={{ fontSize: 13, color: 'var(--mute)', fontWeight: 700, marginTop: 24, textTransform: 'uppercase', letterSpacing: '.08em' }}>{nombreCompania}</div>
       <h2 style={{ fontWeight: 900, fontSize: 64, lineHeight: .92, letterSpacing: -1 }}>
         Antes de empezar,<br />cuéntanos quién responde.
       </h2>
@@ -62,10 +62,10 @@ export default function IntakeForm({ diagnosticoId, nombreCompania, codigo }: {
             <div key={p.id}
               onClick={() => setPerfil(p.id)}
               style={{
-                border: perfil === p.id ? '2px solid var(--neon)' : '2px solid var(--ink)', padding: '16px 18px', cursor: 'pointer',
+                border: '2px solid var(--ink)', padding: '16px 18px', cursor: 'pointer',
                 display: 'flex', flexDirection: 'column', gap: 4,
-                background: 'var(--card)',
-                color: 'var(--ink)',
+                background: perfil === p.id ? 'var(--ink)' : 'var(--card)',
+                color: perfil === p.id ? 'var(--card)' : 'var(--ink)',
                 transition: 'all .15s',
               }}>
               <h5 style={{ margin: 0, fontSize: 16, fontWeight: 800, letterSpacing: '-.01em' }}>{p.h}</h5>
