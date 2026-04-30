@@ -166,11 +166,13 @@ export default function EditorTema({ temaId, temaNombre, descripcion, preguntas 
         <div className="page-header__rule" />
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 24, flexWrap: 'wrap' }}>
           <TemaTitulo temaId={temaId} nombreInicial={temaNombre} />
-          {!abierto && !enReview && (
+          {enReview ? (
+            <BotonesAccion onDescartar={descartar} onGuardar={intentarGuardar} guardando={guardando} />
+          ) : !abierto ? (
             <Button onClick={() => { setAbierto(true); setError('') }}>
               <ClaudeIcon size={14} /> Generar con IA
             </Button>
-          )}
+          ) : null}
         </div>
         {descripcion && <p className="page-header__subtitle">{descripcion}</p>}
       </div>
@@ -215,12 +217,6 @@ export default function EditorTema({ temaId, temaNombre, descripcion, preguntas 
 
       {/* Editor (existente o review) */}
       <div>
-        {enReview && (
-          <div style={{ marginBottom: 16 }}>
-            <BotonesAccion onDescartar={descartar} onGuardar={intentarGuardar} guardando={guardando} />
-          </div>
-        )}
-
         <div style={{ background: 'var(--ink)', padding: '10px 16px', marginBottom: 27, display: 'flex', alignItems: 'center', gap: 10 }}>
           <h2 style={{ fontSize: 20, fontWeight: 900, letterSpacing: 0, margin: 0, color: '#fff', fontFamily: 'Red Hat Display, sans-serif' }}>Plantilla</h2>
           <span style={{ fontSize: 20, fontWeight: 900, letterSpacing: 0, color: '#fff', fontFamily: 'Red Hat Display, sans-serif' }}>
