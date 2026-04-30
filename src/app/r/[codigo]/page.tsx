@@ -179,10 +179,7 @@ export default async function ResultadosPage({ params }: { params: Promise<{ cod
 
         {/* Cobertura por dimensión */}
         <div>
-          <span style={{ fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--ink)', fontWeight: 700 }}>
-            Cobertura por dimensión
-          </span>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', border: '1.5px solid var(--ink)', marginTop: 12, marginLeft: -56, marginRight: -56 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', border: '1.5px solid var(--ink)', marginLeft: -56, marginRight: -56 }}>
             {resultados.map((dim, i) => {
               const completa = dim.rolesConRespuesta.length === 4
               return (
@@ -219,46 +216,52 @@ export default async function ResultadosPage({ params }: { params: Promise<{ cod
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', borderBottom: '1.5px solid var(--ink)' }}>
         {resultados.map((dim, i) => (
           <div key={dim.id} style={{
-            borderRight: i < 3 ? '1.5px solid var(--ink)' : 'none',
-            padding: '28px 24px 24px',
-            display: 'flex', flexDirection: 'column', gap: 14,
+            display: 'flex', flexDirection: 'column',
+            paddingTop: 28,
           }}>
-            <div>
-              <div style={{ fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--ink)', fontWeight: 700 }}>{dim.subtitulo}</div>
-              <h3 style={{ fontSize: 22, fontWeight: 900, letterSpacing: '-.02em', lineHeight: 1, margin: '4px 0 0' }}>{dim.nombre}</h3>
-            </div>
+            <div style={{
+              padding: '0 24px',
+              display: 'flex', flexDirection: 'column', gap: 14,
+            }}>
+              <div>
+                <div style={{ fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--ink)', fontWeight: 700 }}>{dim.subtitulo}</div>
+                <h3 style={{ fontSize: 22, fontWeight: 900, letterSpacing: '-.02em', lineHeight: 1, margin: '4px 0 0' }}>{dim.nombre}</h3>
+              </div>
 
-            <div style={{ width: 42, height: 8, background: 'var(--ink)' }} />
+              <div style={{ width: 42, height: 8, background: 'var(--ink)' }} />
 
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, color: 'var(--ink)' }}>
-              <span style={{ fontWeight: 900, fontSize: 72, lineHeight: 1, letterSpacing: '-.04em' }}>
-                {dim.promedioGeneral ?? '—'}
-              </span>
-              {dim.promedioGeneral !== null && (
-                <span style={{ fontWeight: 700, fontSize: 36, lineHeight: 1, letterSpacing: '-.02em', color: 'var(--ink)' }}>
-                  <span style={{ position: 'relative', top: -5 }}>/</span>
-                  <span style={{ position: 'relative', top: 0 }}>10</span>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, color: 'var(--ink)' }}>
+                <span style={{ fontWeight: 900, fontSize: 72, lineHeight: 1, letterSpacing: '-.04em' }}>
+                  {dim.promedioGeneral ?? '—'}
                 </span>
-              )}
+                {dim.promedioGeneral !== null && (
+                  <span style={{ fontWeight: 700, fontSize: 36, lineHeight: 1, letterSpacing: '-.02em', color: 'var(--ink)' }}>
+                    <span style={{ position: 'relative', top: -5 }}>/</span>
+                    <span style={{ position: 'relative', top: 0 }}>10</span>
+                  </span>
+                )}
+              </div>
             </div>
             {/* Desglose por rol */}
-            <div style={{ display: 'flex', flexDirection: 'column', borderTop: '1.5px solid var(--ink)', marginTop: 8 }}>
-              {ROL_ORDEN.map((rol, idx) => {
-                const val = dim.promedios[rol]
-                return (
-                  <div key={rol} style={{
-                    display: 'grid', gridTemplateColumns: '14px 1fr auto', gap: 10, alignItems: 'center',
-                    padding: '8px 0',
-                    borderBottom: idx < ROL_ORDEN.length - 1 ? '1px solid var(--line-soft)' : 'none',
-                  }}>
-                    <span style={{ width: 10, height: 10, borderRadius: '50%', background: ROL_NEON[rol] }} />
-                    <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--ink-2)' }}>{ROL_INFO[rol].label}</span>
-                    <b style={{ fontSize: 14, fontWeight: 900, fontVariantNumeric: 'tabular-nums', color: val !== undefined ? 'var(--ink)' : 'var(--mute)' }}>
-                      {val ?? '—'}
-                    </b>
-                  </div>
-                )
-              })}
+            <div style={{ padding: '14px 24px 24px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', borderTop: '1.5px solid var(--ink)', marginTop: 8 }}>
+                {ROL_ORDEN.map((rol, idx) => {
+                  const val = dim.promedios[rol]
+                  return (
+                    <div key={rol} style={{
+                      display: 'grid', gridTemplateColumns: '14px 1fr auto', gap: 10, alignItems: 'center',
+                      padding: '8px 0',
+                      borderBottom: idx < ROL_ORDEN.length - 1 ? '1px solid var(--line-soft)' : 'none',
+                    }}>
+                      <span style={{ width: 10, height: 10, borderRadius: '50%', background: ROL_NEON[rol] }} />
+                      <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--ink-2)' }}>{ROL_INFO[rol].label}</span>
+                      <b style={{ fontSize: 14, fontWeight: 900, fontVariantNumeric: 'tabular-nums', color: val !== undefined ? 'var(--ink)' : 'var(--mute)' }}>
+                        {val ?? '—'}
+                      </b>
+                    </div>
+                  )
+                })}
+              </div>
             </div>
           </div>
         ))}
