@@ -6,10 +6,10 @@ import { DIMENSIONES, ROL_INFO, Rol } from '@/types'
 const ROL_ORDEN: Rol[] = ['A', 'C', 'D', 'B']
 
 const ROL_NEON: Record<Rol, string> = {
-  A: '#00FFFF',
+  A: '#00E6FF',
   B: '#FF6600',
   C: '#FF3366',
-  D: '#39FF14',
+  D: '#37FF25',
 }
 
 type Props = {

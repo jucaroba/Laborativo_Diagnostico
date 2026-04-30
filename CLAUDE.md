@@ -52,10 +52,10 @@ Cada dimensión tiene preguntas distintas por rol (misma temática, diferente pe
 - Paleta: fondo crema cálido, tipografía serif para títulos, sans para cuerpo
 - Mínimo, claro, profesional — que proyecte la identidad de Laborativo
 - Colores fijos por rol en el **Dashboard de resultados** (`/r/[codigo]`) — siempre estos, no cambiar:
-  - **A** Equipo → Cyan `#00FFFF`
+  - **A** Equipo → Cyan `#00E6FF`
   - **B** Líder → Eq. → Naranja `#FF6600`
   - **C** Eq. → Líder → Rojo `#FF3366`
-  - **D** Líder auto → Verde lima `#39FF14`
+  - **D** Líder auto → Verde lima `#37FF25`
 
 ## Convenciones de código
 - Componentes en `src/components/[seccion]/NombreComponente.tsx`

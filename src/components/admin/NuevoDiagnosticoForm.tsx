@@ -65,7 +65,7 @@ export default function NuevoDiagnosticoForm() {
 
   const [datos, setDatos] = useState({
     nombre_compania: '', contacto_nombre: '', contacto_cargo: '',
-    contacto_email: '', color_neon: '#39FF14',
+    contacto_email: '', color_neon: '#37FF25',
   })
   const [preguntas, setPreguntas] = useState<PreguntaEditable[]>([])
   const [temas, setTemas] = useState<Tema[]>([])

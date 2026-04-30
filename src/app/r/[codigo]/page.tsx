@@ -12,10 +12,10 @@ const ROL_ORDEN: Rol[] = ['A', 'C', 'D', 'B']
 
 // Paleta neon para el dashboard (override de ROL_INFO.color)
 const ROL_NEON: Record<Rol, string> = {
-  A: '#00FFFF', // Cyan       — Equipo
+  A: '#00E6FF', // Cyan       — Equipo
   B: '#FF6600', // Naranja    — Líder → Eq.
   C: '#FF3366', // Rojo       — Eq. → Líder
-  D: '#39FF14', // Verde lima — Líder auto
+  D: '#37FF25', // Verde lima — Líder auto
 }
 
 export default async function ResultadosPage({ params }: { params: Promise<{ codigo: string }> }) {
