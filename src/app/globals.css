@@ -157,6 +157,11 @@ button { font-family: inherit; }
 /* Texto muted reutilizable */
 .text-mute { color: var(--mute); font-weight: 500; }
 
+/* Color picker — swatch flush al borde */
+.color-swatch-flush::-webkit-color-swatch-wrapper { padding: 0; }
+.color-swatch-flush::-webkit-color-swatch { border: none; border-radius: 0; }
+.color-swatch-flush::-moz-color-swatch { border: none; border-radius: 0; }
+
 /* Hover cards en landing diagnóstico */
 .dim-card { transition: background .2s ease; }
 .nivel-card { transition: background .2s ease; }

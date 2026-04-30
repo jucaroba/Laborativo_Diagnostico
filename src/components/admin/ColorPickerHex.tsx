@@ -23,6 +23,7 @@ export default function ColorPickerHex({ value, onChange }: Props) {
         value={valido ? value : '#000000'}
         onChange={e => onChange(e.target.value.toUpperCase())}
         aria-label="Selector visual de color"
+        className="color-swatch-flush"
         style={{
           width: 40, height: 36,
           border: '1.5px solid var(--ink)',

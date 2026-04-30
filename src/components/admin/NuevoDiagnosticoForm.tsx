@@ -146,7 +146,7 @@ export default function NuevoDiagnosticoForm() {
       <div style={{
         background: 'var(--ink)',
         padding: '10px 16px',
-        marginBottom: 12,
+        marginBottom: 27,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
@@ -177,23 +177,16 @@ export default function NuevoDiagnosticoForm() {
       {/* PASO 1: Datos + selección de tema */}
       {paso === 'datos' && (
         <div>
-          <Row label="Compañía">
-            <Input value={datos.nombre_compania} onChange={e => setDatos(d => ({ ...d, nombre_compania: e.target.value }))} placeholder="Ej: Bancolombia S.A." />
-          </Row>
-          <Row label="Contacto">
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-              <Input value={datos.contacto_nombre} onChange={e => setDatos(d => ({ ...d, contacto_nombre: e.target.value }))} placeholder="Nombre completo" />
-              <Input value={datos.contacto_cargo} onChange={e => setDatos(d => ({ ...d, contacto_cargo: e.target.value }))} placeholder="Cargo" />
-            </div>
-          </Row>
-          <Row label="Email">
-            <Input type="email" value={datos.contacto_email} onChange={e => setDatos(d => ({ ...d, contacto_email: e.target.value }))} placeholder="correo@empresa.com" />
-          </Row>
-          <Row label="Color del diagnóstico">
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 32, alignItems: 'center' }}>
+            <Input style={{ height: 36 }} value={datos.nombre_compania} onChange={e => setDatos(d => ({ ...d, nombre_compania: e.target.value }))} placeholder="Nombre de la empresa" />
+            <Input style={{ height: 36 }} value={datos.contacto_nombre} onChange={e => setDatos(d => ({ ...d, contacto_nombre: e.target.value }))} placeholder="Nombre del contacto" />
+            <Input style={{ height: 36 }} value={datos.contacto_cargo} onChange={e => setDatos(d => ({ ...d, contacto_cargo: e.target.value }))} placeholder="Cargo" />
+            <Input style={{ height: 36 }} type="email" value={datos.contacto_email} onChange={e => setDatos(d => ({ ...d, contacto_email: e.target.value }))} placeholder="Email" />
             <ColorPickerHex value={datos.color_neon} onChange={c => setDatos(d => ({ ...d, color_neon: c }))} />
-          </Row>
+            <div />
+          </div>
 
-          <div style={{ marginTop: 24 }}>
+          <div style={{ marginTop: 44 }}>
             <div style={{ background: 'var(--ink)', padding: '10px 16px', marginBottom: 27 }}>
               <h2 style={{ fontSize: 20, fontWeight: 900, letterSpacing: '0', margin: 0, color: '#fff', fontFamily: 'Red Hat Display, sans-serif' }}>Set de preguntas</h2>
             </div>
@@ -214,17 +207,16 @@ export default function NuevoDiagnosticoForm() {
                       onClick={() => setTemaSeleccionadoId(t.id)}
                       style={{
                         textAlign: 'left', padding: '16px 20px',
-                        border: seleccionado ? '2px solid var(--ink)' : '1px solid var(--border)',
-                        background: seleccionado ? '#fff' : 'var(--card)',
+                        border: '1.5px solid var(--ink)',
+                        background: seleccionado ? 'var(--bg-2)' : 'var(--card)',
                         cursor: 'pointer',
                         display: 'flex', flexDirection: 'column', gap: 4,
                         transition: 'border-color .15s, background .15s',
                       }}
                       onMouseEnter={e => { if (!seleccionado) e.currentTarget.style.borderColor = 'var(--ink)' }}
-                      onMouseLeave={e => { if (!seleccionado) e.currentTarget.style.borderColor = 'var(--border)' }}
+                      onMouseLeave={e => { if (!seleccionado) e.currentTarget.style.borderColor = 'var(--ink)' }}
                     >
                       <span style={{ fontWeight: 800, fontSize: 14 }}>{t.nombre}</span>
-                      {t.descripcion && <span style={{ fontSize: 12, color: seleccionado ? 'var(--ink)' : 'var(--mute)' }}>{t.descripcion}</span>}
                     </button>
                   )
                 })}
