@@ -141,10 +141,7 @@ export default function EditorTema({ temaId, temaNombre, descripcion, preguntas 
         .from('preguntas_base')
         .insert(generadas.map((p, i) => ({ ...p, orden: i, tema_id: temaId })))
       if (insErr) throw new Error(insErr.message)
-      setGeneradas(null)
       setMostrarConfirmacion(false)
-      setVertical('')
-      setContexto('')
       router.refresh()
     } catch (e: any) {
       setError(e.message || 'No se pudieron guardar las preguntas generadas')
@@ -196,7 +193,7 @@ export default function EditorTema({ temaId, temaNombre, descripcion, preguntas 
               <Textarea
                 value={contexto}
                 onChange={e => setContexto(e.target.value)}
-                placeholder="Qué quieres explorar con este tema, ángulo, situaciones, retos típicos…"
+                placeholder="Describe las características que quieres para este set de preguntas"
                 rows={4}
               />
             </div>
