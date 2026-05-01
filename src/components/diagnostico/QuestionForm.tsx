@@ -133,7 +133,7 @@ export default function QuestionForm({ diagnosticoId, codigo, idx }: {
             <span style={{ fontSize: 11, color: 'var(--ink)', letterSpacing: .5, textTransform: 'uppercase', fontWeight: 700 }}>
               Pregunta {idx} de {total}
             </span>
-            <span className="eyebrow soft">{dimension?.nombre} — {dimension?.subtitulo}</span>
+            <span style={{ background: 'var(--ink)', color: 'var(--bg)', padding: '5px 10px', fontSize: 11, letterSpacing: '.08em', textTransform: 'uppercase', fontWeight: 700, alignSelf: 'flex-start' }}>{dimension?.nombre} — {dimension?.subtitulo}</span>
           </div>
         </div>
 

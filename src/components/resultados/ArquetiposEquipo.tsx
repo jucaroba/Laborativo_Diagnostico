@@ -3,10 +3,9 @@ import { Arquetipo } from '@/lib/arquetipos'
 type Props = {
   brechas: Arquetipo
   relaciones: Arquetipo
-  neonColor: string
 }
 
-export default function ArquetiposEquipo({ brechas, relaciones, neonColor }: Props) {
+export default function ArquetiposEquipo({ brechas, relaciones }: Props) {
   const cards: Array<{ titulo: string; arquetipo: Arquetipo }> = [
     { titulo: 'Brechas entre perspectivas', arquetipo: brechas },
     { titulo: 'Relaciones entre dimensiones', arquetipo: relaciones },
@@ -64,7 +63,7 @@ export default function ArquetiposEquipo({ brechas, relaciones, neonColor }: Pro
               fontWeight: 700,
               marginTop: 'auto',
             }}>
-              <span style={{ background: neonColor, color: 'var(--ink)', padding: '2px 6px', marginRight: 8 }}>Patrón</span>
+              <span style={{ background: 'var(--ink)', color: 'var(--bg)', padding: '2px 6px', marginRight: 8 }}>Patrón</span>
               {a.patron}
             </div>
 
@@ -76,7 +75,7 @@ export default function ArquetiposEquipo({ brechas, relaciones, neonColor }: Pro
               color: 'var(--ink)',
               fontWeight: 700,
             }}>
-              <span style={{ background: neonColor, color: 'var(--ink)', padding: '2px 6px', marginRight: 8 }}>Experiencia</span>
+              <span style={{ background: 'var(--ink)', color: 'var(--bg)', padding: '2px 6px', marginRight: 8 }}>Experiencia</span>
               {a.accion}
             </footer>
           </article>

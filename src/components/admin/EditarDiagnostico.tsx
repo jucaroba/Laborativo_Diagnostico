@@ -40,9 +40,14 @@ export default function EditarDiagnostico({ diagnostico }: { diagnostico: Diagno
 
   return (
     <>
-      <Button variant="outline" onClick={() => setOpen(true)} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-        <Pencil size={14} strokeWidth={2.5} /> Editar
-      </Button>
+      <button
+        type="button"
+        title="Editar diagnóstico"
+        onClick={() => setOpen(true)}
+        style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 6, display: 'flex', alignItems: 'center', color: 'var(--ink)' }}
+      >
+        <Pencil size={18} strokeWidth={2} />
+      </button>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
           <DialogHeader>

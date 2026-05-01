@@ -6,6 +6,7 @@ import AccionesDiagnostico from '@/components/admin/AccionesDiagnostico'
 import CopiarLink from '@/components/admin/CopiarLink'
 import EliminarDiagnostico from '@/components/admin/EliminarDiagnostico'
 import EditarDiagnostico from '@/components/admin/EditarDiagnostico'
+import InvitarEquipoDialog from '@/components/admin/InvitarEquipoDialog'
 import GrupoPreguntas from '@/components/admin/GrupoPreguntas'
 import { ArrowUpRight } from 'lucide-react'
 
@@ -42,6 +43,7 @@ export default async function DiagnosticoPage({ params }: { params: Promise<{ id
         <div style={{ display: 'flex', gap: 8 }}>
           <EditarDiagnostico diagnostico={d} />
           <EliminarDiagnostico id={d.id} />
+          {d.estado === 'activo' && <InvitarEquipoDialog diagnosticoId={d.id} />}
           <AccionesDiagnostico diagnostico={d} />
         </div>
       </div>

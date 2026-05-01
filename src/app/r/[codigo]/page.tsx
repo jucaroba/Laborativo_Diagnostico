@@ -381,7 +381,7 @@ export default async function ResultadosPage({ params }: { params: Promise<{ cod
       {/* ============================================ */}
       <SectionBar title="Arquetipos del equipo" subtitle="Patrones detectados en los datos" />
 
-      <ArquetiposEquipo brechas={arqBrechas} relaciones={arqRelaciones} neonColor={diag.color_neon || '#D8FF00'} />
+      <ArquetiposEquipo brechas={arqBrechas} relaciones={arqRelaciones} />
 
       </div> {/* /Container central */}
 

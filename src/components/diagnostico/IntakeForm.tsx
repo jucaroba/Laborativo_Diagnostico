@@ -44,7 +44,7 @@ export default function IntakeForm({ diagnosticoId, nombreCompania, codigo }: {
     <div style={{ minHeight: '100vh', fontFamily: "'Red Hat Display', sans-serif", padding: 56, display: 'flex', flexDirection: 'column', gap: 24, background: 'var(--bg)', maxWidth: 720 }}>
       <span className="eyebrow">Paso 01 / 02 — Registro</span>
       <div className="rule" />
-      <div style={{ fontSize: 13, color: 'var(--mute)', fontWeight: 700, marginTop: 24, textTransform: 'uppercase', letterSpacing: '.08em' }}>{nombreCompania}</div>
+      <div style={{ fontSize: 13, color: 'var(--ink)', fontWeight: 700, marginTop: 24, textTransform: 'uppercase', letterSpacing: '.08em' }}>{nombreCompania}</div>
       <h2 style={{ fontWeight: 900, fontSize: 64, lineHeight: .92, letterSpacing: -1 }}>
         Antes de empezar,<br />cuéntanos quién responde.
       </h2>
@@ -78,7 +78,7 @@ export default function IntakeForm({ diagnosticoId, nombreCompania, codigo }: {
       <div style={{ paddingTop: 8 }}>
         <button onClick={comenzar} disabled={!perfil || loading}
           className="btn primary"
-          style={{ opacity: (!perfil || loading) ? .4 : 1, cursor: (!perfil || loading) ? 'not-allowed' : 'pointer' }}>
+          style={{ cursor: (!perfil || loading) ? 'not-allowed' : 'pointer' }}>
           {loading ? 'Cargando…' : <>Comenzar preguntas <ArrowRight size={15} strokeWidth={2.5} /></>}
         </button>
       </div>

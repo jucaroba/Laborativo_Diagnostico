@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { Button } from '@/components/ui/button'
+import { Trash2 } from 'lucide-react'
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle,
   DialogDescription, DialogFooter,
@@ -22,7 +23,14 @@ export default function EliminarDiagnostico({ id }: { id: string }) {
 
   return (
     <>
-      <Button variant="outline" onClick={() => setOpen(true)}>Eliminar</Button>
+      <button
+        type="button"
+        title="Eliminar"
+        onClick={() => setOpen(true)}
+        style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 6, display: 'flex', alignItems: 'center' }}
+      >
+        <Trash2 size={18} strokeWidth={2} color="#FF3366" />
+      </button>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
           <DialogHeader>

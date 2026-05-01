@@ -31,6 +31,31 @@ export async function enviarLinkParticipacion(params: {
   })
 }
 
+export async function enviarInvitacionParticipante(params: {
+  participanteEmail: string
+  participanteNombre: string
+  nombreCompania: string
+  codigoParticipacion: string
+}) {
+  const { participanteEmail, participanteNombre, nombreCompania, codigoParticipacion } = params
+  const link = `${BASE_URL}/d/${codigoParticipacion}`
+
+  return getResend().emails.send({
+    from: 'Laborativo <diagnostico@laborativo.com>',
+    to: participanteEmail,
+    subject: `Diagnóstico organizacional ${nombreCompania} — Tu invitación`,
+    html: `
+      <p>Hola ${participanteNombre},</p>
+      <p>Estás invitado/a a participar en el diagnóstico organizacional de <strong>${nombreCompania}</strong>.</p>
+      <p>Toma entre 12 y 18 minutos. Tus respuestas son anónimas y se usan para mapear las brechas de cultura del equipo.</p>
+      <p><a href="${link}">Comenzar diagnóstico →</a></p>
+      <p style="font-size: 13px; color: #666;">O copia este link: ${link}</p>
+      <br/>
+      <p>— Equipo Laborativo</p>
+    `,
+  })
+}
+
 export async function enviarLinkResultados(params: {
   contactoEmail: string
   contactoNombre: string
