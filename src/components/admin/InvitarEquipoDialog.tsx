@@ -76,10 +76,12 @@ export default function InvitarEquipoDialog({ diagnosticoId }: { diagnosticoId: 
       <Dialog open={open} onOpenChange={(v) => (v ? setOpen(true) : cerrar())}>
         <DialogContent style={{ maxWidth: 720 }}>
           <DialogHeader>
-            <DialogTitle>Invitar al equipo</DialogTitle>
-            <DialogDescription>
-              Pega desde Excel dos columnas: <strong>nombre</strong> y <strong>email</strong>. Una persona por fila.
-            </DialogDescription>
+            <DialogTitle>Invitación del equipo:</DialogTitle>
+            {!resultado && (
+              <DialogDescription>
+                {`${filas.length} registro${filas.length === 1 ? '' : 's'} recibido${filas.length === 1 ? '' : 's'}.`}
+              </DialogDescription>
+            )}
           </DialogHeader>
 
           {!resultado && (
@@ -138,6 +140,9 @@ export default function InvitarEquipoDialog({ diagnosticoId }: { diagnosticoId: 
 
           {resultado && (
             <div style={{ padding: '12px 0' }}>
+              <p style={{ fontSize: 16, fontWeight: 800, margin: '0 0 4px' }}>
+                {filas.length} registro{filas.length === 1 ? '' : 's'} recibido{filas.length === 1 ? '' : 's'}.
+              </p>
               <p style={{ fontSize: 16, fontWeight: 800, margin: '0 0 8px' }}>
                 {resultado.enviados} invitación{resultado.enviados === 1 ? '' : 'es'} enviada{resultado.enviados === 1 ? '' : 's'}.
               </p>
