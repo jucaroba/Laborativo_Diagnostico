@@ -131,6 +131,7 @@ export default function NuevoDiagnosticoForm() {
   }
 
   const datosValidos = datos.nombre_compania && datos.contacto_nombre && datos.contacto_cargo && datos.contacto_email
+  const temaSeleccionado = temas.find(t => t.id === temaSeleccionadoId)
 
   return (
     <div>
@@ -153,7 +154,9 @@ export default function NuevoDiagnosticoForm() {
         gap: 12,
         flexWrap: 'wrap',
       }}>
-        <h2 style={{ fontSize: 20, fontWeight: 900, letterSpacing: '0', margin: 0, color: '#fff', fontFamily: 'Red Hat Display, sans-serif' }}>Datos de la empresa</h2>
+        <h2 style={{ fontSize: 20, fontWeight: 900, letterSpacing: '0', margin: 0, color: '#fff', fontFamily: 'Red Hat Display, sans-serif' }}>
+          {paso === 'revision' && temaSeleccionado ? temaSeleccionado.nombre : 'Datos de la empresa'}
+        </h2>
         {paso === 'revision' && (
           <div style={{ display: 'flex', gap: 8 }}>
             <Button
@@ -208,7 +211,8 @@ export default function NuevoDiagnosticoForm() {
                       style={{
                         textAlign: 'left', padding: '16px 20px',
                         border: '1.5px solid var(--ink)',
-                        background: seleccionado ? 'var(--bg-2)' : 'var(--card)',
+                        borderRadius: 0,
+                        background: seleccionado ? '#D1D1D1' : 'var(--card)',
                         cursor: 'pointer',
                         display: 'flex', flexDirection: 'column', gap: 4,
                         transition: 'border-color .15s, background .15s',
@@ -216,7 +220,7 @@ export default function NuevoDiagnosticoForm() {
                       onMouseEnter={e => { if (!seleccionado) e.currentTarget.style.borderColor = 'var(--ink)' }}
                       onMouseLeave={e => { if (!seleccionado) e.currentTarget.style.borderColor = 'var(--ink)' }}
                     >
-                      <span style={{ fontWeight: 800, fontSize: 14 }}>{t.nombre}</span>
+                      <span style={{ fontWeight: 400, fontSize: 18 }}>{t.nombre}</span>
                     </button>
                   )
                 })}

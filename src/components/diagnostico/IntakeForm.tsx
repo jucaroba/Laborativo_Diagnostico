@@ -41,21 +41,18 @@ export default function IntakeForm({ diagnosticoId, nombreCompania, codigo }: {
   }
 
   return (
-    <div style={{ minHeight: '100vh', fontFamily: "'Red Hat Display', sans-serif", padding: 56, display: 'flex', flexDirection: 'column', gap: 24, background: 'var(--bg)', maxWidth: 720 }}>
+    <div style={{ minHeight: '100vh', fontFamily: "'Red Hat Display', sans-serif", padding: '56px 56px 56px 106px', display: 'flex', flexDirection: 'column', gap: 24, background: 'var(--bg)', maxWidth: 770 }}>
       <span className="eyebrow">Paso 01 / 02 — Registro</span>
       <div className="rule" />
       <div style={{ fontSize: 13, color: 'var(--ink)', fontWeight: 700, marginTop: 24, textTransform: 'uppercase', letterSpacing: '.08em' }}>{nombreCompania}</div>
       <h2 style={{ fontWeight: 900, fontSize: 64, lineHeight: .92, letterSpacing: -1 }}>
-        Antes de empezar,<br />cuéntanos quién responde.
+        Antes de empezar,<br />elige tu rol.
       </h2>
-      <p style={{ color: 'var(--ink-2)', lineHeight: 1.5, fontWeight: 500, fontSize: 15, margin: 0 }}>
-        Esta información nos ayuda a cruzar tu respuesta con la de tu equipo.<br />Nadie verá tus respuestas individuales, solo los resultados colectivos.
-      </p>
 
       {/* Rol */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 16 }}>
         <div style={{ background: 'var(--ink)', padding: '10px 16px' }}>
-          <h2 style={{ fontSize: 20, fontWeight: 900, letterSpacing: 0, margin: 0, color: '#fff', fontFamily: 'Red Hat Display, sans-serif' }}>Elige tu rol, selecciona una de las dos opciones</h2>
+          <h2 style={{ fontSize: 20, fontWeight: 900, letterSpacing: 0, margin: 0, color: '#fff', fontFamily: 'Red Hat Display, sans-serif' }}>Selecciona una de las dos opciones</h2>
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 8 }}>
           {PERFILES.map(p => (

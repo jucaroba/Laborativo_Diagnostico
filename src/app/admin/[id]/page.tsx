@@ -23,10 +23,44 @@ export default async function DiagnosticoPage({ params }: { params: Promise<{ id
   const { data: preguntas } = await supabase
     .from('preguntas').select('*').eq('diagnostico_id', id).order('orden')
   const { data: participantes } = await supabase
-    .from('participantes').select('rol').eq('diagnostico_id', id)
+    .from('participantes').select('id, rol').eq('diagnostico_id', id)
 
   const conteoRoles = { A: 0, B: 0, C: 0, D: 0 }
-  for (const p of participantes ?? []) conteoRoles[p.rol as Rol]++
+  for (const p of (participantes ?? []) as { id: string; rol: Rol }[]) conteoRoles[p.rol]++
+
+  const { count: invitacionesEnviadas } = await supabase
+    .from('invitaciones')
+    .select('id', { count: 'exact', head: true })
+    .eq('diagnostico_id', id)
+    .not('enviado_at', 'is', null)
+
+  const preguntasPorRol: Record<Rol, Set<string>> = { A: new Set(), B: new Set(), C: new Set(), D: new Set() }
+  for (const p of (preguntas ?? []) as Pregunta[]) preguntasPorRol[p.rol].add(p.id)
+
+  const partIds = ((participantes ?? []) as { id: string }[]).map(p => p.id)
+  const { data: respuestas } = partIds.length > 0
+    ? await supabase.from('respuestas').select('participante_id, pregunta_id').in('participante_id', partIds)
+    : { data: [] as { participante_id: string; pregunta_id: string }[] }
+
+  const respuestasPorParticipante: Record<string, Set<string>> = {}
+  for (const r of respuestas ?? []) {
+    if (!respuestasPorParticipante[r.participante_id]) respuestasPorParticipante[r.participante_id] = new Set()
+    respuestasPorParticipante[r.participante_id].add(r.pregunta_id)
+  }
+
+  let cuestionariosDiligenciados = 0
+  for (const p of (participantes ?? []) as { id: string; rol: Rol }[]) {
+    const esperadas = p.rol === 'A'
+      ? new Set<string>([...preguntasPorRol.A, ...preguntasPorRol.C])
+      : p.rol === 'D'
+      ? new Set<string>([...preguntasPorRol.D, ...preguntasPorRol.B])
+      : new Set<string>([...preguntasPorRol[p.rol]])
+    if (esperadas.size === 0) continue
+    const dadas = respuestasPorParticipante[p.id] ?? new Set<string>()
+    let completo = true
+    for (const pid of esperadas) if (!dadas.has(pid)) { completo = false; break }
+    if (completo) cuestionariosDiligenciados++
+  }
 
   const d = diag as Diagnostico
   const ps = (preguntas ?? []) as Pregunta[]
@@ -86,8 +120,11 @@ export default async function DiagnosticoPage({ params }: { params: Promise<{ id
 
       {/* Participantes */}
       <div>
-        <div style={{ background: 'var(--ink)', padding: '10px 16px', marginBottom: 12 }}>
+        <div style={{ background: 'var(--ink)', padding: '10px 16px', marginBottom: 12, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
           <h2 style={{ fontSize: 20, fontWeight: 900, letterSpacing: '0', margin: 0, color: '#fff', fontFamily: 'Red Hat Display, sans-serif' }}>Participantes</h2>
+          <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '.08em', textTransform: 'uppercase', color: '#fff', fontFamily: 'Red Hat Display, sans-serif' }}>
+            {invitacionesEnviadas ?? 0} invitaciones · {cuestionariosDiligenciados} diligenciados
+          </span>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 12 }}>
           {(['A', 'C', 'D', 'B'] as Rol[]).map(rol => (
