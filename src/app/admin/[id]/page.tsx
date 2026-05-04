@@ -82,7 +82,7 @@ export default async function DiagnosticoPage({ params }: { params: Promise<{ id
       </div>
 
       {/* Links */}
-      <div style={{ display: 'grid', gridTemplateColumns: d.estado === 'activo' ? 'repeat(3, 1fr)' : 'repeat(2, 1fr)', gap: 16 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
         {[
           { label: 'Link de dirección proyecto', url: `${BASE_URL}/d/${d.codigo_participacion}`, href: `${BASE_URL}/d/${d.codigo_participacion}` },
           { label: 'Link de resultados', url: `${BASE_URL}/r/${d.codigo_resultados}`, href: `${BASE_URL}/r/${d.codigo_resultados}` },
@@ -111,9 +111,20 @@ export default async function DiagnosticoPage({ params }: { params: Promise<{ id
             </span>
           </div>
         ))}
-        {d.estado === 'activo' && (
-          <InvitarEquipoDialog diagnosticoId={d.id} variant="card" />
-        )}
+        <div style={{
+          border: '1.5px solid var(--ink)',
+          padding: '12px 16px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: 12,
+        }}>
+          <span style={{ fontSize: 14, fontWeight: 700 }}>Invitar al equipo</span>
+          <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+            <CopiarLink url={`${BASE_URL}/d/${d.codigo_participacion}`} />
+            <InvitarEquipoDialog diagnosticoId={d.id} variant="iconOnly" />
+          </span>
+        </div>
       </div>
 
       {/* Participantes */}

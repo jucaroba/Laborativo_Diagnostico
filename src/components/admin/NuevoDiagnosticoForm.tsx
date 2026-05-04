@@ -65,7 +65,7 @@ export default function NuevoDiagnosticoForm() {
 
   const [datos, setDatos] = useState({
     nombre_compania: '', contacto_nombre: '', contacto_cargo: '',
-    contacto_email: '', color_neon: '#37FF25',
+    contacto_email: '', numero_participantes: '', color_neon: '#37FF25',
   })
   const [preguntas, setPreguntas] = useState<PreguntaEditable[]>([])
   const [temas, setTemas] = useState<Tema[]>([])
@@ -119,12 +119,17 @@ export default function NuevoDiagnosticoForm() {
       const { data: diag, error: diagErr } = await supabase.from('diagnosticos').insert({
         nombre_compania: datos.nombre_compania, contacto_nombre: datos.contacto_nombre,
         contacto_cargo: datos.contacto_cargo, contacto_email: datos.contacto_email,
-        color_neon: datos.color_neon,
+        color_neon: datos.color_neon, estado: 'activo',
       }).select().single()
       if (diagErr || !diag) throw new Error(diagErr?.message)
       const { error: pregErr } = await supabase.from('preguntas')
         .insert(preguntas.map(p => ({ ...p, diagnostico_id: diag.id })))
       if (pregErr) throw new Error(pregErr.message)
+      fetch('/api/enviar-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ diagnosticoId: diag.id, tipo: 'activo' }),
+      }).catch(() => {})
       router.push(`/admin/${diag.id}`)
     } catch (e: any) { setError(e.message || 'Error guardando') }
     finally { setGuardando(false) }
@@ -138,7 +143,7 @@ export default function NuevoDiagnosticoForm() {
 
       {/* Header de página */}
       <div className="page-header" style={{ marginBottom: 16 }}>
-        <span className="page-header__eyebrow">Nuevo diagnóstico</span>
+        <span className="page-header__eyebrow">{paso === 'revision' ? 'Edición cuestionario' : 'Nuevo diagnóstico'}</span>
         <div className="page-header__rule" />
         <h1 className="page-header__title">Configuración</h1>
       </div>
@@ -185,8 +190,8 @@ export default function NuevoDiagnosticoForm() {
             <Input style={{ height: 36 }} value={datos.contacto_nombre} onChange={e => setDatos(d => ({ ...d, contacto_nombre: e.target.value }))} placeholder="Nombre del contacto" />
             <Input style={{ height: 36 }} value={datos.contacto_cargo} onChange={e => setDatos(d => ({ ...d, contacto_cargo: e.target.value }))} placeholder="Cargo" />
             <Input style={{ height: 36 }} type="email" value={datos.contacto_email} onChange={e => setDatos(d => ({ ...d, contacto_email: e.target.value }))} placeholder="Email" />
+            <Input style={{ height: 36 }} type="number" min={1} value={datos.numero_participantes} onChange={e => setDatos(d => ({ ...d, numero_participantes: e.target.value }))} placeholder="Número de participantes" />
             <ColorPickerHex value={datos.color_neon} onChange={c => setDatos(d => ({ ...d, color_neon: c }))} />
-            <div />
           </div>
 
           <div style={{ marginTop: 44 }}>
@@ -220,7 +225,7 @@ export default function NuevoDiagnosticoForm() {
                       onMouseEnter={e => { if (!seleccionado) e.currentTarget.style.borderColor = 'var(--ink)' }}
                       onMouseLeave={e => { if (!seleccionado) e.currentTarget.style.borderColor = 'var(--ink)' }}
                     >
-                      <span style={{ fontWeight: 400, fontSize: 18 }}>{t.nombre}</span>
+                      <span style={{ fontWeight: 700, fontSize: 18 }}>{t.nombre}</span>
                     </button>
                   )
                 })}

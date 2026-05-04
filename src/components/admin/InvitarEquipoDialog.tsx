@@ -30,7 +30,7 @@ function parsear(texto: string): Fila[] {
   })
 }
 
-export default function InvitarEquipoDialog({ diagnosticoId, variant = 'button' }: { diagnosticoId: string; variant?: 'button' | 'card' }) {
+export default function InvitarEquipoDialog({ diagnosticoId, variant = 'button' }: { diagnosticoId: string; variant?: 'button' | 'card' | 'iconOnly' }) {
   const router = useRouter()
   const [open, setOpen] = useState(false)
   const [texto, setTexto] = useState('')
@@ -93,6 +93,15 @@ export default function InvitarEquipoDialog({ diagnosticoId, variant = 'button' 
         >
           <span style={{ fontSize: 14, fontWeight: 700 }}>Invitar al equipo</span>
           <Mail size={16} strokeWidth={2.5} />
+        </button>
+      ) : variant === 'iconOnly' ? (
+        <button
+          onClick={() => setOpen(true)}
+          title="Pegar lista de emails"
+          aria-label="Pegar lista de emails"
+          style={{ flexShrink: 0, background: 'none', border: 'none', cursor: 'pointer', padding: '4px 8px 4px 4px', color: 'var(--ink)', display: 'flex' }}
+        >
+          <Mail size={16} strokeWidth={2} />
         </button>
       ) : (
         <Button variant="outline" onClick={() => setOpen(true)}>Invitar equipo</Button>

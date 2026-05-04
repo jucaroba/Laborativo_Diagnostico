@@ -14,11 +14,18 @@ export async function POST(req: NextRequest) {
 
     const { data: diag } = await supabaseAdmin
       .from('diagnosticos')
-      .select('id, nombre_compania, codigo_participacion')
+      .select('id, nombre_compania, codigo_participacion, estado')
       .eq('id', diagnosticoId)
       .single()
 
     if (!diag) return NextResponse.json({ error: 'Diagnóstico no encontrado' }, { status: 404 })
+
+    if (diag.estado === 'completado') {
+      await supabaseAdmin
+        .from('diagnosticos')
+        .update({ estado: 'activo' })
+        .eq('id', diagnosticoId)
+    }
 
     const limpia = lista
       .map(e => ({ nombre: (e.nombre || '').trim(), email: (e.email || '').trim().toLowerCase() }))
