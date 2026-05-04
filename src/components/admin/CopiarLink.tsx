@@ -12,14 +12,13 @@ export default function CopiarLink({ url }: { url: string }) {
   }
 
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-      <p style={{ fontSize: 13, wordBreak: 'break-all', fontWeight: 500, margin: 0 }}>{url}</p>
-      <button
-        onClick={copiar}
-        style={{ flexShrink: 0, background: 'none', border: 'none', cursor: 'pointer', padding: 4, color: copiado ? '#3D6B4F' : '#7A7A7A', display: 'flex' }}
-      >
-        {copiado ? <Check size={15} strokeWidth={2.5} /> : <Copy size={15} strokeWidth={2} />}
-      </button>
-    </div>
+    <button
+      onClick={copiar}
+      title="Copiar link"
+      aria-label="Copiar link"
+      style={{ flexShrink: 0, background: 'none', border: 'none', cursor: 'pointer', padding: 4, color: copiado ? '#3D6B4F' : 'var(--ink)', display: 'flex' }}
+    >
+      {copiado ? <Check size={16} strokeWidth={2.5} /> : <Copy size={16} strokeWidth={2} />}
+    </button>
   )
 }

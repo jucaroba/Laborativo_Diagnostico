@@ -152,10 +152,10 @@ export default async function ResultadosPage({ params }: { params: Promise<{ cod
       {/* ============================================ */}
       <SectionBar title="Resumen de respuestas" subtitle={`Estado · ${diag.estado}`} />
 
-      <div style={{ padding: '20px 56px 32px', borderBottom: '1.5px solid var(--ink)' }}>
+      <div style={{ padding: '32px 56px', borderBottom: '1.5px solid var(--ink)' }}>
 
         {/* Stats top row — 4 indicadores en línea, mismo formato */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', marginBottom: 28, marginLeft: -56, marginRight: -56 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', marginLeft: -56, marginRight: -56 }}>
           {[
             { label: 'Participantes',    count: totalParticipantes, color: null },
             { label: 'Personas equipo',  count: personasEquipo,     color: ROL_NEON.A },
@@ -177,35 +177,6 @@ export default async function ResultadosPage({ params }: { params: Promise<{ cod
           ))}
         </div>
 
-        {/* Cobertura por dimensión */}
-        <div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', border: '1.5px solid var(--ink)', marginLeft: -56, marginRight: -56 }}>
-            {resultados.map((dim, i) => {
-              const completa = dim.rolesConRespuesta.length === 4
-              return (
-                <div key={dim.id} style={{
-                  padding: '20px 18px',
-                  borderRight: i < 3 ? '1.5px solid var(--ink)' : 'none',
-                  display: 'flex', flexDirection: 'column', gap: 14,
-                  background: completa ? 'var(--card)' : 'var(--bg-2)',
-                }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
-                    <h3 style={{ fontSize: 18, fontWeight: 900, letterSpacing: '-.02em', margin: 0 }}>{dim.nombre}</h3>
-                    <span style={{
-                      fontSize: 10, fontWeight: 900, letterSpacing: '.08em', textTransform: 'uppercase',
-                      padding: '3px 8px', border: '1.5px solid var(--ink)',
-                      background: completa ? 'var(--ink)' : 'transparent',
-                      color: completa ? '#fff' : 'var(--ink)',
-                      whiteSpace: 'nowrap',
-                    }}>
-                      {completa ? '✓ Completa' : `${dim.rolesConRespuesta.length}/4`}
-                    </span>
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-        </div>
       </div>
 
       {/* ============================================ */}

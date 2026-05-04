@@ -6,6 +6,7 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle,
   DialogDescription, DialogFooter,
 } from '@/components/ui/dialog'
+import { Mail } from 'lucide-react'
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
@@ -29,7 +30,7 @@ function parsear(texto: string): Fila[] {
   })
 }
 
-export default function InvitarEquipoDialog({ diagnosticoId }: { diagnosticoId: string }) {
+export default function InvitarEquipoDialog({ diagnosticoId, variant = 'button' }: { diagnosticoId: string; variant?: 'button' | 'card' }) {
   const router = useRouter()
   const [open, setOpen] = useState(false)
   const [texto, setTexto] = useState('')
@@ -72,13 +73,36 @@ export default function InvitarEquipoDialog({ diagnosticoId }: { diagnosticoId: 
 
   return (
     <>
-      <Button variant="outline" onClick={() => setOpen(true)}>Invitar equipo</Button>
+      {variant === 'card' ? (
+        <button
+          onClick={() => setOpen(true)}
+          style={{
+            border: '1.5px solid var(--ink)',
+            padding: '12px 16px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 12,
+            background: 'var(--card)',
+            color: 'var(--ink)',
+            cursor: 'pointer',
+            textAlign: 'left',
+            fontFamily: 'inherit',
+            width: '100%',
+          }}
+        >
+          <span style={{ fontSize: 14, fontWeight: 700 }}>Invitar al equipo</span>
+          <Mail size={16} strokeWidth={2.5} />
+        </button>
+      ) : (
+        <Button variant="outline" onClick={() => setOpen(true)}>Invitar equipo</Button>
+      )}
       <Dialog open={open} onOpenChange={(v) => (v ? setOpen(true) : cerrar())}>
-        <DialogContent style={{ maxWidth: 720 }}>
+        <DialogContent style={{ maxWidth: 720, padding: '28px 32px 0' }}>
           <DialogHeader>
-            <DialogTitle>Invitación del equipo:</DialogTitle>
+            <DialogTitle style={{ fontWeight: 800 }}>Invitación del equipo:</DialogTitle>
             {!resultado && (
-              <DialogDescription>
+              <DialogDescription style={{ color: 'var(--ink)' }}>
                 {`${filas.length} registro${filas.length === 1 ? '' : 's'} recibido${filas.length === 1 ? '' : 's'}.`}
               </DialogDescription>
             )}
@@ -130,11 +154,11 @@ export default function InvitarEquipoDialog({ diagnosticoId }: { diagnosticoId: 
                 </div>
               )}
 
-              <p style={{ fontSize: 11, color: 'var(--mute)', margin: '10px 0 0', letterSpacing: '.04em' }}>
-                {filas.length === 0
-                  ? 'Aceptamos separadores: tab, coma o punto y coma.'
-                  : `${validos.length} de ${filas.length} listas para enviar.`}
-              </p>
+              {filas.length > 0 && (
+                <p style={{ fontSize: 11, color: 'var(--mute)', margin: '10px 0 0', letterSpacing: '.04em' }}>
+                  {validos.length} de {filas.length} listas para enviar.
+                </p>
+              )}
             </>
           )}
 
@@ -161,7 +185,7 @@ export default function InvitarEquipoDialog({ diagnosticoId }: { diagnosticoId: 
             </div>
           )}
 
-          <DialogFooter>
+          <DialogFooter style={{ marginLeft: -32, marginRight: -32, marginBottom: 0, padding: '16px 32px' }}>
             {!resultado ? (
               <>
                 <Button variant="outline" onClick={cerrar} disabled={enviando}>Cancelar</Button>

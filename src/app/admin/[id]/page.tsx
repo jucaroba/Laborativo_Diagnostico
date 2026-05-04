@@ -77,45 +77,43 @@ export default async function DiagnosticoPage({ params }: { params: Promise<{ id
         <div style={{ display: 'flex', gap: 8 }}>
           <EditarDiagnostico diagnostico={d} />
           <EliminarDiagnostico id={d.id} />
-          {d.estado === 'activo' && <InvitarEquipoDialog diagnosticoId={d.id} />}
           <AccionesDiagnostico diagnostico={d} />
         </div>
       </div>
 
       {/* Links */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: d.estado === 'activo' ? 'repeat(3, 1fr)' : 'repeat(2, 1fr)', gap: 16 }}>
         {[
-          { label: 'Link de participación', url: `${BASE_URL}/d/${d.codigo_participacion}`, href: `${BASE_URL}/d/${d.codigo_participacion}` },
+          { label: 'Link de dirección proyecto', url: `${BASE_URL}/d/${d.codigo_participacion}`, href: `${BASE_URL}/d/${d.codigo_participacion}` },
           { label: 'Link de resultados', url: `${BASE_URL}/r/${d.codigo_resultados}`, href: `${BASE_URL}/r/${d.codigo_resultados}` },
         ].map(l => (
           <div key={l.label} style={{
             border: '1.5px solid var(--ink)',
             padding: '12px 16px',
             display: 'flex',
-            flexDirection: 'column',
-            gap: 6,
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 12,
           }}>
-            <a
-              href={l.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                gap: 12,
-                color: 'var(--ink)',
-                textDecoration: 'none',
-              }}
-            >
-              <span style={{ fontSize: 13, fontWeight: 800, letterSpacing: '-.01em' }}>
-                {l.label}
-              </span>
-              <ArrowUpRight size={16} strokeWidth={2.5} />
-            </a>
-            <CopiarLink url={l.url} />
+            <span style={{ fontSize: 14, fontWeight: 700 }}>{l.label}</span>
+            <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+              <CopiarLink url={l.url} />
+              <a
+                href={l.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                title="Abrir link"
+                aria-label="Abrir link"
+                style={{ display: 'flex', padding: 4, color: 'var(--ink)' }}
+              >
+                <ArrowUpRight size={16} strokeWidth={2.5} />
+              </a>
+            </span>
           </div>
         ))}
+        {d.estado === 'activo' && (
+          <InvitarEquipoDialog diagnosticoId={d.id} variant="card" />
+        )}
       </div>
 
       {/* Participantes */}
