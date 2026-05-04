@@ -117,6 +117,16 @@ button { font-family: inherit; }
 }
 
 /* =============================================
+   PARTICIPANTE — Switch desktop / mobile
+   ============================================= */
+.only-desktop { display: block; }
+.only-mobile  { display: none; }
+@media (max-width: 768px) {
+  .only-desktop { display: none; }
+  .only-mobile  { display: block; }
+}
+
+/* =============================================
    SISTEMA DE TIPOGRAFÍA ADMIN
    ============================================= */
 

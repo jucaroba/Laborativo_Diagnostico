@@ -17,5 +17,21 @@ export default async function IntakePage({ params }: { params: Promise<{ codigo:
     return <EstadoNoDisponible estado={diag.estado as 'borrador' | 'completado'} nombreCompania={diag.nombre_compania} neon={diag.color_neon || undefined} />
   }
 
-  return <IntakeForm diagnosticoId={diag.id} nombreCompania={diag.nombre_compania} codigo={codigo} />
+  const { data: preguntas } = await supabase
+    .from('preguntas')
+    .select('rol')
+    .eq('diagnostico_id', diag.id)
+
+  const conteo = { A: 0, B: 0, C: 0, D: 0 }
+  for (const p of preguntas ?? []) conteo[p.rol as 'A' | 'B' | 'C' | 'D']++
+
+  return (
+    <IntakeForm
+      diagnosticoId={diag.id}
+      nombreCompania={diag.nombre_compania}
+      codigo={codigo}
+      preguntasEquipo={conteo.A + conteo.C}
+      preguntasLider={conteo.D + conteo.B}
+    />
+  )
 }

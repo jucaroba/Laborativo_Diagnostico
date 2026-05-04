@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { ArrowRight } from 'lucide-react'
+import IntakeFormMobile from './IntakeFormMobile'
 
 type Perfil = 'equipo' | 'lider'
 
@@ -11,10 +12,12 @@ const PERFILES = [
   { id: 'lider' as Perfil, h: 'Líder del equipo', p: 'Responderás desde tu rol de liderazgo.\nIncluye tu auto-evaluación y tu mirada sobre el equipo que lideras.' },
 ]
 
-export default function IntakeForm({ diagnosticoId, nombreCompania, codigo }: {
+export default function IntakeForm({ diagnosticoId, nombreCompania, codigo, preguntasEquipo, preguntasLider }: {
   diagnosticoId: string
   nombreCompania: string
   codigo: string
+  preguntasEquipo: number
+  preguntasLider: number
 }) {
   const router = useRouter()
   const [perfil, setPerfil] = useState<Perfil | null>(null)
@@ -41,16 +44,28 @@ export default function IntakeForm({ diagnosticoId, nombreCompania, codigo }: {
   }
 
   return (
-    <div style={{ minHeight: '100vh', fontFamily: "'Red Hat Display', sans-serif", padding: '56px 56px 56px 106px', display: 'flex', flexDirection: 'column', gap: 24, background: 'var(--bg)', maxWidth: 770 }}>
+    <>
+    <div className="only-mobile">
+      <IntakeFormMobile
+        nombreCompania={nombreCompania}
+        preguntasEquipo={preguntasEquipo}
+        preguntasLider={preguntasLider}
+        perfil={perfil}
+        setPerfil={setPerfil}
+        loading={loading}
+        onComenzar={comenzar}
+      />
+    </div>
+    <div className="only-desktop" style={{ minHeight: '100vh', fontFamily: "'Red Hat Display', sans-serif", padding: '56px 56px 56px 106px', display: 'flex', flexDirection: 'column', gap: 24, background: 'var(--bg)', maxWidth: 870 }}>
       <span className="eyebrow">Paso 01 / 02 — Registro</span>
       <div className="rule" />
-      <div style={{ fontSize: 13, color: 'var(--ink)', fontWeight: 700, marginTop: 24, textTransform: 'uppercase', letterSpacing: '.08em' }}>{nombreCompania}</div>
-      <h2 style={{ fontWeight: 900, fontSize: 64, lineHeight: .92, letterSpacing: -1 }}>
+      <div style={{ fontSize: 13, color: 'var(--ink)', fontWeight: 700, marginTop: 24, marginLeft: 100, textTransform: 'uppercase', letterSpacing: '.08em' }}>{nombreCompania}</div>
+      <h2 style={{ fontWeight: 900, fontSize: 64, lineHeight: .92, letterSpacing: -1, marginLeft: 100 }}>
         Antes de empezar,<br />elige tu rol.
       </h2>
 
       {/* Rol */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 16 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 16, marginLeft: 100 }}>
         <div style={{ background: 'var(--ink)', padding: '10px 16px' }}>
           <h2 style={{ fontSize: 20, fontWeight: 900, letterSpacing: 0, margin: 0, color: '#fff', fontFamily: 'Red Hat Display, sans-serif' }}>Selecciona una de las dos opciones</h2>
         </div>
@@ -72,7 +87,7 @@ export default function IntakeForm({ diagnosticoId, nombreCompania, codigo }: {
         </div>
       </div>
 
-      <div style={{ paddingTop: 8 }}>
+      <div style={{ paddingTop: 8, marginLeft: 100 }}>
         <button onClick={comenzar} disabled={!perfil || loading}
           className="btn primary"
           style={{ cursor: (!perfil || loading) ? 'not-allowed' : 'pointer' }}>
@@ -81,8 +96,11 @@ export default function IntakeForm({ diagnosticoId, nombreCompania, codigo }: {
       </div>
 
       <div style={{ marginTop: 'auto' }}>
-        <span className="eyebrow soft">≈ 12–18 min · 32 preguntas</span>
+        <span className="eyebrow soft">
+          ≈ 12–18 min{perfil ? ` · ${perfil === 'lider' ? preguntasLider : preguntasEquipo} preguntas` : ''}
+        </span>
       </div>
     </div>
+    </>
   )
 }

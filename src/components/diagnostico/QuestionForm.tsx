@@ -4,6 +4,8 @@ import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { DIMENSIONES, Rol } from '@/types'
 import { ArrowRight, ArrowLeft } from 'lucide-react'
+import { shuffleSeeded } from '@/lib/shuffle'
+import QuestionFormMobile from './QuestionFormMobile'
 
 const ESCALA = [
   { n: 1, label: 'Muy bajo', desc: 'Totalmente en desacuerdo' },
@@ -39,9 +41,9 @@ export default function QuestionForm({ diagnosticoId, codigo, idx }: {
   }, [])
 
   useEffect(() => {
-    if (!perfil) return
+    if (!perfil || !pid) return
     cargarPreguntas()
-  }, [perfil, diagnosticoId])
+  }, [perfil, pid, diagnosticoId])
 
   async function cargarPreguntas() {
     const roles: Rol[] = perfil === 'equipo' ? ['A', 'C'] : ['D', 'B']
@@ -51,7 +53,7 @@ export default function QuestionForm({ diagnosticoId, codigo, idx }: {
       .eq('diagnostico_id', diagnosticoId)
       .in('rol', roles)
       .order('orden')
-    if (data) setPreguntas(data)
+    if (data && pid) setPreguntas(shuffleSeeded(data, pid))
   }
 
   if (!pid || !perfil) {
@@ -101,7 +103,22 @@ export default function QuestionForm({ diagnosticoId, codigo, idx }: {
   }
 
   return (
-    <div style={{ fontFamily: "'Red Hat Display', sans-serif", minHeight: '100vh', background: 'var(--bg)' }}>
+    <>
+    <div className="only-mobile">
+      <QuestionFormMobile
+        codigo={codigo}
+        idx={idx}
+        total={total}
+        pregunta={pregunta}
+        valor={valor}
+        setValor={setValor}
+        guardando={guardando}
+        errorSeleccion={errorSeleccion}
+        setErrorSeleccion={setErrorSeleccion}
+        onSiguiente={siguiente}
+      />
+    </div>
+    <div className="only-desktop" style={{ fontFamily: "'Red Hat Display', sans-serif", minHeight: '100vh', background: 'var(--bg)' }}>
 
       {/* Header sticky */}
       <div style={{
@@ -138,7 +155,7 @@ export default function QuestionForm({ diagnosticoId, codigo, idx }: {
         </div>
 
         {/* Pregunta */}
-        <h2 style={{ fontWeight: 900, fontSize: 36, lineHeight: 1.05, letterSpacing: -1, margin: '0 0 40px', maxWidth: '40ch' }}>
+        <h2 style={{ fontWeight: 900, fontSize: 36, lineHeight: 1.05, letterSpacing: -1, margin: '0 0 40px', maxWidth: '40ch', minHeight: '2.1em' }}>
           {pregunta.texto}
         </h2>
 
@@ -183,5 +200,6 @@ export default function QuestionForm({ diagnosticoId, codigo, idx }: {
         </div>
       </div>
     </div>
+    </>
   )
 }
