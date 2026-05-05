@@ -57,19 +57,11 @@ export default function QuestionFormMobile({
       {/* Body */}
       <div style={{ padding: '24px 20px 56px' }}>
 
-        {/* Eyebrow con número grande */}
-        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 16, marginBottom: 24 }}>
-          <span style={{ fontWeight: 900, fontSize: 56, lineHeight: .88, letterSpacing: -1, flexShrink: 0, color: 'var(--ink)' }}>
+        {/* Número de pregunta */}
+        <div style={{ marginBottom: 24 }}>
+          <span style={{ fontWeight: 900, fontSize: 56, lineHeight: .88, letterSpacing: -1, color: 'var(--ink)' }}>
             {String(idx).padStart(2, '0')}
           </span>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8, paddingTop: 6, minWidth: 0 }}>
-            <span style={{ fontSize: 10.5, color: 'var(--ink)', letterSpacing: .5, textTransform: 'uppercase', fontWeight: 700 }}>
-              Pregunta {idx} de {total}
-            </span>
-            <span style={{ background: 'var(--ink)', color: 'var(--bg)', padding: '5px 9px', fontSize: 10, letterSpacing: '.06em', textTransform: 'uppercase', fontWeight: 700, alignSelf: 'flex-start', maxWidth: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-              {dimension?.nombre} — {dimension?.subtitulo}
-            </span>
-          </div>
         </div>
 
         {/* Pregunta */}
@@ -77,14 +69,13 @@ export default function QuestionFormMobile({
           {pregunta.texto}
         </h2>
 
-        {/* Labels arriba: alineados con el 1 (izquierda) y el 10 (derecha) */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: 'var(--ink)', fontWeight: 600, letterSpacing: .5, textTransform: 'uppercase', marginBottom: 8, gap: 8 }}>
-          <span>Totalmente en desacuerdo</span>
-          <span style={{ textAlign: 'right' }}>Totalmente de acuerdo</span>
+        {/* Label arriba: alineado con el 1 */}
+        <div style={{ fontSize: 10, color: 'var(--ink)', fontWeight: 600, letterSpacing: .5, textTransform: 'uppercase', marginBottom: 8 }}>
+          Totalmente en desacuerdo
         </div>
 
         {/* Escala 1-10 — 5 cols × 2 filas */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 6, marginBottom: 28 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 6, marginBottom: 8 }}>
           {Array.from({ length: 10 }, (_, i) => i + 1).map(n => (
             <div key={n} onClick={() => { setValor(n); setErrorSeleccion(false) }}
               style={{
@@ -98,6 +89,11 @@ export default function QuestionFormMobile({
               <span style={{ fontWeight: 900, fontSize: 22, lineHeight: 1, letterSpacing: '-.04em' }}>{n}</span>
             </div>
           ))}
+        </div>
+
+        {/* Label abajo: alineado con el 10 */}
+        <div style={{ fontSize: 10, color: 'var(--ink)', fontWeight: 600, letterSpacing: .5, textTransform: 'uppercase', textAlign: 'right', marginBottom: 28 }}>
+          Totalmente de acuerdo
         </div>
 
         {/* Nav */}

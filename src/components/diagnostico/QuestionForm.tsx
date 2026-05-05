@@ -141,17 +141,11 @@ export default function QuestionForm({ diagnosticoId, codigo, idx }: {
       {/* Body */}
       <div style={{ padding: '56px 56px 100px', maxWidth: 900, margin: '0 auto' }}>
 
-        {/* Eyebrow con número grande */}
-        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 24, marginBottom: 32 }}>
-          <span style={{ fontWeight: 900, fontSize: 88, lineHeight: .88, letterSpacing: -1, flexShrink: 0, color: 'var(--ink)' }}>
+        {/* Número de pregunta */}
+        <div style={{ marginBottom: 32 }}>
+          <span style={{ fontWeight: 900, fontSize: 88, lineHeight: .88, letterSpacing: -1, color: 'var(--ink)' }}>
             {String(idx).padStart(2, '0')}
           </span>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, paddingTop: 12 }}>
-            <span style={{ fontSize: 11, color: 'var(--ink)', letterSpacing: .5, textTransform: 'uppercase', fontWeight: 700 }}>
-              Pregunta {idx} de {total}
-            </span>
-            <span style={{ background: 'var(--ink)', color: 'var(--bg)', padding: '5px 10px', fontSize: 11, letterSpacing: '.08em', textTransform: 'uppercase', fontWeight: 700, alignSelf: 'flex-start' }}>{dimension?.nombre} — {dimension?.subtitulo}</span>
-          </div>
         </div>
 
         {/* Pregunta */}
