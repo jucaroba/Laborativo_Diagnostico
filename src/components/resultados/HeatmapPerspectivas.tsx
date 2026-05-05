@@ -10,20 +10,37 @@ type Props = {
   promediosPorRol: Record<Rol, Record<number, number | null>>
 }
 
-export const cellAlpha = (val: number | null): number => {
-  if (val === null) return 0
+// Paleta tipo heatmap diverging: rojo (bajo) → amarillo (medio) → verde (alto)
+const HEAT_LOW: [number, number, number] = [215, 48, 39]    // #D73027
+const HEAT_MID: [number, number, number] = [254, 224, 139]  // #FEE08B
+const HEAT_HIGH: [number, number, number] = [26, 152, 80]   // #1A9850
+
+const lerpColor = (
+  a: [number, number, number],
+  b: [number, number, number],
+  t: number,
+): [number, number, number] => [
+  Math.round(a[0] + (b[0] - a[0]) * t),
+  Math.round(a[1] + (b[1] - a[1]) * t),
+  Math.round(a[2] + (b[2] - a[2]) * t),
+]
+
+const heatRgb = (val: number): [number, number, number] => {
   const t = Math.max(0, Math.min(1, (val - 1) / 9))
-  return 0.07 + t * 0.88
+  return t < 0.5
+    ? lerpColor(HEAT_LOW, HEAT_MID, t * 2)
+    : lerpColor(HEAT_MID, HEAT_HIGH, (t - 0.5) * 2)
 }
 
 export const cellBg = (val: number | null): string => {
   if (val === null) return 'var(--bg-2)'
-  return `rgba(10, 10, 10, ${cellAlpha(val).toFixed(3)})`
+  const [r, g, b] = heatRgb(val)
+  return `rgb(${r}, ${g}, ${b})`
 }
 
 export const cellTextColor = (val: number | null): string => {
   if (val === null) return 'var(--mute)'
-  return '#fff'
+  return '#0A0A0A'
 }
 
 const round1 = (n: number) => Math.round(n * 10) / 10

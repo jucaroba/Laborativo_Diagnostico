@@ -185,7 +185,7 @@ export default async function ResultadosPage({ params }: { params: Promise<{ cod
       <SectionBar title="Promedios por dimensión" subtitle="Escala 1–10" />
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', borderBottom: '1.5px solid var(--ink)' }}>
-        {resultados.map((dim, i) => (
+        {[...resultados].sort((a, b) => (b.promedioGeneral ?? -Infinity) - (a.promedioGeneral ?? -Infinity)).map((dim, i) => (
           <div key={dim.id} style={{
             display: 'flex', flexDirection: 'column',
             paddingTop: 28,
@@ -203,7 +203,7 @@ export default async function ResultadosPage({ params }: { params: Promise<{ cod
 
               <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, color: 'var(--ink)' }}>
                 <span style={{ fontWeight: 900, fontSize: 72, lineHeight: 1, letterSpacing: '-.04em' }}>
-                  {dim.promedioGeneral ?? '—'}
+                  {dim.promedioGeneral !== null ? dim.promedioGeneral.toFixed(1) : '—'}
                 </span>
                 {dim.promedioGeneral !== null && (
                   <span style={{ fontWeight: 700, fontSize: 36, lineHeight: 1, letterSpacing: '-.02em', color: 'var(--ink)' }}>
@@ -216,18 +216,18 @@ export default async function ResultadosPage({ params }: { params: Promise<{ cod
             {/* Desglose por rol */}
             <div style={{ padding: '14px 24px 24px' }}>
               <div style={{ display: 'flex', flexDirection: 'column', borderTop: '1.5px solid var(--ink)', marginTop: 8 }}>
-                {ROL_ORDEN.map((rol, idx) => {
+                {[...ROL_ORDEN].sort((a, b) => (dim.promedios[b] ?? -Infinity) - (dim.promedios[a] ?? -Infinity)).map((rol, idx, arr) => {
                   const val = dim.promedios[rol]
                   return (
                     <div key={rol} style={{
                       display: 'grid', gridTemplateColumns: '14px 1fr auto', gap: 10, alignItems: 'center',
                       padding: '8px 0',
-                      borderBottom: idx < ROL_ORDEN.length - 1 ? '1px solid var(--line-soft)' : 'none',
+                      borderBottom: idx < arr.length - 1 ? '1px solid var(--line-soft)' : 'none',
                     }}>
                       <span style={{ width: 10, height: 10, borderRadius: '50%', background: ROL_NEON[rol] }} />
                       <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--ink-2)' }}>{ROL_INFO[rol].label}</span>
                       <b style={{ fontSize: 14, fontWeight: 900, fontVariantNumeric: 'tabular-nums', color: val !== undefined ? 'var(--ink)' : 'var(--mute)' }}>
-                        {val ?? '—'}
+                        {val !== undefined ? val.toFixed(1) : '—'}
                       </b>
                     </div>
                   )
@@ -262,7 +262,7 @@ export default async function ResultadosPage({ params }: { params: Promise<{ cod
 
         {/* Filas por dimensión */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
-          {resultados.map(dim => (
+          {[...resultados].sort((a, b) => a.delta - b.delta).map(dim => (
             <div key={dim.id} style={{ display: 'grid', gridTemplateColumns: '160px 90px 1fr', gap: 16, alignItems: 'center' }}>
               {/* Label */}
               <div>
@@ -357,7 +357,7 @@ export default async function ResultadosPage({ params }: { params: Promise<{ cod
       </div> {/* /Container central */}
 
       {/* Footer */}
-      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '24px 56px', display: 'flex', justifyContent: 'space-between', fontSize: 10, color: 'var(--ink)', letterSpacing: '.08em', textTransform: 'uppercase', fontWeight: 600 }}>
+      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '24px', display: 'flex', justifyContent: 'space-between', fontSize: 10, color: 'var(--ink)', letterSpacing: '.08em', textTransform: 'uppercase', fontWeight: 600 }}>
         <span>Laborativo / Consultoría Creativa Basada en la Emoción</span>
         <span>Diag · V1.0</span>
       </div>
@@ -368,7 +368,7 @@ export default async function ResultadosPage({ params }: { params: Promise<{ cod
 
 function SectionBar({ title, subtitle }: { title: string; subtitle?: string }) {
   return (
-    <div style={{ background: 'var(--ink)', padding: '12px 56px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+    <div style={{ background: 'var(--ink)', padding: '12px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
       <h2 style={{ fontSize: 18, fontWeight: 900, letterSpacing: '-.01em', margin: 0, color: '#fff' }}>{title}</h2>
       {subtitle && <span style={{ fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase', fontWeight: 600, color: '#fff' }}>{subtitle}</span>}
     </div>

@@ -74,7 +74,7 @@ export default function RadarPerspectivas({ promediosPorRol, promedioGlobalPorRo
     }}>
       {/* Toggle cards */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12, height: '80%', alignSelf: 'center' }}>
-        {ROL_ORDEN.map(rol => {
+        {[...ROL_ORDEN].sort((a, b) => (promedioGlobalPorRol[b] ?? -Infinity) - (promedioGlobalPorRol[a] ?? -Infinity)).map(rol => {
           const activo = activos.has(rol)
           const promedio = promedioGlobalPorRol[rol]
           return (
@@ -124,7 +124,7 @@ export default function RadarPerspectivas({ promediosPorRol, promedioGlobalPorRo
                 color: 'var(--ink)',
                 fontVariantNumeric: 'tabular-nums',
               }}>
-                {promedio ?? '—'}
+                {promedio !== null ? promedio.toFixed(1) : '—'}
               </span>
             </button>
           )
@@ -191,6 +191,27 @@ export default function RadarPerspectivas({ promediosPorRol, promedioGlobalPorRo
                     />
                   )
                 })}
+              </g>
+            )
+          })}
+
+          {/* Scale ticks — círculo negro con número blanco, sobre la línea, en la capa superior */}
+          {[0, 2, 4, 6, 8, 10].map(level => {
+            const cy = center - (level / 10) * radius * Math.SQRT1_2
+            return (
+              <g key={`tick-${level}`}>
+                <circle cx={center} cy={cy} r={9} fill="#0A0A0A" />
+                <text
+                  x={center}
+                  y={cy}
+                  fontSize="10"
+                  fontWeight="700"
+                  fill="#fff"
+                  textAnchor="middle"
+                  dominantBaseline="central"
+                >
+                  {level}
+                </text>
               </g>
             )
           })}
