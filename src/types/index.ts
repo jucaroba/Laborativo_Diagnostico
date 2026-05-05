@@ -27,6 +27,7 @@ export interface Diagnostico {
   color_neon: string
   vertical: string | null
   contexto_ia: string | null
+  numero_participantes: number | null
   created_at: string
 }
 

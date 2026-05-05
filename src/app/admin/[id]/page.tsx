@@ -1,6 +1,6 @@
 import { supabase } from '@/lib/supabase'
 import { notFound } from 'next/navigation'
-import { Diagnostico, Pregunta, DIMENSIONES, ROL_INFO, Rol } from '@/types'
+import { Diagnostico, Pregunta, DIMENSIONES, Rol } from '@/types'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import AccionesDiagnostico from '@/components/admin/AccionesDiagnostico'
 import CopiarLink from '@/components/admin/CopiarLink'
@@ -26,9 +26,6 @@ export default async function DiagnosticoPage({ params }: { params: Promise<{ id
   const { data: participantes } = await supabase
     .from('participantes').select('id, rol').eq('diagnostico_id', id)
 
-  const conteoRoles = { A: 0, B: 0, C: 0, D: 0 }
-  for (const p of (participantes ?? []) as { id: string; rol: Rol }[]) conteoRoles[p.rol]++
-
   const { count: invitacionesEnviadas } = await supabase
     .from('invitaciones')
     .select('id', { count: 'exact', head: true })
@@ -50,6 +47,8 @@ export default async function DiagnosticoPage({ params }: { params: Promise<{ id
   }
 
   let cuestionariosDiligenciados = 0
+  let formulariosLider = 0
+  let formulariosEquipo = 0
   for (const p of (participantes ?? []) as { id: string; rol: Rol }[]) {
     const esperadas = p.rol === 'A'
       ? new Set<string>([...preguntasPorRol.A, ...preguntasPorRol.C])
@@ -60,7 +59,11 @@ export default async function DiagnosticoPage({ params }: { params: Promise<{ id
     const dadas = respuestasPorParticipante[p.id] ?? new Set<string>()
     let completo = true
     for (const pid of esperadas) if (!dadas.has(pid)) { completo = false; break }
-    if (completo) cuestionariosDiligenciados++
+    if (completo) {
+      cuestionariosDiligenciados++
+      if (p.rol === 'D') formulariosLider++
+      else if (p.rol === 'A') formulariosEquipo++
+    }
   }
 
   const d = diag as Diagnostico
@@ -139,11 +142,16 @@ export default async function DiagnosticoPage({ params }: { params: Promise<{ id
           </span>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 12 }}>
-          {(['A', 'C', 'D', 'B'] as Rol[]).map(rol => (
-            <Card key={rol}>
+          {[
+            { label: 'Participantes', valor: d.numero_participantes ?? 0 },
+            { label: 'Invitaciones enviadas', valor: invitacionesEnviadas ?? 0 },
+            { label: 'Formularios líder', valor: formulariosLider },
+            { label: 'Formularios equipo', valor: formulariosEquipo },
+          ].map(c => (
+            <Card key={c.label}>
               <CardContent style={{ padding: '6px 16px 8px' }}>
-                <p className="page-header__eyebrow" style={{ margin: '0 0 4px', fontWeight: 800 }}>{ROL_INFO[rol].label}</p>
-                <p style={{ fontSize: 36, fontWeight: 900, letterSpacing: '-2px', margin: 0, lineHeight: 1 }}>{conteoRoles[rol]}</p>
+                <p className="page-header__eyebrow" style={{ margin: '0 0 4px', fontWeight: 800 }}>{c.label}</p>
+                <p style={{ fontSize: 36, fontWeight: 900, letterSpacing: '-2px', margin: 0, lineHeight: 1 }}>{c.valor}</p>
               </CardContent>
             </Card>
           ))}

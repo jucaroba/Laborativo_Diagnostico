@@ -18,6 +18,7 @@ export default function EditarDiagnostico({ diagnostico }: { diagnostico: Diagno
     contacto_nombre: diagnostico.contacto_nombre,
     contacto_cargo: diagnostico.contacto_cargo,
     contacto_email: diagnostico.contacto_email,
+    numero_participantes: diagnostico.numero_participantes != null ? String(diagnostico.numero_participantes) : '',
   })
 
   function set(field: string, value: string) {
@@ -26,7 +27,11 @@ export default function EditarDiagnostico({ diagnostico }: { diagnostico: Diagno
 
   async function guardar() {
     setLoading(true)
-    await supabase.from('diagnosticos').update(form).eq('id', diagnostico.id)
+    const { numero_participantes, ...resto } = form
+    await supabase.from('diagnosticos').update({
+      ...resto,
+      numero_participantes: numero_participantes ? parseInt(numero_participantes, 10) : null,
+    }).eq('id', diagnostico.id)
     setLoading(false)
     setOpen(false)
     router.refresh()
@@ -59,6 +64,7 @@ export default function EditarDiagnostico({ diagnostico }: { diagnostico: Diagno
               { label: 'Nombre contacto', field: 'contacto_nombre' },
               { label: 'Cargo', field: 'contacto_cargo' },
               { label: 'Email', field: 'contacto_email' },
+              { label: 'Número de participantes', field: 'numero_participantes' },
             ].map(({ label, field }) => (
               <div key={field}>
                 <p className="page-header__eyebrow" style={{ margin: '0 0 4px' }}>{label}</p>

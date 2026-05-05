@@ -120,6 +120,7 @@ export default function NuevoDiagnosticoForm() {
         nombre_compania: datos.nombre_compania, contacto_nombre: datos.contacto_nombre,
         contacto_cargo: datos.contacto_cargo, contacto_email: datos.contacto_email,
         color_neon: datos.color_neon, estado: 'activo',
+        numero_participantes: datos.numero_participantes ? parseInt(datos.numero_participantes, 10) : null,
       }).select().single()
       if (diagErr || !diag) throw new Error(diagErr?.message)
       const { error: pregErr } = await supabase.from('preguntas')
