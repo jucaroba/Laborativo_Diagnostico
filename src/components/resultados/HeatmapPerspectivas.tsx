@@ -73,7 +73,6 @@ export default function HeatmapPerspectivas({ promediosPorRol }: Props) {
     fontSize: 32,
     fontWeight: 900,
     letterSpacing: '-.03em',
-    fontVariantNumeric: 'tabular-nums' as const,
     lineHeight: 1,
   }
 
