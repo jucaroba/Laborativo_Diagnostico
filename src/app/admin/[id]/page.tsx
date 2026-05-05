@@ -7,6 +7,7 @@ import CopiarLink from '@/components/admin/CopiarLink'
 import EliminarDiagnostico from '@/components/admin/EliminarDiagnostico'
 import EditarDiagnostico from '@/components/admin/EditarDiagnostico'
 import InvitarEquipoDialog from '@/components/admin/InvitarEquipoDialog'
+import EnviarDescripcionDialog from '@/components/admin/EnviarDescripcionDialog'
 import GrupoPreguntas from '@/components/admin/GrupoPreguntas'
 import { ArrowUpRight } from 'lucide-react'
 
@@ -82,10 +83,19 @@ export default async function DiagnosticoPage({ params }: { params: Promise<{ id
       </div>
 
       {/* Links */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16 }}>
+        <EnviarDescripcionDialog
+          diagnosticoId={d.id}
+          linkUrl={`${BASE_URL}/d/${d.codigo_participacion}`}
+        />
+        <InvitarEquipoDialog
+          diagnosticoId={d.id}
+          variant="cardWithCopy"
+          copyUrl={`${BASE_URL}/d/${d.codigo_participacion}/intake`}
+        />
         {[
-          { label: 'Link de dirección proyecto', url: `${BASE_URL}/d/${d.codigo_participacion}`, href: `${BASE_URL}/d/${d.codigo_participacion}` },
-          { label: 'Link de resultados', url: `${BASE_URL}/r/${d.codigo_resultados}`, href: `${BASE_URL}/r/${d.codigo_resultados}` },
+          { label: 'Formulario', url: `${BASE_URL}/d/${d.codigo_participacion}/intake`, href: `${BASE_URL}/d/${d.codigo_participacion}/intake` },
+          { label: 'Dashboard', url: `${BASE_URL}/r/${d.codigo_resultados}`, href: `${BASE_URL}/r/${d.codigo_resultados}` },
         ].map(l => (
           <div key={l.label} style={{
             border: '1.5px solid var(--ink)',
@@ -95,7 +105,14 @@ export default async function DiagnosticoPage({ params }: { params: Promise<{ id
             justifyContent: 'space-between',
             gap: 12,
           }}>
-            <span style={{ fontSize: 14, fontWeight: 700 }}>{l.label}</span>
+            <a
+              href={l.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ fontSize: 14, fontWeight: 700, color: 'var(--ink)', textDecoration: 'none' }}
+            >
+              {l.label}
+            </a>
             <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
               <CopiarLink url={l.url} />
               <a
@@ -111,20 +128,6 @@ export default async function DiagnosticoPage({ params }: { params: Promise<{ id
             </span>
           </div>
         ))}
-        <div style={{
-          border: '1.5px solid var(--ink)',
-          padding: '12px 16px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: 12,
-        }}>
-          <span style={{ fontSize: 14, fontWeight: 700 }}>Invitar al equipo</span>
-          <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-            <CopiarLink url={`${BASE_URL}/d/${d.codigo_participacion}`} />
-            <InvitarEquipoDialog diagnosticoId={d.id} variant="iconOnly" />
-          </span>
-        </div>
       </div>
 
       {/* Participantes */}

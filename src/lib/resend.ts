@@ -38,7 +38,7 @@ export async function enviarInvitacionParticipante(params: {
   codigoParticipacion: string
 }) {
   const { participanteEmail, participanteNombre, nombreCompania, codigoParticipacion } = params
-  const link = `${BASE_URL}/d/${codigoParticipacion}`
+  const link = `${BASE_URL}/d/${codigoParticipacion}/intake`
 
   return getResend().emails.send({
     from: 'Laborativo <diagnostico@laborativo.com>',
@@ -49,6 +49,31 @@ export async function enviarInvitacionParticipante(params: {
       <p>Estás invitado/a a participar en el diagnóstico organizacional de <strong>${nombreCompania}</strong>.</p>
       <p>Toma entre 12 y 18 minutos. Tus respuestas son anónimas y se usan para mapear las brechas de cultura del equipo.</p>
       <p><a href="${link}">Comenzar diagnóstico →</a></p>
+      <p style="font-size: 13px; color: #666;">O copia este link: ${link}</p>
+      <br/>
+      <p>— Equipo Laborativo</p>
+    `,
+  })
+}
+
+export async function enviarLinkDescripcion(params: {
+  participanteEmail: string
+  participanteNombre: string
+  nombreCompania: string
+  codigoParticipacion: string
+}) {
+  const { participanteEmail, participanteNombre, nombreCompania, codigoParticipacion } = params
+  const link = `${BASE_URL}/d/${codigoParticipacion}`
+
+  return getResend().emails.send({
+    from: 'Laborativo <diagnostico@laborativo.com>',
+    to: participanteEmail,
+    subject: `Diagnóstico organizacional ${nombreCompania} — Descripción del proyecto`,
+    html: `
+      <p>Hola ${participanteNombre},</p>
+      <p>Acá está la descripción del diagnóstico organizacional para <strong>${nombreCompania}</strong>.</p>
+      <p>Conoce las cuatro dimensiones, las miradas y el paso a paso del proceso:</p>
+      <p><a href="${link}">Ver descripción del diagnóstico →</a></p>
       <p style="font-size: 13px; color: #666;">O copia este link: ${link}</p>
       <br/>
       <p>— Equipo Laborativo</p>

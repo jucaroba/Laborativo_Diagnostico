@@ -1,6 +1,5 @@
 'use client'
 import { useState, useMemo } from 'react'
-import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle,
@@ -31,8 +30,13 @@ function parsear(texto: string): Fila[] {
   })
 }
 
-export default function InvitarEquipoDialog({ diagnosticoId, variant = 'button', copyUrl }: { diagnosticoId: string; variant?: 'button' | 'card' | 'iconOnly' | 'cardWithCopy'; copyUrl?: string }) {
-  const router = useRouter()
+export default function EnviarDescripcionDialog({
+  diagnosticoId,
+  linkUrl,
+}: {
+  diagnosticoId: string
+  linkUrl: string
+}) {
   const [open, setOpen] = useState(false)
   const [texto, setTexto] = useState('')
   const [enviando, setEnviando] = useState(false)
@@ -45,7 +49,7 @@ export default function InvitarEquipoDialog({ diagnosticoId, variant = 'button',
     setEnviando(true)
     setResultado(null)
     try {
-      const r = await fetch('/api/invitaciones/enviar', {
+      const r = await fetch('/api/descripcion/enviar', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -56,7 +60,6 @@ export default function InvitarEquipoDialog({ diagnosticoId, variant = 'button',
       const data = await r.json()
       if (!r.ok) throw new Error(data.error || 'Error al enviar')
       setResultado({ enviados: data.enviados, fallidos: data.fallidos || [] })
-      router.refresh()
     } catch (e: any) {
       setResultado({ enviados: 0, fallidos: [{ email: '—', error: e.message }] })
     } finally {
@@ -74,73 +77,44 @@ export default function InvitarEquipoDialog({ diagnosticoId, variant = 'button',
 
   return (
     <>
-      {variant === 'card' ? (
-        <button
-          onClick={() => setOpen(true)}
+      <div style={{
+        border: '1.5px solid var(--ink)',
+        padding: '12px 16px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        gap: 12,
+      }}>
+        <a
+          href={linkUrl}
+          target="_blank"
+          rel="noopener noreferrer"
           style={{
-            border: '1.5px solid var(--ink)',
-            padding: '12px 16px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: 12,
-            background: 'var(--card)',
+            fontSize: 14,
+            fontWeight: 700,
             color: 'var(--ink)',
-            cursor: 'pointer',
-            textAlign: 'left',
-            fontFamily: 'inherit',
-            width: '100%',
+            textDecoration: 'none',
           }}
         >
-          <span style={{ fontSize: 14, fontWeight: 700 }}>Invitación</span>
-          <Mail size={16} strokeWidth={2.5} />
-        </button>
-      ) : variant === 'cardWithCopy' ? (
-        <div
-          role="button"
-          tabIndex={0}
-          onClick={() => setOpen(true)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-              e.preventDefault()
-              setOpen(true)
-            }
-          }}
-          style={{
-            border: '1.5px solid var(--ink)',
-            padding: '12px 16px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: 12,
-            cursor: 'pointer',
-            background: 'transparent',
-          }}
-        >
-          <span style={{ fontSize: 14, fontWeight: 700 }}>Invitación</span>
-          <span style={{ display: 'flex', alignItems: 'center', gap: 4 }} onClick={(e) => e.stopPropagation()}>
-            {copyUrl && <CopiarLink url={copyUrl} />}
-            <span style={{ flexShrink: 0, padding: '4px 8px 4px 4px', color: 'var(--ink)', display: 'flex' }} aria-hidden="true">
-              <Mail size={16} strokeWidth={2} />
-            </span>
-          </span>
-        </div>
-      ) : variant === 'iconOnly' ? (
-        <button
-          onClick={() => setOpen(true)}
-          title="Pegar lista de emails"
-          aria-label="Pegar lista de emails"
-          style={{ flexShrink: 0, background: 'none', border: 'none', cursor: 'pointer', padding: '4px 8px 4px 4px', color: 'var(--ink)', display: 'flex' }}
-        >
-          <Mail size={16} strokeWidth={2} />
-        </button>
-      ) : (
-        <Button variant="outline" onClick={() => setOpen(true)}>Invitar equipo</Button>
-      )}
+          Descripción
+        </a>
+        <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+          <CopiarLink url={linkUrl} />
+          <button
+            onClick={() => setOpen(true)}
+            title="Enviar link de descripción"
+            aria-label="Enviar link de descripción"
+            style={{ flexShrink: 0, background: 'none', border: 'none', cursor: 'pointer', padding: '4px 8px 4px 4px', color: 'var(--ink)', display: 'flex' }}
+          >
+            <Mail size={16} strokeWidth={2} />
+          </button>
+        </span>
+      </div>
+
       <Dialog open={open} onOpenChange={(v) => (v ? setOpen(true) : cerrar())}>
         <DialogContent style={{ maxWidth: 720, padding: '28px 32px 0' }}>
           <DialogHeader>
-            <DialogTitle style={{ fontWeight: 800 }}>Invitación del equipo:</DialogTitle>
+            <DialogTitle style={{ fontWeight: 800 }}>Enviar link de descripción:</DialogTitle>
             {!resultado && (
               <DialogDescription style={{ color: 'var(--ink)' }}>
                 {`${filas.length} registro${filas.length === 1 ? '' : 's'} recibido${filas.length === 1 ? '' : 's'}.`}
@@ -208,7 +182,7 @@ export default function InvitarEquipoDialog({ diagnosticoId, variant = 'button',
                 {filas.length} registro{filas.length === 1 ? '' : 's'} recibido{filas.length === 1 ? '' : 's'}.
               </p>
               <p style={{ fontSize: 16, fontWeight: 800, margin: '0 0 8px' }}>
-                {resultado.enviados} invitación{resultado.enviados === 1 ? '' : 'es'} enviada{resultado.enviados === 1 ? '' : 's'}.
+                {resultado.enviados} link{resultado.enviados === 1 ? '' : 's'} enviado{resultado.enviados === 1 ? '' : 's'}.
               </p>
               {resultado.fallidos.length > 0 && (
                 <>
@@ -230,7 +204,7 @@ export default function InvitarEquipoDialog({ diagnosticoId, variant = 'button',
               <>
                 <Button variant="outline" onClick={cerrar} disabled={enviando}>Cancelar</Button>
                 <Button onClick={enviar} disabled={enviando || validos.length === 0}>
-                  {enviando ? 'Enviando…' : `Enviar ${validos.length || ''} invitación${validos.length === 1 ? '' : 'es'}`.trim()}
+                  {enviando ? 'Enviando…' : `Enviar ${validos.length || ''} link${validos.length === 1 ? '' : 's'}`.trim()}
                 </Button>
               </>
             ) : (
