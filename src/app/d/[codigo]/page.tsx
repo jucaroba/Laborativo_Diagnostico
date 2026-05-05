@@ -130,9 +130,9 @@ export default async function LandingPage({ params }: { params: Promise<{ codigo
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 16 }}>
           {[
             { tag: 'Nivel 01 · Individuo', h: 'Autoevaluación personal', p: 'Cada miembro del equipo se observa a sí mismo en las cuatro dimensiones.', accent: false },
-            { tag: 'Nivel 02 · Líder', h: 'Autoevaluación del líder', p: 'El líder se observa con los mismos criterios que su equipo.', accent: false },
-            { tag: 'Nivel 03 · Descendente', h: 'Líder evalúa al equipo', p: 'La mirada del líder sobre las conductas colectivas que observa.', accent: false },
-            { tag: 'Nivel 04 · Ascendente', h: 'Equipo evalúa al líder', p: 'El contrapeso. Cómo ve el equipo al liderazgo que recibe.', accent: false },
+            { tag: 'Nivel 02 · Líder', h: 'Autoevaluación del líder', p: 'El líder se observa a sí mismo en las cuatro dimensiones.', accent: false },
+            { tag: 'Nivel 03 · Descendente', h: 'Líder evalúa al equipo', p: 'La mirada del líder sobre las conductas colectivas que observa en el equipo.', accent: false },
+            { tag: 'Nivel 04 · Ascendente', h: 'Equipo evalúa al líder', p: 'La mirada del equipo sobre las conductas que observa de su líder.', accent: false },
           ].map(l => (
             <div key={l.tag} style={{
               border: '1.5px solid var(--ink)', padding: 22,
