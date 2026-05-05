@@ -59,9 +59,25 @@ export default function IntakeFormMobile({
 
       <div style={{ paddingTop: 4 }}>
         <button onClick={onComenzar} disabled={!perfil || loading}
-          className="btn primary"
-          style={{ cursor: (!perfil || loading) ? 'not-allowed' : 'pointer', width: '100%', justifyContent: 'center' }}>
-          {loading ? 'Cargando…' : <>Comenzar preguntas <ArrowRight size={15} strokeWidth={2.5} /></>}
+          style={{
+            width: '100%',
+            padding: '18px 22px',
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 10,
+            border: '2px solid var(--ink)',
+            background: (!perfil || loading) ? 'transparent' : 'var(--ink)',
+            color: (!perfil || loading) ? 'var(--mute)' : 'var(--bg)',
+            borderColor: (!perfil || loading) ? 'var(--mute)' : 'var(--ink)',
+            fontFamily: 'inherit',
+            fontSize: 16,
+            fontWeight: 800,
+            letterSpacing: '-.01em',
+            cursor: (!perfil || loading) ? 'not-allowed' : 'pointer',
+            transition: 'background .15s ease, color .15s ease, border-color .15s ease',
+          }}>
+          {loading ? 'Cargando…' : <>Comenzar preguntas <ArrowRight size={17} strokeWidth={2.5} /></>}
         </button>
       </div>
 

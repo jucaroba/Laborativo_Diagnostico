@@ -73,12 +73,18 @@ export default function QuestionFormMobile({
         </div>
 
         {/* Pregunta */}
-        <h2 style={{ fontWeight: 900, fontSize: 'clamp(22px, 6vw, 28px)', lineHeight: 1.1, letterSpacing: -.5, margin: '0 0 28px' }}>
+        <h2 style={{ fontWeight: 900, fontSize: 'clamp(22px, 6vw, 28px)', lineHeight: 1.1, letterSpacing: -.5, margin: '0 0 44px' }}>
           {pregunta.texto}
         </h2>
 
+        {/* Labels arriba: alineados con el 1 (izquierda) y el 10 (derecha) */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: 'var(--ink)', fontWeight: 600, letterSpacing: .5, textTransform: 'uppercase', marginBottom: 8, gap: 8 }}>
+          <span>Totalmente en desacuerdo</span>
+          <span style={{ textAlign: 'right' }}>Totalmente de acuerdo</span>
+        </div>
+
         {/* Escala 1-10 — 5 cols × 2 filas */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 6, marginBottom: 10 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 6, marginBottom: 28 }}>
           {Array.from({ length: 10 }, (_, i) => i + 1).map(n => (
             <div key={n} onClick={() => { setValor(n); setErrorSeleccion(false) }}
               style={{
@@ -92,10 +98,6 @@ export default function QuestionFormMobile({
               <span style={{ fontWeight: 900, fontSize: 22, lineHeight: 1, letterSpacing: '-.04em' }}>{n}</span>
             </div>
           ))}
-        </div>
-        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: 'var(--ink)', fontWeight: 600, letterSpacing: .5, textTransform: 'uppercase', marginBottom: 28, gap: 8 }}>
-          <span>Totalmente en desacuerdo</span>
-          <span style={{ textAlign: 'right' }}>Totalmente de acuerdo</span>
         </div>
 
         {/* Nav */}
