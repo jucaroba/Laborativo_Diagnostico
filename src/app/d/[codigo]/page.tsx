@@ -4,6 +4,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { ArrowRight, ArrowDown } from 'lucide-react'
 import EstadoNoDisponible from '@/components/diagnostico/EstadoNoDisponible'
+import LandingMobile from '@/components/diagnostico/LandingMobile'
 
 export default async function LandingPage({ params }: { params: Promise<{ codigo: string }> }) {
   const { codigo } = await params
@@ -25,7 +26,11 @@ export default async function LandingPage({ params }: { params: Promise<{ codigo
     .eq('diagnostico_id', diag.id)
 
   return (
-    <div style={{ background: 'var(--bg)', minHeight: '100vh', fontFamily: "'Red Hat Display', sans-serif" }}>
+    <>
+    <div className="only-mobile">
+      <LandingMobile codigo={codigo} nombreCompania={diag.nombre_compania} totalPreguntas={totalPreguntas ?? null} />
+    </div>
+    <div className="only-desktop" style={{ background: 'var(--bg)', minHeight: '100vh', fontFamily: "'Red Hat Display', sans-serif" }}>
 
       {/* Hero */}
       <div style={{ padding: '48px 56px 64px', borderBottom: '1.5px solid var(--ink)', position: 'relative' }}>
@@ -44,8 +49,7 @@ export default async function LandingPage({ params }: { params: Promise<{ codigo
           </div>
         </div>
 
-        <span className="eyebrow">{diag.nombre_compania}</span>
-        <div className="rule" />
+        <span style={{ background: 'var(--ink)', color: 'var(--bg)', padding: '6px 12px', fontSize: 11, letterSpacing: '.08em', textTransform: 'uppercase', fontWeight: 700, display: 'inline-block' }}>{diag.nombre_compania}</span>
         <h1 style={{ fontWeight: 900, fontSize: 80, lineHeight: 1, letterSpacing: '-.020em', maxWidth: '30ch', paddingBottom: '.08em', marginTop: 24 }}>
           exploremos las visiones,<br />entendamos las oportunidades,<br />cambiemos los comportamientos.
         </h1>
@@ -193,10 +197,11 @@ export default async function LandingPage({ params }: { params: Promise<{ codigo
         <Link href={`/d/${codigo}/intake`} className="btn primary">Iniciar diagnóstico <ArrowRight size={15} strokeWidth={2.5} /></Link>
         <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 72, fontSize: 10, color: 'var(--mute)', letterSpacing: '.08em', textTransform: 'uppercase', fontWeight: 600 }}>
           <span>Laborativo / Consultoría Creativa Basada en la Emoción</span>
-          <span>Diag-2026 · V1.0</span>
+          <span>Diagnóstico · V1.12</span>
         </div>
       </div>
 
     </div>
+    </>
   )
 }
