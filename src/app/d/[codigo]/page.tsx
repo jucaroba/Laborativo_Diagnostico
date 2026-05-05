@@ -39,7 +39,7 @@ export default async function LandingPage({ params }: { params: Promise<{ codigo
               Formato<b style={{ display: 'block', fontSize: 12, color: 'var(--ink)', marginTop: 6, fontWeight: 700, letterSpacing: '.04em' }}>Mirada 360°</b>
             </span>
             <span style={{ fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--mute)', fontWeight: 600, textAlign: 'right' }}>
-              Tiempo<b style={{ display: 'block', fontSize: 12, color: 'var(--ink)', marginTop: 6, fontWeight: 700, letterSpacing: '.04em' }}>12–18 minutos</b>
+              Tiempo<b style={{ display: 'block', fontSize: 12, color: 'var(--ink)', marginTop: 6, fontWeight: 700, letterSpacing: '.04em' }}>5–10 minutos</b>
             </span>
           </div>
         </div>
@@ -52,10 +52,9 @@ export default async function LandingPage({ params }: { params: Promise<{ codigo
 
         <div style={{ display: 'flex', gap: 40, marginTop: 42, alignItems: 'flex-end' }}>
           <p style={{ fontSize: 17, lineHeight: 1.45, width: '55ch', flexShrink: 0, color: 'var(--ink)', margin: 0, fontWeight: 500 }}>
-            <b style={{ fontWeight: 800 }}>Acá está lo que tenemos pensado:</b><br />
-            Las cuatro dimensiones que enmarcan cualquier reto de cultura,<br />
-            las cuatro miradas que se cruzan para revelar dónde están las brechas,<br />
-            el paso a paso que vas a recorrer y el punto desde donde empezar.<br />
+            Este es un diagnóstico que recoge la sensación del equipo y su líder<br />
+            a través de cuatro dimensiones de cultura y cuatro perspectivas que se cruzan.<br />
+            Así identificamos dónde están las brechas y cómo abordarlas.<br />
             <b style={{ fontWeight: 800 }}>Un modelo de consultoría creativa basada en la emoción.</b>
           </p>
           <Link href="#empezar" style={{
