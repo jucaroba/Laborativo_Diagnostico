@@ -73,12 +73,12 @@ export default async function DiagnosticoPage({ params }: { params: Promise<{ id
     <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
 
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
         <div>
           <h1 className="page-header__title" style={{ fontSize: 32, letterSpacing: '0px' }}>{d.nombre_compania}</h1>
           <p className="page-header__subtitle">{d.contacto_nombre} / {d.contacto_cargo} / {d.contacto_email}</p>
         </div>
-        <div style={{ display: 'flex', gap: 8 }}>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
           <EditarDiagnostico diagnostico={d} />
           <EliminarDiagnostico id={d.id} />
           <AccionesDiagnostico diagnostico={d} />
@@ -86,7 +86,7 @@ export default async function DiagnosticoPage({ params }: { params: Promise<{ id
       </div>
 
       {/* Links */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16 }}>
+      <div className="admin-grid-cards admin-grid-cards--4">
         <EnviarDescripcionDialog
           diagnosticoId={d.id}
           linkUrl={`${BASE_URL}/d/${d.codigo_participacion}`}
@@ -141,7 +141,7 @@ export default async function DiagnosticoPage({ params }: { params: Promise<{ id
             {invitacionesEnviadas ?? 0} invitaciones · {cuestionariosDiligenciados} diligenciados
           </span>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 12 }}>
+        <div className="admin-grid-cards admin-grid-cards--4" style={{ gap: 12 }}>
           {[
             { label: 'Participantes', valor: d.numero_participantes ?? 0 },
             { label: 'Invitaciones enviadas', valor: invitacionesEnviadas ?? 0 },

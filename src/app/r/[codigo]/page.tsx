@@ -4,6 +4,7 @@ import { DIMENSIONES, ROL_INFO, Rol } from '@/types'
 import Image from 'next/image'
 import VistaPerspectivas from '@/components/resultados/VistaPerspectivas'
 import ArquetiposEquipo from '@/components/resultados/ArquetiposEquipo'
+import ResultadosMobile from '@/components/resultados/ResultadosMobile'
 import { evaluarBrechas, evaluarRelaciones } from '@/lib/arquetipos'
 
 export const revalidate = 0
@@ -124,7 +125,23 @@ export default async function ResultadosPage({ params }: { params: Promise<{ cod
   const arqRelaciones = evaluarRelaciones(arqCtx)
 
   return (
-    <div style={{ fontFamily: "'Red Hat Display', sans-serif", background: 'var(--bg)', minHeight: '100vh' }}>
+    <>
+    <div className="only-mobile">
+      <ResultadosMobile
+        nombreCompania={diag.nombre_compania}
+        estado={diag.estado}
+        totalParticipantes={totalParticipantes}
+        personasEquipo={personasEquipo}
+        personasLider={personasLider}
+        totalFormularios={totalFormularios}
+        resultados={resultados}
+        promediosPorRol={promediosPorRol}
+        promedioGlobalPorRol={promedioGlobalPorRol}
+        arqBrechas={arqBrechas}
+        arqRelaciones={arqRelaciones}
+      />
+    </div>
+    <div className="only-desktop" style={{ fontFamily: "'Red Hat Display', sans-serif", background: 'var(--bg)', minHeight: '100vh' }}>
 
       {/* Header — patrón slim laborativo / Resultados */}
       <header style={{ borderBottom: '1.5px solid var(--ink)', background: '#ffffff', padding: '14px 40px', display: 'flex', alignItems: 'center' }}>
@@ -363,6 +380,7 @@ export default async function ResultadosPage({ params }: { params: Promise<{ cod
       </div>
 
     </div>
+    </>
   )
 }
 

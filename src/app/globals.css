@@ -135,6 +135,120 @@ input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
 }
 
 /* =============================================
+   ADMIN — Layout responsive
+   ============================================= */
+.admin-header {
+  border-bottom: 1.5px solid var(--ink);
+  background: #ffffff;
+  padding: 14px 40px;
+  display: flex;
+  align-items: center;
+}
+.admin-shell { display: flex; min-height: calc(100vh - 70px); }
+.admin-content { max-width: 960px; margin: 0 auto; padding: 48px 40px; }
+
+.admin-sidebar {
+  width: 232px; flex-shrink: 0;
+  border-right: 1.5px solid var(--ink);
+  background: #ffffff;
+  padding: 24px 0;
+  display: flex; flex-direction: column;
+  gap: 8px;
+}
+.admin-sidebar__divider {
+  height: 1px; background: var(--ink); opacity: .15;
+  margin: 8px 16px 16px;
+}
+.admin-sidebar__link {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 24px;
+  text-decoration: none; color: var(--ink);
+  background: transparent;
+  font-weight: 600; font-size: 14px; letter-spacing: -.01em;
+  transition: font-weight .15s;
+}
+.admin-sidebar__link--active { font-weight: 900; }
+
+@media (max-width: 768px) {
+  .admin-header { padding: 10px 16px; }
+  .admin-header__logo { width: 110px !important; height: 28px !important; }
+  .admin-shell { flex-direction: column; min-height: calc(100vh - 56px); }
+  .admin-content { padding: 24px 16px; max-width: none; }
+
+  .admin-sidebar {
+    width: 100%;
+    flex-direction: row;
+    border-right: none;
+    border-bottom: 1.5px solid var(--ink);
+    padding: 0;
+    overflow-x: auto;
+    gap: 0;
+  }
+  .admin-sidebar__section { display: flex; }
+  .admin-sidebar__list { flex-direction: row !important; }
+  .admin-sidebar__divider {
+    width: 1px; height: auto; margin: 12px 0;
+    align-self: stretch;
+  }
+  .admin-sidebar__link { padding: 14px 16px; white-space: nowrap; font-size: 13px; }
+}
+
+/* Tablas admin: scroll horizontal en mobile y tipografía menor */
+@media (max-width: 768px) {
+  .admin-content table { min-width: 0 !important; }
+  .admin-content .table-cell,
+  .admin-content .table-cell-mute { font-size: 13px; }
+  .admin-content .table-header-cell { font-size: 11px !important; }
+
+  .page-header__title { font-size: 32px !important; letter-spacing: -1px !important; }
+  .page-header { margin-bottom: 24px; }
+}
+
+/* Wrapper opcional para tablas con scroll horizontal */
+.admin-table-scroll {
+  width: 100%;
+}
+@media (max-width: 768px) {
+  .admin-table-scroll {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .admin-table-scroll table { min-width: 640px; }
+}
+
+/* Grids responsive admin: 2/3/4 columnas → 1 columna en mobile */
+.admin-grid-cards { display: grid; gap: 16px; }
+.admin-grid-cards--4 { grid-template-columns: repeat(4, 1fr); }
+.admin-grid-cards--2 { grid-template-columns: repeat(2, 1fr); }
+@media (max-width: 768px) {
+  .admin-grid-cards--4 { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .admin-grid-cards--2 { grid-template-columns: 1fr; gap: 10px; }
+}
+
+/* Form rows: en mobile dejan de ser 180/1fr y apilan */
+@media (max-width: 768px) {
+  .form-row {
+    grid-template-columns: 1fr !important;
+    gap: 8px !important;
+  }
+  /* Inputs de NuevoDiagnostico: 2col → 1col */
+  .admin-form-grid {
+    grid-template-columns: 1fr !important;
+  }
+  /* Form de usuarios: 1fr 1fr auto → 1fr apilado */
+  .admin-usuarios-form {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+    padding: 16px !important;
+  }
+  /* Lista de usuarios: editable e item normal */
+  .admin-usuarios-item {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+}
+
+/* =============================================
    SISTEMA DE TIPOGRAFÍA ADMIN
    ============================================= */
 

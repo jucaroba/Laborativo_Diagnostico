@@ -53,27 +53,11 @@ export default function Sidebar() {
   const pathname = usePathname()
 
   return (
-    <aside style={{
-      width: SIDEBAR_WIDTH,
-      flexShrink: 0,
-      borderRight: '1.5px solid var(--ink)',
-      background: '#ffffff',
-      padding: '24px 0',
-      display: 'flex',
-      flexDirection: 'column',
-      gap: 8,
-    }}>
+    <aside className="admin-sidebar">
       {SECTIONS.map((section, sIdx) => (
-        <div key={sIdx}>
-          {sIdx > 0 && (
-            <div style={{
-              height: 1,
-              background: 'var(--ink)',
-              opacity: 0.15,
-              margin: '8px 16px 16px',
-            }} />
-          )}
-          <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <div key={sIdx} className="admin-sidebar__section">
+          {sIdx > 0 && <div className="admin-sidebar__divider" />}
+          <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 2 }} className="admin-sidebar__list">
             {section.items.map(item => {
               const Icon = item.icon
               const active = item.match ? item.match(pathname ?? '') : pathname === item.href
@@ -81,19 +65,7 @@ export default function Sidebar() {
                 <li key={item.href}>
                   <Link
                     href={item.href}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 12,
-                      padding: '10px 24px',
-                      textDecoration: 'none',
-                      color: 'var(--ink)',
-                      background: 'transparent',
-                      fontWeight: active ? 900 : 600,
-                      fontSize: 14,
-                      letterSpacing: '-.01em',
-                      transition: 'font-weight .15s',
-                    }}
+                    className={`admin-sidebar__link${active ? ' admin-sidebar__link--active' : ''}`}
                   >
                     <Icon size={16} strokeWidth={active ? 3 : 2} />
                     {item.label}

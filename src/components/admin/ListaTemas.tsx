@@ -88,6 +88,7 @@ export default function ListaTemas({ temas }: Props) {
       {!items.length ? (
         <p className="text-mute" style={{ fontSize: 14 }}>Aún no hay temas. Crea el primero para empezar.</p>
       ) : (
+        <div className="admin-table-scroll">
         <Table>
           <TableHeader>
             <TableRow style={{ background: '#0A0A0A', borderBottom: 'none' }}>
@@ -122,6 +123,7 @@ export default function ListaTemas({ temas }: Props) {
             ))}
           </TableBody>
         </Table>
+        </div>
       )}
 
       <Dialog open={!!confirmarEliminar} onOpenChange={open => { if (!open) setConfirmarEliminar(null) }}>

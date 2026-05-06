@@ -21,7 +21,7 @@ export default async function AdminPage() {
 
   return (
     <div>
-      <div className="page-header" style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
+      <div className="page-header admin-list-header" style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
         <div>
           <span className="page-header__eyebrow">Panel</span>
           <div className="page-header__rule" />
@@ -33,6 +33,7 @@ export default async function AdminPage() {
       {!diagnosticos?.length ? (
         <p className="text-mute" style={{ fontSize: 14 }}>Aún no hay diagnósticos.</p>
       ) : (
+        <div className="admin-table-scroll">
         <Table>
           <TableHeader>
             <TableRow style={{ background: '#0A0A0A', borderBottom: 'none' }}>
@@ -66,6 +67,7 @@ export default async function AdminPage() {
             ))}
           </TableBody>
         </Table>
+        </div>
       )}
     </div>
   )

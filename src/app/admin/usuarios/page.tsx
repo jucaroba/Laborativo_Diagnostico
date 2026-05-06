@@ -129,7 +129,7 @@ export default function UsuariosPage() {
       </div>
 
       {/* Formulario crear */}
-      <form onSubmit={crear} style={{
+      <form onSubmit={crear} className="admin-usuarios-form" style={{
         border: '1.5px solid var(--ink)',
         padding: 20,
         display: 'grid',
@@ -182,7 +182,7 @@ export default function UsuariosPage() {
             {usuarios.map((u, i) => {
               const editando = editId === u.id
               return (
-                <li key={u.id} style={{
+                <li key={u.id} className="admin-usuarios-item" style={{
                   borderTop: i === 0 ? 'none' : '1px solid var(--line-soft)',
                   padding: '14px 16px',
                   display: 'grid',

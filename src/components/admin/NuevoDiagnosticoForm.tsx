@@ -186,7 +186,7 @@ export default function NuevoDiagnosticoForm() {
       {/* PASO 1: Datos + selección de tema */}
       {paso === 'datos' && (
         <div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 32, alignItems: 'center' }}>
+          <div className="admin-form-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 32, alignItems: 'center' }}>
             <Input style={{ height: 36 }} value={datos.nombre_compania} onChange={e => setDatos(d => ({ ...d, nombre_compania: e.target.value }))} placeholder="Nombre de la empresa" />
             <Input style={{ height: 36 }} value={datos.contacto_nombre} onChange={e => setDatos(d => ({ ...d, contacto_nombre: e.target.value }))} placeholder="Nombre del contacto" />
             <Input style={{ height: 36 }} value={datos.contacto_cargo} onChange={e => setDatos(d => ({ ...d, contacto_cargo: e.target.value }))} placeholder="Cargo" />
@@ -206,7 +206,7 @@ export default function NuevoDiagnosticoForm() {
                 Aún no hay temas. Crea uno en <strong>Preguntas base</strong>.
               </p>
             ) : (
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              <div className="admin-form-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                 {temas.map(t => {
                   const seleccionado = temaSeleccionadoId === t.id
                   return (
