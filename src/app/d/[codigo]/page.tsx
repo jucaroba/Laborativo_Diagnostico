@@ -51,14 +51,12 @@ export default async function LandingPage({ params }: { params: Promise<{ codigo
 
         <span style={{ background: 'var(--ink)', color: 'var(--bg)', padding: '6px 12px', fontSize: 11, letterSpacing: '.08em', textTransform: 'uppercase', fontWeight: 700, display: 'inline-block' }}>{diag.nombre_compania}</span>
         <h1 style={{ fontWeight: 900, fontSize: 80, lineHeight: 1, letterSpacing: '-.020em', maxWidth: '30ch', paddingBottom: '.08em', marginTop: 24 }}>
-          exploremos las visiones,<br />entendamos las oportunidades,<br />cambiemos los comportamientos.
+          exploremos las visiones,<br />entendamos las oportunidades,<br />fortalezcamos la cultura.
         </h1>
 
         <div style={{ display: 'flex', gap: 40, marginTop: 42, alignItems: 'flex-end' }}>
-          <p style={{ fontSize: 17, lineHeight: 1.45, width: '55ch', flexShrink: 0, color: 'var(--ink)', margin: 0, fontWeight: 500 }}>
-            Este es un diagnóstico que recoge la sensación del equipo y su líder<br />
-            a través de cuatro dimensiones de cultura y cuatro perspectivas que se cruzan.<br />
-            Así identificamos dónde están las brechas y cómo abordarlas.<br />
+          <p style={{ fontSize: 17, lineHeight: 1.45, width: '48ch', flexShrink: 0, color: 'var(--ink)', margin: 0, fontWeight: 500 }}>
+            <b style={{ fontWeight: 900 }}>4C</b> es un modelo de diagnóstico que integra la percepción del equipo y su líder a través de cuatro dimensiones de cultura, haciendo visibles las brechas y habilitando acciones para transformarla.<br />
             <b style={{ fontWeight: 800 }}>Un modelo de consultoría creativa basada en la emoción.</b>
           </p>
           <Link href="#empezar" style={{
@@ -91,7 +89,7 @@ export default async function LandingPage({ params }: { params: Promise<{ codigo
             <span className="eyebrow">Contexto de diagnóstico.</span>
             <div className="rule" />
             <h2 style={{ fontWeight: 900, fontSize: 'clamp(36px,4.2vw,56px)', lineHeight: .95, letterSpacing: '-.035em', maxWidth: '26ch', marginTop: 24 }}>
-              cuatro dimensiones para<br />abordar cualquier reto.
+              cuatro dimensiones de cultura<br />para abordar cualquier reto.
             </h2>
           </div>
           <span className="chip">4 ejes · {totalPreguntas ?? 0} preguntas</span>

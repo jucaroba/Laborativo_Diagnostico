@@ -56,11 +56,11 @@ export default function LandingMobile({
         </div>
 
         <h1 style={{ fontWeight: 900, fontSize: 'clamp(20px, 5.5vw, 30px)', lineHeight: 1.04, letterSpacing: '-.02em', margin: '20px 0 0', paddingBottom: '.05em' }}>
-          exploremos las visiones,<br />entendamos las oportunidades,<br />cambiemos los comportamientos.
+          exploremos las visiones,<br />entendamos las oportunidades,<br />fortalezcamos la cultura.
         </h1>
 
         <p style={{ fontSize: 14.5, lineHeight: 1.5, color: 'var(--ink)', margin: '24px 0 0', fontWeight: 500 }}>
-          Este es un diagnóstico que recoge la sensación del equipo y su líder a través de cuatro dimensiones de cultura y cuatro perspectivas que se cruzan. Así identificamos dónde están las brechas y cómo abordarlas.<br /><b style={{ fontWeight: 800 }}>Un modelo de consultoría creativa basada en la emoción.</b>
+          <b style={{ fontWeight: 900 }}>4C</b> es un modelo de diagnóstico que integra la percepción del equipo y su líder a través de cuatro dimensiones de cultura, haciendo visibles las brechas y habilitando acciones para transformarla.<br /><b style={{ fontWeight: 800 }}>Un modelo de consultoría creativa basada en la emoción.</b>
         </p>
 
         <Link href="#empezar" style={{
@@ -89,7 +89,7 @@ export default function LandingMobile({
         <span className="eyebrow">Contexto de diagnóstico.</span>
         <div className="rule" />
         <h2 style={{ fontWeight: 900, fontSize: 'clamp(28px, 8vw, 40px)', lineHeight: .98, letterSpacing: '-.03em', margin: '16px 0 16px' }}>
-          cuatro dimensiones para abordar cualquier reto.
+          cuatro dimensiones de cultura para abordar cualquier reto.
         </h2>
         <span className="chip" style={{ marginBottom: 8 }}>4 ejes · {totalPreguntas ?? 0} preguntas</span>
 
