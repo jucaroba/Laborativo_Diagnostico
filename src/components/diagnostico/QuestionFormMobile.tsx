@@ -64,8 +64,9 @@ export default function QuestionFormMobile({
           </span>
         </div>
 
-        {/* Pregunta */}
-        <h2 style={{ fontWeight: 900, fontSize: 'clamp(22px, 6vw, 28px)', lineHeight: 1.1, letterSpacing: -.5, margin: '0 0 44px' }}>
+        {/* Pregunta — minHeight reservado para la pregunta más larga para
+            que la escala 1–10 no se mueva entre preguntas */}
+        <h2 style={{ fontWeight: 900, fontSize: 'clamp(22px, 6vw, 28px)', lineHeight: 1.1, letterSpacing: -.5, margin: '0 0 44px', minHeight: '6.6em' }}>
           {pregunta.texto}
         </h2>
 
