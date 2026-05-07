@@ -11,6 +11,12 @@ export const revalidate = 0
 const ESTADO_LABEL: Record<string, string> = {
   borrador: 'Borrador', activo: 'Activo', completado: 'Completado',
 }
+
+const MESES = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic']
+const fechaCorta = (iso: string) => {
+  const d = new Date(iso)
+  return `${d.getDate()} ${MESES[d.getMonth()]} ${d.getFullYear()}`
+}
 const ESTADO_VARIANT: Record<string, 'default' | 'secondary' | 'outline'> = {
   borrador: 'outline', activo: 'default', completado: 'secondary',
 }
@@ -52,7 +58,7 @@ export default async function AdminPage() {
                 </TableCell>
                 <TableCell style={{ color: 'var(--ink)', fontWeight: 500, fontSize: 14 }}>{d.contacto_nombre}</TableCell>
                 <TableCell style={{ color: 'var(--ink)', fontWeight: 500, fontSize: 14 }}>
-                  {new Date(d.created_at).toLocaleDateString('es-CO', { day: 'numeric', month: 'short', year: 'numeric' })}
+                  {fechaCorta(d.created_at)}
                 </TableCell>
                 <TableCell>
                   <Badge variant={ESTADO_VARIANT[d.estado]}>{ESTADO_LABEL[d.estado]}</Badge>
