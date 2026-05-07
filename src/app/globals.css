@@ -64,6 +64,10 @@ html, body {
   text-rendering: optimizeLegibility;
 }
 
+@media (max-width: 768px) {
+  html, body { overflow-x: hidden; }
+}
+
 h1, h2, h3, h4, h5 {
   font-family: 'Red Hat Display', sans-serif;
   margin: 0;
