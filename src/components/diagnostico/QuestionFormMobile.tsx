@@ -33,7 +33,7 @@ export default function QuestionFormMobile({
   const esUltima = idx === total
 
   return (
-    <div style={{ fontFamily: "'Red Hat Display', sans-serif", minHeight: '100vh', background: 'var(--bg)' }}>
+    <div style={{ fontFamily: "'Red Hat Display', sans-serif", minHeight: '100vh', background: 'var(--bg)', overflowX: 'hidden' }}>
 
       {/* Header sticky */}
       <div style={{
