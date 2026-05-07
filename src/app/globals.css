@@ -134,8 +134,10 @@ input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
 .only-desktop { display: block; }
 .only-mobile  { display: none; }
 @media (max-width: 768px) {
-  .only-desktop { display: none; }
-  .only-mobile  { display: block; }
+  /* !important para vencer cualquier display inline en el div desktop wrapper
+     (p. ej. display: flex en IntakeForm o gracias) */
+  .only-desktop { display: none !important; }
+  .only-mobile  { display: block !important; }
 }
 
 /* =============================================
