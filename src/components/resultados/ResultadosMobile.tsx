@@ -35,6 +35,7 @@ type Props = {
   arqBrechas: Arquetipo
   arqRelaciones: Arquetipo
   arqCtx: ArquetipoCtx
+  diagnosticoId: string
 }
 
 const deltaBg = (d: number) => d >= 5 ? '#F2C2C2' : d >= 3 ? '#FCE99A' : '#C8E6C9'
@@ -53,7 +54,7 @@ function SectionBar({ title, subtitle }: { title: string; subtitle?: string }) {
 
 export default function ResultadosMobile({
   nombreCompania, estado, totalParticipantes, personasEquipo, personasLider, totalFormularios,
-  resultados, promediosPorRol, promedioGlobalPorRol, arqBrechas, arqRelaciones, arqCtx,
+  resultados, promediosPorRol, promedioGlobalPorRol, arqBrechas, arqRelaciones, arqCtx, diagnosticoId,
 }: Props) {
   return (
     <div style={{ fontFamily: "'Red Hat Display', sans-serif", background: 'var(--bg)', minHeight: '100vh' }}>
@@ -244,7 +245,7 @@ export default function ResultadosMobile({
 
       {/* Arquetipos */}
       <SectionBar title="Arquetipos del equipo" subtitle="Patrones detectados" />
-      <ArquetiposEquipoMobile brechas={arqBrechas} relaciones={arqRelaciones} ctx={arqCtx} />
+      <ArquetiposEquipoMobile brechas={arqBrechas} relaciones={arqRelaciones} ctx={arqCtx} diagnosticoId={diagnosticoId} />
 
       {/* Footer */}
       <div style={{

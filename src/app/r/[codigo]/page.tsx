@@ -121,8 +121,17 @@ export default async function ResultadosPage({ params }: { params: Promise<{ cod
     deltaDim[r.id] = r.delta
   }
   const arqCtx = { promedioDim, deltaDim, promediosPorRol, promedioGlobalPorRol }
-  const arqBrechas = evaluarBrechas(arqCtx)
-  const arqRelaciones = evaluarRelaciones(arqCtx)
+  let arqBrechas = evaluarBrechas(arqCtx)
+  let arqRelaciones = evaluarRelaciones(arqCtx)
+
+  // Overrides persistidos: si el equipo regeneró la lectura desde el dashboard,
+  // se usa esa en vez de la auto-generada. Mantenemos tag y patrón (data) y
+  // sustituimos solo el copy.
+  type Override = { titulo?: string; resumen?: string; cuerpo?: string; cita?: string; accion?: string }
+  const ovBrechas    = (diag as { arquetipo_brechas_override?: Override }).arquetipo_brechas_override
+  const ovRelaciones = (diag as { arquetipo_relaciones_override?: Override }).arquetipo_relaciones_override
+  if (ovBrechas)    arqBrechas    = { ...arqBrechas,    ...ovBrechas }
+  if (ovRelaciones) arqRelaciones = { ...arqRelaciones, ...ovRelaciones }
 
   return (
     <>
@@ -140,6 +149,7 @@ export default async function ResultadosPage({ params }: { params: Promise<{ cod
         arqBrechas={arqBrechas}
         arqRelaciones={arqRelaciones}
         arqCtx={arqCtx}
+        diagnosticoId={diag.id}
       />
     </div>
     <div className="only-desktop" style={{ fontFamily: "'Red Hat Display', sans-serif", background: 'var(--bg)', minHeight: '100vh' }}>
@@ -370,7 +380,7 @@ export default async function ResultadosPage({ params }: { params: Promise<{ cod
       {/* ============================================ */}
       <SectionBar title="Arquetipos del equipo" subtitle="Patrones detectados en los datos" />
 
-      <ArquetiposEquipo brechas={arqBrechas} relaciones={arqRelaciones} ctx={arqCtx} />
+      <ArquetiposEquipo brechas={arqBrechas} relaciones={arqRelaciones} ctx={arqCtx} diagnosticoId={diag.id} />
 
       </div> {/* /Container central */}
 

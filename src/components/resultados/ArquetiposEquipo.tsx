@@ -10,6 +10,7 @@ type Props = {
   brechas: Arquetipo
   relaciones: Arquetipo
   ctx: ArquetipoCtx
+  diagnosticoId: string
 }
 
 type Card = { tipo: Tipo; titulo: string; arquetipo: Arquetipo; loading: boolean }
@@ -29,7 +30,7 @@ function Tagged({ tag, children }: { tag: string; children: React.ReactNode }) {
   )
 }
 
-export default function ArquetiposEquipo({ brechas, relaciones, ctx }: Props) {
+export default function ArquetiposEquipo({ brechas, relaciones, ctx, diagnosticoId }: Props) {
   const [brechasState, setBrechasState] = useState<Arquetipo>(brechas)
   const [relacionesState, setRelacionesState] = useState<Arquetipo>(relaciones)
   const [loadingBrechas, setLoadingBrechas] = useState(false)
@@ -47,6 +48,7 @@ export default function ArquetiposEquipo({ brechas, relaciones, ctx }: Props) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           tipo,
+          diagnosticoId,
           promediosPorRol: ctx.promediosPorRol,
           promedioGlobalPorRol: ctx.promedioGlobalPorRol,
           promedioDim: ctx.promedioDim,
