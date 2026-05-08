@@ -56,12 +56,12 @@ export default async function ResultadosPage({ params }: { params: Promise<{ cod
   const personasEquipo = conteoPorRol.A
   const personasLider = conteoPorRol.D
 
-  // Cada persona llena 2 formularios (2 perspectivas). Contamos combos únicos (participante, perspectiva).
+  // Un formulario = una persona que respondió. Cada participante cubre dos
+  // perspectivas (equipo: A+C, líder: D+B), pero conceptualmente es un solo
+  // diligenciamiento por persona.
   const formulariosSet = new Set<string>()
   for (const resp of respuestas ?? []) {
-    const pregunta = preguntas?.find(p => p.id === resp.pregunta_id)
-    if (!pregunta) continue
-    formulariosSet.add(`${resp.participante_id}|${pregunta.rol}`)
+    formulariosSet.add(resp.participante_id)
   }
   const totalFormularios = formulariosSet.size
 
