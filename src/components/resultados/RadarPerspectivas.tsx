@@ -110,7 +110,7 @@ export default function RadarPerspectivas({ promediosPorRol, promedioGlobalPorRo
                 whiteSpace: 'nowrap',
               }}>
                 <span style={{
-                  borderBottom: activo ? '4px solid var(--ink)' : 'none',
+                  borderBottom: activo ? `4px solid ${ROL_NEON[rol]}` : 'none',
                   paddingBottom: 4,
                 }}>
                   {ROL_INFO[rol].label}

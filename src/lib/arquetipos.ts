@@ -26,10 +26,10 @@ const dimNombre = (id: number) => DIMENSIONES.find(d => d.id === id)?.nombre ?? 
 // ─────────────────────────────────────────────────────────
 
 const ROL_LABEL_CORTO: Record<Rol, string> = {
-  A: 'Equipo',
+  A: 'Equipo auto',
   B: 'Líder → Eq.',
   C: 'Eq. → Líder',
-  D: 'Líder',
+  D: 'Líder auto',
 }
 
 const ORDEN_ROL: Rol[] = ['A', 'B', 'C', 'D']

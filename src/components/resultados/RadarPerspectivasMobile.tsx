@@ -80,7 +80,7 @@ export default function RadarPerspectivasMobile({ promediosPorRol, promedioGloba
               aria-pressed={activo}
             >
               <span style={{ fontSize: 11, fontWeight: 900, color: 'var(--ink)', lineHeight: 1.15, letterSpacing: '-.01em' }}>
-                <span style={{ borderBottom: activo ? '3px solid var(--ink)' : 'none', paddingBottom: 2 }}>
+                <span style={{ borderBottom: activo ? `3px solid ${ROL_NEON[rol]}` : 'none', paddingBottom: 2 }}>
                   {ROL_INFO[rol].label}
                 </span>
               </span>
