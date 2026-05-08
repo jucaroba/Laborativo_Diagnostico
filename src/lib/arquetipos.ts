@@ -135,7 +135,7 @@ export function evaluarBrechas(ctx: ArquetipoCtx): Arquetipo {
 
   return {
     ...texto,
-    tag: `${ROL_LABEL_CORTO[r1]} ↔ ${ROL_LABEL_CORTO[r2]}`,
+    tag: `${ROL_LABEL_CORTO[r1]} + ${ROL_LABEL_CORTO[r2]}`,
     patron: `${ROL_LABEL_CORTO[r1]} = ${v1.toFixed(1)} · ${ROL_LABEL_CORTO[r2]} = ${v2.toFixed(1)} · Δ = ${mejor.diff.toFixed(1)}`,
   }
 }
