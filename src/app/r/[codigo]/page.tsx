@@ -139,6 +139,7 @@ export default async function ResultadosPage({ params }: { params: Promise<{ cod
         promedioGlobalPorRol={promedioGlobalPorRol}
         arqBrechas={arqBrechas}
         arqRelaciones={arqRelaciones}
+        arqCtx={arqCtx}
       />
     </div>
     <div className="only-desktop" style={{ fontFamily: "'Red Hat Display', sans-serif", background: 'var(--bg)', minHeight: '100vh' }}>
@@ -369,7 +370,7 @@ export default async function ResultadosPage({ params }: { params: Promise<{ cod
       {/* ============================================ */}
       <SectionBar title="Arquetipos del equipo" subtitle="Patrones detectados en los datos" />
 
-      <ArquetiposEquipo brechas={arqBrechas} relaciones={arqRelaciones} />
+      <ArquetiposEquipo brechas={arqBrechas} relaciones={arqRelaciones} ctx={arqCtx} />
 
       </div> {/* /Container central */}
 

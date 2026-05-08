@@ -1,14 +1,61 @@
-import { Arquetipo } from '@/lib/arquetipos'
+'use client'
+import { useState } from 'react'
+import { Arquetipo, ArquetipoCtx } from '@/lib/arquetipos'
+import { RefreshCw } from 'lucide-react'
+import { ClaudeIcon } from '@/components/icons/ClaudeIcon'
+
+type Tipo = 'brechas' | 'relaciones'
 
 type Props = {
   brechas: Arquetipo
   relaciones: Arquetipo
+  ctx: ArquetipoCtx
 }
 
-export default function ArquetiposEquipo({ brechas, relaciones }: Props) {
-  const cards: Array<{ titulo: string; arquetipo: Arquetipo }> = [
-    { titulo: 'Brechas entre perspectivas', arquetipo: brechas },
-    { titulo: 'Relaciones entre dimensiones', arquetipo: relaciones },
+export default function ArquetiposEquipo({ brechas, relaciones, ctx }: Props) {
+  const [brechasState, setBrechasState] = useState<Arquetipo>(brechas)
+  const [relacionesState, setRelacionesState] = useState<Arquetipo>(relaciones)
+  const [loadingBrechas, setLoadingBrechas] = useState(false)
+  const [loadingRelaciones, setLoadingRelaciones] = useState(false)
+
+  async function regenerar(tipo: Tipo) {
+    const setLoading = tipo === 'brechas' ? setLoadingBrechas : setLoadingRelaciones
+    const setState   = tipo === 'brechas' ? setBrechasState   : setRelacionesState
+    const actual     = tipo === 'brechas' ? brechasState      : relacionesState
+
+    setLoading(true)
+    try {
+      const res = await fetch('/api/regenerar-arquetipo', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          tipo,
+          promediosPorRol: ctx.promediosPorRol,
+          promedioGlobalPorRol: ctx.promedioGlobalPorRol,
+          promedioDim: ctx.promedioDim,
+          deltaDim: ctx.deltaDim,
+          actual: {
+            tag: actual.tag, titulo: actual.titulo, resumen: actual.resumen,
+            cuerpo: actual.cuerpo, cita: actual.cita, accion: actual.accion,
+          },
+        }),
+      })
+      if (!res.ok) {
+        const j = await res.json().catch(() => ({}))
+        throw new Error(j.error || 'No se pudo regenerar')
+      }
+      const fields = await res.json()
+      setState(prev => ({ ...prev, ...fields }))
+    } catch (e) {
+      alert(e instanceof Error ? e.message : 'Error desconocido')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const cards: Array<{ tipo: Tipo; titulo: string; arquetipo: Arquetipo; loading: boolean }> = [
+    { tipo: 'brechas',    titulo: 'Brechas entre perspectivas',   arquetipo: brechasState,    loading: loadingBrechas },
+    { tipo: 'relaciones', titulo: 'Relaciones entre dimensiones', arquetipo: relacionesState, loading: loadingRelaciones },
   ]
 
   return (
@@ -32,12 +79,8 @@ export default function ArquetiposEquipo({ brechas, relaciones }: Props) {
               <span className="eyebrow">{a.tag} / {card.titulo}</span>
               <div className="rule" />
               <h3 style={{
-                fontSize: 32,
-                fontWeight: 900,
-                letterSpacing: '-.02em',
-                lineHeight: 1.05,
-                margin: '16px 0 0',
-                color: 'var(--ink)',
+                fontSize: 32, fontWeight: 900, letterSpacing: '-.02em',
+                lineHeight: 1.05, margin: '16px 0 0', color: 'var(--ink)',
               }}>
                 {a.titulo}
               </h3>
@@ -47,21 +90,38 @@ export default function ArquetiposEquipo({ brechas, relaciones }: Props) {
               <p style={{ fontSize: 15, fontWeight: 800, lineHeight: 1.4, color: 'var(--ink)', margin: 0, letterSpacing: '-.01em' }}>
                 {a.resumen}
               </p>
-
               <p style={{ fontSize: 14, lineHeight: 1.6, color: 'var(--ink-2)', margin: 0, fontWeight: 500 }}>
                 {a.cuerpo}
               </p>
+
+              <button
+                type="button"
+                onClick={() => regenerar(card.tipo)}
+                disabled={card.loading}
+                style={{
+                  alignSelf: 'flex-start',
+                  display: 'inline-flex', alignItems: 'center', gap: 8,
+                  padding: '8px 12px',
+                  border: '1.5px solid var(--ink)',
+                  background: card.loading ? 'var(--bg-2)' : 'transparent',
+                  color: 'var(--ink)',
+                  fontFamily: 'inherit', fontSize: 11,
+                  fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase',
+                  cursor: card.loading ? 'not-allowed' : 'pointer',
+                  transition: 'background .15s ease',
+                }}
+              >
+                {card.loading
+                  ? <><RefreshCw size={13} strokeWidth={2.5} className="spinning" /> Regenerando…</>
+                  : <><ClaudeIcon size={13} /> Otra lectura</>}
+              </button>
             </div>
 
             <div style={{
               borderTop: '1.5px solid var(--ink)',
               padding: '16px 32px',
-              fontSize: 10,
-              letterSpacing: '.08em',
-              textTransform: 'uppercase',
-              color: 'var(--ink)',
-              fontWeight: 700,
-              marginTop: 'auto',
+              fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase',
+              color: 'var(--ink)', fontWeight: 700, marginTop: 'auto',
             }}>
               <span style={{ background: 'var(--ink)', color: 'var(--bg)', padding: '2px 6px', marginRight: 8 }}>Patrón</span>
               {a.patron}
@@ -69,11 +129,8 @@ export default function ArquetiposEquipo({ brechas, relaciones }: Props) {
 
             <footer style={{
               padding: '0 32px 16px',
-              fontSize: 10,
-              letterSpacing: '.08em',
-              textTransform: 'uppercase',
-              color: 'var(--ink)',
-              fontWeight: 700,
+              fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase',
+              color: 'var(--ink)', fontWeight: 700,
             }}>
               <span style={{ background: 'var(--ink)', color: 'var(--bg)', padding: '2px 6px', marginRight: 8 }}>Experiencia</span>
               {a.accion}

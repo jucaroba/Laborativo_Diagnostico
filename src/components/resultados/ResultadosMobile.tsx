@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import { ROL_INFO, Rol } from '@/types'
-import { Arquetipo } from '@/lib/arquetipos'
+import { Arquetipo, ArquetipoCtx } from '@/lib/arquetipos'
 import VistaPerspectivasMobile from './VistaPerspectivasMobile'
 import ArquetiposEquipoMobile from './ArquetiposEquipoMobile'
 
@@ -34,6 +34,7 @@ type Props = {
   promedioGlobalPorRol: Record<Rol, number | null>
   arqBrechas: Arquetipo
   arqRelaciones: Arquetipo
+  arqCtx: ArquetipoCtx
 }
 
 const deltaBg = (d: number) => d >= 5 ? '#F2C2C2' : d >= 3 ? '#FCE99A' : '#C8E6C9'
@@ -52,7 +53,7 @@ function SectionBar({ title, subtitle }: { title: string; subtitle?: string }) {
 
 export default function ResultadosMobile({
   nombreCompania, estado, totalParticipantes, personasEquipo, personasLider, totalFormularios,
-  resultados, promediosPorRol, promedioGlobalPorRol, arqBrechas, arqRelaciones,
+  resultados, promediosPorRol, promedioGlobalPorRol, arqBrechas, arqRelaciones, arqCtx,
 }: Props) {
   return (
     <div style={{ fontFamily: "'Red Hat Display', sans-serif", background: 'var(--bg)', minHeight: '100vh' }}>
@@ -243,7 +244,7 @@ export default function ResultadosMobile({
 
       {/* Arquetipos */}
       <SectionBar title="Arquetipos del equipo" subtitle="Patrones detectados" />
-      <ArquetiposEquipoMobile brechas={arqBrechas} relaciones={arqRelaciones} />
+      <ArquetiposEquipoMobile brechas={arqBrechas} relaciones={arqRelaciones} ctx={arqCtx} />
 
       {/* Footer */}
       <div style={{

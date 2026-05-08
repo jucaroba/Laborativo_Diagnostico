@@ -304,6 +304,10 @@ input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
 .dim-card { transition: background .2s ease; }
 .nivel-card { transition: background .2s ease; }
 
+/* Spinner para botones de regeneración */
+@keyframes spin { to { transform: rotate(360deg); } }
+.spinning { animation: spin 1s linear infinite; }
+
 /* Acciones de fila — visibles solo en hover */
 tr:hover .row-actions { opacity: 1 !important; }
 .row-actions { transition: opacity .15s ease; }
