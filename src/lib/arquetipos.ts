@@ -27,8 +27,8 @@ const dimNombre = (id: number) => DIMENSIONES.find(d => d.id === id)?.nombre ?? 
 
 const ROL_LABEL_CORTO: Record<Rol, string> = {
   A: 'Equipo auto',
-  B: 'Líder → Eq.',
-  C: 'Eq. → Líder',
+  B: 'Líder → Equipo',
+  C: 'Equipo → Líder',
   D: 'Líder auto',
 }
 
