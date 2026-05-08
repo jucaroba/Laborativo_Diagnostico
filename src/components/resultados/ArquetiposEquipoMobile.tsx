@@ -12,6 +12,21 @@ type Props = {
   ctx: ArquetipoCtx
 }
 
+type Card = { tipo: Tipo; titulo: string; arquetipo: Arquetipo; loading: boolean }
+
+function Tagged({ tag, children }: { tag: string; children: React.ReactNode }) {
+  return (
+    <div style={{
+      display: 'flex', alignItems: 'flex-start', gap: 8,
+      fontSize: 9.5, letterSpacing: '.08em', textTransform: 'uppercase',
+      color: 'var(--ink)', fontWeight: 700, lineHeight: 1.5,
+    }}>
+      <span style={{ background: 'var(--ink)', color: 'var(--bg)', padding: '2px 6px', flexShrink: 0 }}>{tag}</span>
+      <span style={{ flex: 1 }}>{children}</span>
+    </div>
+  )
+}
+
 export default function ArquetiposEquipoMobile({ brechas, relaciones, ctx }: Props) {
   const [brechasState, setBrechasState] = useState<Arquetipo>(brechas)
   const [relacionesState, setRelacionesState] = useState<Arquetipo>(relaciones)
@@ -53,7 +68,7 @@ export default function ArquetiposEquipoMobile({ brechas, relaciones, ctx }: Pro
     }
   }
 
-  const cards: Array<{ tipo: Tipo; titulo: string; arquetipo: Arquetipo; loading: boolean }> = [
+  const cards: Card[] = [
     { tipo: 'brechas',    titulo: 'Brechas entre perspectivas',   arquetipo: brechasState,    loading: loadingBrechas },
     { tipo: 'relaciones', titulo: 'Relaciones entre dimensiones', arquetipo: relacionesState, loading: loadingRelaciones },
   ]
@@ -96,6 +111,7 @@ export default function ArquetiposEquipoMobile({ brechas, relaciones, ctx }: Pro
                 type="button"
                 onClick={() => regenerar(card.tipo)}
                 disabled={card.loading}
+                aria-busy={card.loading}
                 style={{
                   alignSelf: 'flex-start',
                   display: 'inline-flex', alignItems: 'center', gap: 7,
@@ -116,22 +132,12 @@ export default function ArquetiposEquipoMobile({ brechas, relaciones, ctx }: Pro
 
             <div style={{
               borderTop: '1.5px solid var(--ink)',
-              padding: '12px 20px',
-              fontSize: 9.5, letterSpacing: '.08em', textTransform: 'uppercase',
-              color: 'var(--ink)', fontWeight: 700,
+              padding: '12px 20px 14px',
+              display: 'flex', flexDirection: 'column', gap: 8,
             }}>
-              <span style={{ background: 'var(--ink)', color: 'var(--bg)', padding: '2px 6px', marginRight: 8 }}>Patrón</span>
-              {a.patron}
+              <Tagged tag="Patrón">{a.patron}</Tagged>
+              <Tagged tag="Experiencia">{a.accion}</Tagged>
             </div>
-
-            <footer style={{
-              padding: '0 20px 14px',
-              fontSize: 9.5, letterSpacing: '.08em', textTransform: 'uppercase',
-              color: 'var(--ink)', fontWeight: 700,
-            }}>
-              <span style={{ background: 'var(--ink)', color: 'var(--bg)', padding: '2px 6px', marginRight: 8 }}>Experiencia</span>
-              {a.accion}
-            </footer>
           </article>
         )
       })}

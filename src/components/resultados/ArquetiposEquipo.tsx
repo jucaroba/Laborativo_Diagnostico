@@ -12,6 +12,23 @@ type Props = {
   ctx: ArquetipoCtx
 }
 
+type Card = { tipo: Tipo; titulo: string; arquetipo: Arquetipo; loading: boolean }
+
+function Tagged({ tag, children }: { tag: string; children: React.ReactNode }) {
+  // Tag fijo en la izquierda; texto envuelve en su propia columna
+  // (hanging indent: las líneas siguientes no caen bajo el tag).
+  return (
+    <div style={{
+      display: 'flex', alignItems: 'flex-start', gap: 8,
+      fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase',
+      color: 'var(--ink)', fontWeight: 700, lineHeight: 1.5,
+    }}>
+      <span style={{ background: 'var(--ink)', color: 'var(--bg)', padding: '2px 6px', flexShrink: 0 }}>{tag}</span>
+      <span style={{ flex: 1 }}>{children}</span>
+    </div>
+  )
+}
+
 export default function ArquetiposEquipo({ brechas, relaciones, ctx }: Props) {
   const [brechasState, setBrechasState] = useState<Arquetipo>(brechas)
   const [relacionesState, setRelacionesState] = useState<Arquetipo>(relaciones)
@@ -53,15 +70,19 @@ export default function ArquetiposEquipo({ brechas, relaciones, ctx }: Props) {
     }
   }
 
-  const cards: Array<{ tipo: Tipo; titulo: string; arquetipo: Arquetipo; loading: boolean }> = [
+  const cards: Card[] = [
     { tipo: 'brechas',    titulo: 'Brechas entre perspectivas',   arquetipo: brechasState,    loading: loadingBrechas },
     { tipo: 'relaciones', titulo: 'Relaciones entre dimensiones', arquetipo: relacionesState, loading: loadingRelaciones },
   ]
 
+  // Layout: 2 columnas × 2 filas (top + bottom). Render aplanado para
+  // que CSS Grid alinee los bottoms en una misma fila y queden con
+  // exactamente la misma altura (toma la del más alto).
   return (
     <div style={{
       display: 'grid',
       gridTemplateColumns: 'repeat(2, 1fr)',
+      gridTemplateRows: '1fr auto',
       borderBottom: '1.5px solid var(--ink)',
       borderLeft: '1.5px solid var(--ink)',
       borderRight: '1.5px solid var(--ink)',
@@ -69,11 +90,10 @@ export default function ArquetiposEquipo({ brechas, relaciones, ctx }: Props) {
       {cards.map((card, i) => {
         const a = card.arquetipo
         return (
-          <article key={a.id} style={{
+          <div key={`top-${i}`} style={{
+            gridColumn: i + 1, gridRow: 1,
             borderRight: i === 0 ? '1.5px solid var(--ink)' : 'none',
-            background: 'transparent',
-            display: 'flex',
-            flexDirection: 'column',
+            display: 'flex', flexDirection: 'column',
           }}>
             <header style={{ padding: '28px 32px 20px' }}>
               <span className="eyebrow">{a.tag} / {card.titulo}</span>
@@ -98,6 +118,7 @@ export default function ArquetiposEquipo({ brechas, relaciones, ctx }: Props) {
                 type="button"
                 onClick={() => regenerar(card.tipo)}
                 disabled={card.loading}
+                aria-busy={card.loading}
                 style={{
                   alignSelf: 'flex-start',
                   display: 'inline-flex', alignItems: 'center', gap: 8,
@@ -116,26 +137,23 @@ export default function ArquetiposEquipo({ brechas, relaciones, ctx }: Props) {
                   : <><ClaudeIcon size={13} /> Otra lectura</>}
               </button>
             </div>
+          </div>
+        )
+      })}
 
-            <div style={{
-              borderTop: '1.5px solid var(--ink)',
-              padding: '16px 32px',
-              fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase',
-              color: 'var(--ink)', fontWeight: 700, marginTop: 'auto',
-            }}>
-              <span style={{ background: 'var(--ink)', color: 'var(--bg)', padding: '2px 6px', marginRight: 8 }}>Patrón</span>
-              {a.patron}
-            </div>
-
-            <footer style={{
-              padding: '0 32px 16px',
-              fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase',
-              color: 'var(--ink)', fontWeight: 700,
-            }}>
-              <span style={{ background: 'var(--ink)', color: 'var(--bg)', padding: '2px 6px', marginRight: 8 }}>Experiencia</span>
-              {a.accion}
-            </footer>
-          </article>
+      {cards.map((card, i) => {
+        const a = card.arquetipo
+        return (
+          <div key={`bot-${i}`} style={{
+            gridColumn: i + 1, gridRow: 2,
+            borderRight: i === 0 ? '1.5px solid var(--ink)' : 'none',
+            borderTop: '1.5px solid var(--ink)',
+            padding: '16px 32px',
+            display: 'flex', flexDirection: 'column', gap: 8,
+          }}>
+            <Tagged tag="Patrón">{a.patron}</Tagged>
+            <Tagged tag="Experiencia">{a.accion}</Tagged>
+          </div>
         )
       })}
     </div>
