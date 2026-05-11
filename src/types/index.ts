@@ -40,6 +40,8 @@ export interface Diagnostico {
   contexto_ia: string | null
   numero_participantes: number | null
   tipo: TipoDiagnostico
+  diagnostico_padre_id?: string | null
+  ronda?: number
   created_at: string
 }
 

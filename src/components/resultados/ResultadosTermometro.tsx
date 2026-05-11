@@ -15,6 +15,27 @@ type Props = {
   totalParticipantes: number
   totalFormularios: number
   resultados: DimResultado[]
+  comparacion?: DimResultado[] | null
+  rondaActual?: number
+  rondaAnterior?: number
+}
+
+function DeltaRonda({ actual, anterior, rondaAnterior }: { actual: number | null; anterior: number | null; rondaAnterior?: number }) {
+  if (actual === null || anterior === null) return null
+  const diff = Math.round((actual - anterior) * 10) / 10
+  const color = diff > 0.1 ? '#1A9850' : diff < -0.1 ? '#D73027' : 'var(--mute)'
+  const flecha = diff > 0.1 ? '↑' : diff < -0.1 ? '↓' : '→'
+  const signo = diff > 0 ? '+' : ''
+  return (
+    <span style={{
+      display: 'inline-flex', alignItems: 'center', gap: 4,
+      fontSize: 11, fontWeight: 700, color,
+      fontVariantNumeric: 'tabular-nums',
+    }}>
+      {flecha} {signo}{diff.toFixed(1)}
+      {rondaAnterior ? <span style={{ fontWeight: 500, color: 'var(--mute)', letterSpacing: '.04em', textTransform: 'uppercase', fontSize: 9 }}> vs ronda {rondaAnterior}</span> : null}
+    </span>
+  )
 }
 
 // Color "termómetro" según valor: rojo–ámbar–verde
@@ -39,14 +60,17 @@ function SectionBar({ title, subtitle, mobile }: { title: string; subtitle?: str
   )
 }
 
-function MedidorBase({ dim, sizeNumber, padding }: { dim: DimResultado; sizeNumber: number; padding: string }) {
+function MedidorBase({ dim, sizeNumber, padding, anterior, rondaAnterior }: { dim: DimResultado; sizeNumber: number; padding: string; anterior?: number | null; rondaAnterior?: number }) {
   const pct = dim.promedio !== null ? ((dim.promedio - 1) / 9) * 100 : 0
   const color = tempColor(dim.promedio)
   return (
     <div style={{ padding, display: 'flex', flexDirection: 'column', gap: 14 }}>
-      <div>
-        <div style={{ fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--ink)', fontWeight: 700 }}>{dim.subtitulo}</div>
-        <h3 style={{ fontSize: sizeNumber * 0.32, fontWeight: 900, letterSpacing: '-.02em', lineHeight: 1, margin: '4px 0 0' }}>{dim.nombre}</h3>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
+        <div>
+          <div style={{ fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--ink)', fontWeight: 700 }}>{dim.subtitulo}</div>
+          <h3 style={{ fontSize: sizeNumber * 0.32, fontWeight: 900, letterSpacing: '-.02em', lineHeight: 1, margin: '4px 0 0' }}>{dim.nombre}</h3>
+        </div>
+        {anterior !== null && anterior !== undefined && <DeltaRonda actual={dim.promedio} anterior={anterior} rondaAnterior={rondaAnterior} />}
       </div>
       <div style={{ display: 'flex', alignItems: 'baseline', gap: 10 }}>
         <span style={{ fontWeight: 900, fontSize: sizeNumber, lineHeight: .9, letterSpacing: '-.05em', color }}>
@@ -82,7 +106,10 @@ function MedidorBase({ dim, sizeNumber, padding }: { dim: DimResultado; sizeNumb
 
 export default function ResultadosTermometro({
   nombreCompania, estado, totalParticipantes, totalFormularios, resultados,
+  comparacion, rondaActual, rondaAnterior,
 }: Props) {
+  const hayComparacion = comparacion && comparacion.length > 0
+  const getAnterior = (id: number) => comparacion?.find(c => c.id === id)?.promedio ?? null
   return (
     <>
       {/* MOBILE */}
@@ -96,7 +123,7 @@ export default function ResultadosTermometro({
         </header>
 
         <div style={{ padding: '24px 20px 20px', borderBottom: '1.5px solid var(--ink)' }}>
-          <span className="page-header__eyebrow">Termómetro de 4</span>
+          <span className="page-header__eyebrow">Termómetro de 4{rondaActual && rondaActual > 1 ? ` · Ronda ${rondaActual}` : ''}</span>
           <div className="page-header__rule" />
           <h1 style={{ fontSize: 'clamp(28px, 8vw, 36px)', fontWeight: 900, letterSpacing: '-.02em', lineHeight: 1, margin: 0 }}>
             {nombreCompania}
@@ -127,7 +154,7 @@ export default function ResultadosTermometro({
               borderRight: i % 2 === 0 ? '1.5px solid var(--ink)' : 'none',
               borderBottom: i < resultados.length - 2 ? '1.5px solid var(--ink)' : 'none',
             }}>
-              <MedidorBase dim={dim} sizeNumber={56} padding="18px 16px 20px" />
+              <MedidorBase dim={dim} sizeNumber={56} padding="18px 16px 20px" anterior={hayComparacion ? getAnterior(dim.id) : null} rondaAnterior={rondaAnterior} />
             </div>
           ))}
         </div>
@@ -150,7 +177,7 @@ export default function ResultadosTermometro({
 
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
           <div style={{ padding: '40px 56px 32px', borderBottom: '1.5px solid var(--ink)' }}>
-            <span className="page-header__eyebrow">Termómetro de 4</span>
+            <span className="page-header__eyebrow">Termómetro de 4{rondaActual && rondaActual > 1 ? ` · Ronda ${rondaActual}` : ''}</span>
             <div className="page-header__rule" />
             <h1 className="page-header__title" style={{ fontSize: 'clamp(32px,4vw,48px)' }}>
               {nombreCompania}
@@ -182,7 +209,7 @@ export default function ResultadosTermometro({
               <div key={dim.id} style={{
                 borderRight: i < arr.length - 1 ? '1.5px solid var(--ink)' : 'none',
               }}>
-                <MedidorBase dim={dim} sizeNumber={96} padding="32px 24px 30px" />
+                <MedidorBase dim={dim} sizeNumber={96} padding="32px 24px 30px" anterior={hayComparacion ? getAnterior(dim.id) : null} rondaAnterior={rondaAnterior} />
               </div>
             ))}
           </div>

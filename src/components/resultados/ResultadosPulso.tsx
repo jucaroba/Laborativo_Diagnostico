@@ -16,6 +16,28 @@ type Props = {
   totalParticipantes: number
   totalFormularios: number
   resultados: DimResultado[]
+  comparacion?: DimResultado[] | null
+  rondaActual?: number
+  rondaAnterior?: number
+}
+
+// Pinta el Δ vs ronda anterior: subió, bajó, igual.
+function DeltaRonda({ actual, anterior, rondaAnterior }: { actual: number | null; anterior: number | null; rondaAnterior?: number }) {
+  if (actual === null || anterior === null) return null
+  const diff = Math.round((actual - anterior) * 10) / 10
+  const color = diff > 0.1 ? '#1A9850' : diff < -0.1 ? '#D73027' : 'var(--mute)'
+  const flecha = diff > 0.1 ? '↑' : diff < -0.1 ? '↓' : '→'
+  const signo = diff > 0 ? '+' : ''
+  return (
+    <span style={{
+      display: 'inline-flex', alignItems: 'center', gap: 4,
+      fontSize: 11, fontWeight: 700, color,
+      fontVariantNumeric: 'tabular-nums',
+    }}>
+      {flecha} {signo}{diff.toFixed(1)}
+      {rondaAnterior ? <span style={{ fontWeight: 500, color: 'var(--mute)', letterSpacing: '.04em', textTransform: 'uppercase', fontSize: 9 }}> vs ronda {rondaAnterior}</span> : null}
+    </span>
+  )
 }
 
 const avgColor = (v: number | null) => {
@@ -41,7 +63,10 @@ function SectionBar({ title, subtitle, mobile }: { title: string; subtitle?: str
 
 export default function ResultadosPulso({
   nombreCompania, estado, totalParticipantes, totalFormularios, resultados,
+  comparacion, rondaActual, rondaAnterior,
 }: Props) {
+  const hayComparacion = comparacion && comparacion.length > 0
+  const getAnterior = (id: number) => comparacion?.find(c => c.id === id)?.promedio ?? null
   return (
     <>
       {/* MOBILE */}
@@ -55,7 +80,7 @@ export default function ResultadosPulso({
         </header>
 
         <div style={{ padding: '24px 20px 20px', borderBottom: '1.5px solid var(--ink)' }}>
-          <span className="page-header__eyebrow">Pulso colectivo</span>
+          <span className="page-header__eyebrow">Pulso colectivo{rondaActual && rondaActual > 1 ? ` · Ronda ${rondaActual}` : ''}</span>
           <div className="page-header__rule" />
           <h1 style={{ fontSize: 'clamp(28px, 8vw, 36px)', fontWeight: 900, letterSpacing: '-.02em', lineHeight: 1, margin: 0 }}>
             {nombreCompania}
@@ -84,7 +109,7 @@ export default function ResultadosPulso({
         <SectionBar title="Pulso por dimensión" subtitle="Escala 1–10" mobile />
         <div style={{ borderBottom: '1.5px solid var(--ink)' }}>
           {[...resultados].sort((a, b) => (b.promedio ?? -Infinity) - (a.promedio ?? -Infinity)).map((dim, i, arr) => (
-            <DimCardMobile key={dim.id} dim={dim} ultimo={i === arr.length - 1} />
+            <DimCardMobile key={dim.id} dim={dim} anterior={hayComparacion ? getAnterior(dim.id) : null} rondaAnterior={rondaAnterior} ultimo={i === arr.length - 1} />
           ))}
         </div>
 
@@ -111,7 +136,7 @@ export default function ResultadosPulso({
 
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
           <div style={{ padding: '40px 56px 32px', borderBottom: '1.5px solid var(--ink)' }}>
-            <span className="page-header__eyebrow">Pulso colectivo</span>
+            <span className="page-header__eyebrow">Pulso colectivo{rondaActual && rondaActual > 1 ? ` · Ronda ${rondaActual}` : ''}</span>
             <div className="page-header__rule" />
             <h1 className="page-header__title" style={{ fontSize: 'clamp(32px,4vw,48px)' }}>
               {nombreCompania}
@@ -140,7 +165,7 @@ export default function ResultadosPulso({
           <SectionBar title="Pulso por dimensión" subtitle="Escala 1–10" />
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', borderBottom: '1.5px solid var(--ink)' }}>
             {[...resultados].sort((a, b) => (b.promedio ?? -Infinity) - (a.promedio ?? -Infinity)).map((dim, i, arr) => (
-              <DimCardDesktop key={dim.id} dim={dim} ultimo={i === arr.length - 1} />
+              <DimCardDesktop key={dim.id} dim={dim} anterior={hayComparacion ? getAnterior(dim.id) : null} rondaAnterior={rondaAnterior} ultimo={i === arr.length - 1} />
             ))}
           </div>
 
@@ -161,16 +186,19 @@ export default function ResultadosPulso({
 
 // ─── DimCard ─────────────────────────────────────────────────────
 
-function DimCardMobile({ dim, ultimo }: { dim: DimResultado; ultimo: boolean }) {
+function DimCardMobile({ dim, anterior, rondaAnterior, ultimo }: { dim: DimResultado; anterior: number | null; rondaAnterior?: number; ultimo: boolean }) {
   return (
     <div style={{
       padding: '18px 20px 20px',
       borderBottom: ultimo ? 'none' : '1.5px solid var(--ink)',
       display: 'flex', flexDirection: 'column', gap: 10,
     }}>
-      <div>
-        <div style={{ fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--ink)', fontWeight: 700 }}>{dim.subtitulo}</div>
-        <h3 style={{ fontSize: 20, fontWeight: 900, letterSpacing: '-.02em', lineHeight: 1, margin: '4px 0 0' }}>{dim.nombre}</h3>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
+        <div>
+          <div style={{ fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--ink)', fontWeight: 700 }}>{dim.subtitulo}</div>
+          <h3 style={{ fontSize: 20, fontWeight: 900, letterSpacing: '-.02em', lineHeight: 1, margin: '4px 0 0' }}>{dim.nombre}</h3>
+        </div>
+        {anterior !== null && <DeltaRonda actual={dim.promedio} anterior={anterior} rondaAnterior={rondaAnterior} />}
       </div>
       <div style={{ display: 'flex', alignItems: 'baseline', gap: 10 }}>
         <span style={{ fontWeight: 900, fontSize: 52, lineHeight: 1, letterSpacing: '-.04em', color: avgColor(dim.promedio) }}>
@@ -190,16 +218,19 @@ function DimCardMobile({ dim, ultimo }: { dim: DimResultado; ultimo: boolean }) 
   )
 }
 
-function DimCardDesktop({ dim, ultimo }: { dim: DimResultado; ultimo: boolean }) {
+function DimCardDesktop({ dim, anterior, rondaAnterior, ultimo }: { dim: DimResultado; anterior: number | null; rondaAnterior?: number; ultimo: boolean }) {
   return (
     <div style={{
       padding: '28px 24px 26px',
       borderRight: ultimo ? 'none' : '1.5px solid var(--ink)',
       display: 'flex', flexDirection: 'column', gap: 12,
     }}>
-      <div>
-        <div style={{ fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--ink)', fontWeight: 700 }}>{dim.subtitulo}</div>
-        <h3 style={{ fontSize: 22, fontWeight: 900, letterSpacing: '-.02em', lineHeight: 1, margin: '4px 0 0' }}>{dim.nombre}</h3>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
+        <div>
+          <div style={{ fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--ink)', fontWeight: 700 }}>{dim.subtitulo}</div>
+          <h3 style={{ fontSize: 22, fontWeight: 900, letterSpacing: '-.02em', lineHeight: 1, margin: '4px 0 0' }}>{dim.nombre}</h3>
+        </div>
+        {anterior !== null && <DeltaRonda actual={dim.promedio} anterior={anterior} rondaAnterior={rondaAnterior} />}
       </div>
       <div style={{ width: 42, height: 8, background: 'var(--ink)' }} />
       <div style={{ display: 'flex', alignItems: 'baseline', gap: 12 }}>

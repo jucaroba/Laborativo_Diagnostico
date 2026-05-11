@@ -36,6 +36,7 @@ type Props = {
   arqRelaciones: Arquetipo
   arqCtx: ArquetipoCtx
   diagnosticoId: string
+  rondaActual?: number
 }
 
 const deltaBg = (d: number) => d >= 5 ? '#F2C2C2' : d >= 3 ? '#FCE99A' : '#C8E6C9'
@@ -54,7 +55,7 @@ function SectionBar({ title, subtitle }: { title: string; subtitle?: string }) {
 
 export default function ResultadosMobile({
   nombreCompania, estado, totalParticipantes, personasEquipo, personasLider, totalFormularios,
-  resultados, promediosPorRol, promedioGlobalPorRol, arqBrechas, arqRelaciones, arqCtx, diagnosticoId,
+  resultados, promediosPorRol, promedioGlobalPorRol, arqBrechas, arqRelaciones, arqCtx, diagnosticoId, rondaActual,
 }: Props) {
   return (
     <div style={{ fontFamily: "'Red Hat Display', sans-serif", background: 'var(--bg)', minHeight: '100vh' }}>
@@ -70,7 +71,7 @@ export default function ResultadosMobile({
 
       {/* Título */}
       <div style={{ padding: '24px 20px 20px', borderBottom: '1.5px solid var(--ink)' }}>
-        <span className="page-header__eyebrow">Diagnóstico organizacional</span>
+        <span className="page-header__eyebrow">Diagnóstico organizacional{rondaActual && rondaActual > 1 ? ` · Ronda ${rondaActual}` : ''}</span>
         <div className="page-header__rule" />
         <h1 style={{ fontSize: 'clamp(28px, 8vw, 36px)', fontWeight: 900, letterSpacing: '-.02em', lineHeight: 1, margin: 0 }}>
           {nombreCompania}

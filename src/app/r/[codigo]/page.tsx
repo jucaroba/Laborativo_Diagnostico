@@ -8,6 +8,7 @@ import ResultadosMobile from '@/components/resultados/ResultadosMobile'
 import ResultadosPulso from '@/components/resultados/ResultadosPulso'
 import ResultadosTermometro from '@/components/resultados/ResultadosTermometro'
 import ResultadosEspejo from '@/components/resultados/ResultadosEspejo'
+import { calcSimpleFromData, calcEspejoFromData, fetchYCalcSimple, fetchYCalcEspejo } from '@/lib/calc-resultados'
 import { evaluarBrechas, evaluarRelaciones } from '@/lib/arquetipos'
 
 export const revalidate = 0
@@ -56,28 +57,19 @@ export default async function ResultadosPage({ params }: { params: Promise<{ cod
   // dedicadas. La rama 360 (default) sigue debajo intacta.
   const tipoDiag = (diag.tipo ?? 'cultura_360') as string
 
+  // Ronda anterior, si existe — para mostrar Δ en los dashboards
+  const padreId = (diag as { diagnostico_padre_id?: string }).diagnostico_padre_id ?? null
+  const rondaActual = (diag as { ronda?: number }).ronda ?? 1
+  const rondaAnterior = rondaActual - 1
+
   // Pulso y Termómetro comparten el cálculo (1 perspectiva 'X', 4 dimensiones)
   // pero usan dashboards distintos.
   if (tipoDiag === 'pulso_colectivo' || tipoDiag === 'termometro_4') {
-    const porDim: Record<number, number[]> = { 1: [], 2: [], 3: [], 4: [] }
-    for (const resp of respuestas ?? []) {
-      const pq = preguntas?.find(p => p.id === resp.pregunta_id)
-      if (!pq) continue
-      if (porDim[pq.dimension_id]) porDim[pq.dimension_id].push(resp.valor)
-    }
-    const resultadosSimple = DIMENSIONES.map(d => {
-      const vals = porDim[d.id]
-      if (!vals.length) return { id: d.id, nombre: d.nombre, subtitulo: d.subtitulo, promedio: null, desviacion: 0, n: 0 }
-      const avg = vals.reduce((a, b) => a + b, 0) / vals.length
-      const variance = vals.reduce((s, v) => s + (v - avg) ** 2, 0) / vals.length
-      const std = Math.sqrt(variance)
-      return {
-        id: d.id, nombre: d.nombre, subtitulo: d.subtitulo,
-        promedio: Math.round(avg * 10) / 10,
-        desviacion: Math.round(std * 10) / 10,
-        n: vals.length,
-      }
-    })
+    const resultadosSimple = calcSimpleFromData(
+      (preguntas ?? []) as { id: string; dimension_id: number; rol: string }[],
+      (respuestas ?? []).map(r => ({ pregunta_id: r.pregunta_id, valor: r.valor })),
+    )
+    const comparacion = padreId ? await fetchYCalcSimple(padreId) : null
     const totalFormulariosSimple = new Set((respuestas ?? []).map(r => r.participante_id)).size
     const sharedProps = {
       nombreCompania: diag.nombre_compania,
@@ -85,6 +77,9 @@ export default async function ResultadosPage({ params }: { params: Promise<{ cod
       totalParticipantes,
       totalFormularios: totalFormulariosSimple,
       resultados: resultadosSimple,
+      comparacion,
+      rondaActual,
+      rondaAnterior,
     }
     return tipoDiag === 'pulso_colectivo'
       ? <ResultadosPulso {...sharedProps} />
@@ -93,43 +88,11 @@ export default async function ResultadosPage({ params }: { params: Promise<{ cod
 
   // ─── Equipo en Espejo: 2 perspectivas (YO, EQUIPO) por dimensión
   if (tipoDiag === 'equipo_en_espejo') {
-    type Bucket = { suma: number; n: number; valores: number[] }
-    const init = (): Bucket => ({ suma: 0, n: 0, valores: [] })
-    const acum: Record<number, { YO: Bucket; EQUIPO: Bucket }> = {
-      1: { YO: init(), EQUIPO: init() },
-      2: { YO: init(), EQUIPO: init() },
-      3: { YO: init(), EQUIPO: init() },
-      4: { YO: init(), EQUIPO: init() },
-    }
-    for (const resp of respuestas ?? []) {
-      const pq = preguntas?.find(p => p.id === resp.pregunta_id)
-      if (!pq) continue
-      const persp = pq.rol === 'YO' ? 'YO' : pq.rol === 'EQUIPO' ? 'EQUIPO' : null
-      if (!persp) continue
-      const bucket = acum[pq.dimension_id]?.[persp]
-      if (!bucket) continue
-      bucket.suma += resp.valor
-      bucket.n += 1
-      bucket.valores.push(resp.valor)
-    }
-    const calcStats = (b: Bucket) => {
-      if (b.n === 0) return { promedio: null as number | null, desviacion: 0, n: 0 }
-      const avg = b.suma / b.n
-      const variance = b.valores.reduce((s, v) => s + (v - avg) ** 2, 0) / b.n
-      return {
-        promedio: Math.round(avg * 10) / 10,
-        desviacion: Math.round(Math.sqrt(variance) * 10) / 10,
-        n: b.n,
-      }
-    }
-    const resultadosEspejo = DIMENSIONES.map(d => {
-      const yo = calcStats(acum[d.id].YO)
-      const equipo = calcStats(acum[d.id].EQUIPO)
-      const delta = (yo.promedio !== null && equipo.promedio !== null)
-        ? Math.round(Math.abs(yo.promedio - equipo.promedio) * 10) / 10
-        : 0
-      return { id: d.id, nombre: d.nombre, subtitulo: d.subtitulo, yo, equipo, delta }
-    })
+    const resultadosEspejo = calcEspejoFromData(
+      (preguntas ?? []) as { id: string; dimension_id: number; rol: string }[],
+      (respuestas ?? []).map(r => ({ pregunta_id: r.pregunta_id, valor: r.valor })),
+    )
+    const comparacion = padreId ? await fetchYCalcEspejo(padreId) : null
     const totalFormulariosEspejo = new Set((respuestas ?? []).map(r => r.participante_id)).size
     return (
       <ResultadosEspejo
@@ -138,6 +101,9 @@ export default async function ResultadosPage({ params }: { params: Promise<{ cod
         totalParticipantes={totalParticipantes}
         totalFormularios={totalFormulariosEspejo}
         resultados={resultadosEspejo}
+        comparacion={comparacion}
+        rondaActual={rondaActual}
+        rondaAnterior={rondaAnterior}
       />
     )
   }
@@ -246,6 +212,7 @@ export default async function ResultadosPage({ params }: { params: Promise<{ cod
         arqRelaciones={arqRelaciones}
         arqCtx={arqCtx}
         diagnosticoId={diag.id}
+        rondaActual={rondaActual}
       />
     </div>
     <div className="only-desktop" style={{ fontFamily: "'Red Hat Display', sans-serif", background: 'var(--bg)', minHeight: '100vh' }}>
@@ -264,7 +231,7 @@ export default async function ResultadosPage({ params }: { params: Promise<{ cod
 
       {/* Título del diagnóstico */}
       <div style={{ padding: '40px 56px 32px', borderBottom: '1.5px solid var(--ink)' }}>
-        <span className="page-header__eyebrow">Diagnóstico organizacional</span>
+        <span className="page-header__eyebrow">Diagnóstico organizacional{rondaActual > 1 ? ` · Ronda ${rondaActual}` : ''}</span>
         <div className="page-header__rule" />
         <h1 className="page-header__title" style={{ fontSize: 'clamp(32px,4vw,48px)' }}>
           {diag.nombre_compania}

@@ -18,6 +18,27 @@ type Props = {
   totalParticipantes: number
   totalFormularios: number
   resultados: DimResultado[]
+  comparacion?: DimResultado[] | null
+  rondaActual?: number
+  rondaAnterior?: number
+}
+
+function DeltaRonda({ actual, anterior, rondaAnterior }: { actual: number | null; anterior: number | null; rondaAnterior?: number }) {
+  if (actual === null || anterior === null) return null
+  const diff = Math.round((actual - anterior) * 10) / 10
+  const color = diff > 0.1 ? '#1A9850' : diff < -0.1 ? '#D73027' : 'var(--mute)'
+  const flecha = diff > 0.1 ? '↑' : diff < -0.1 ? '↓' : '→'
+  const signo = diff > 0 ? '+' : ''
+  return (
+    <span style={{
+      display: 'inline-flex', alignItems: 'center', gap: 4,
+      fontSize: 10.5, fontWeight: 700, color,
+      fontVariantNumeric: 'tabular-nums',
+    }}>
+      {flecha} {signo}{diff.toFixed(1)}
+      {rondaAnterior ? <span style={{ fontWeight: 500, color: 'var(--mute)', letterSpacing: '.04em', textTransform: 'uppercase', fontSize: 8.5 }}> vs r{rondaAnterior}</span> : null}
+    </span>
+  )
 }
 
 // Paleta Espejo — colores propios para distinguir del 360
@@ -71,7 +92,7 @@ function FilaPerspectiva({
   )
 }
 
-function DimCard({ dim, mobile }: { dim: DimResultado; mobile?: boolean }) {
+function DimCard({ dim, anterior, rondaAnterior, mobile }: { dim: DimResultado; anterior?: DimResultado | null; rondaAnterior?: number; mobile?: boolean }) {
   return (
     <div style={{
       padding: mobile ? '18px 20px 22px' : '28px 24px 28px',
@@ -94,6 +115,18 @@ function DimCard({ dim, mobile }: { dim: DimResultado; mobile?: boolean }) {
         <FilaPerspectiva label="Yo" valor={dim.yo.promedio} color={COLOR_YO} mobile={mobile} />
         <FilaPerspectiva label="Equipo" valor={dim.equipo.promedio} color={COLOR_EQUIPO} mobile={mobile} />
       </div>
+      {anterior && (
+        <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap', borderTop: '1px solid var(--line-soft)', paddingTop: 8 }}>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+            <span style={{ fontSize: 9, letterSpacing: '.08em', textTransform: 'uppercase', fontWeight: 700, color: 'var(--mute)' }}>Yo</span>
+            <DeltaRonda actual={dim.yo.promedio} anterior={anterior.yo.promedio} rondaAnterior={rondaAnterior} />
+          </span>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+            <span style={{ fontSize: 9, letterSpacing: '.08em', textTransform: 'uppercase', fontWeight: 700, color: 'var(--mute)' }}>Equipo</span>
+            <DeltaRonda actual={dim.equipo.promedio} anterior={anterior.equipo.promedio} rondaAnterior={rondaAnterior} />
+          </span>
+        </div>
+      )}
     </div>
   )
 }
@@ -209,7 +242,9 @@ function RadarEspejo({ resultados, maxSize }: { resultados: DimResultado[]; maxS
 
 export default function ResultadosEspejo({
   nombreCompania, estado, totalParticipantes, totalFormularios, resultados,
+  comparacion, rondaActual, rondaAnterior,
 }: Props) {
+  const getAnterior = (id: number) => comparacion?.find(c => c.id === id) ?? null
   return (
     <>
       {/* MOBILE */}
@@ -223,7 +258,7 @@ export default function ResultadosEspejo({
         </header>
 
         <div style={{ padding: '24px 20px 20px', borderBottom: '1.5px solid var(--ink)' }}>
-          <span className="page-header__eyebrow">Equipo en Espejo</span>
+          <span className="page-header__eyebrow">Equipo en Espejo{rondaActual && rondaActual > 1 ? ` · Ronda ${rondaActual}` : ''}</span>
           <div className="page-header__rule" />
           <h1 style={{ fontSize: 'clamp(28px, 8vw, 36px)', fontWeight: 900, letterSpacing: '-.02em', lineHeight: 1, margin: 0 }}>
             {nombreCompania}
@@ -254,7 +289,7 @@ export default function ResultadosEspejo({
         <div style={{ borderBottom: '1.5px solid var(--ink)' }}>
           {[...resultados].sort((a, b) => b.delta - a.delta).map((dim, i, arr) => (
             <div key={dim.id} style={{ borderBottom: i < arr.length - 1 ? '1.5px solid var(--ink)' : 'none' }}>
-              <DimCard dim={dim} mobile />
+              <DimCard dim={dim} anterior={getAnterior(dim.id)} rondaAnterior={rondaAnterior} mobile />
             </div>
           ))}
         </div>
@@ -283,7 +318,7 @@ export default function ResultadosEspejo({
 
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
           <div style={{ padding: '40px 56px 32px', borderBottom: '1.5px solid var(--ink)' }}>
-            <span className="page-header__eyebrow">Equipo en Espejo</span>
+            <span className="page-header__eyebrow">Equipo en Espejo{rondaActual && rondaActual > 1 ? ` · Ronda ${rondaActual}` : ''}</span>
             <div className="page-header__rule" />
             <h1 className="page-header__title" style={{ fontSize: 'clamp(32px,4vw,48px)' }}>
               {nombreCompania}
@@ -319,7 +354,7 @@ export default function ResultadosEspejo({
                 borderRight: i % 2 === 0 ? '1.5px solid var(--ink)' : 'none',
                 borderBottom: i < arr.length - 2 ? '1.5px solid var(--ink)' : 'none',
               }}>
-                <DimCard dim={dim} />
+                <DimCard dim={dim} anterior={getAnterior(dim.id)} rondaAnterior={rondaAnterior} />
               </div>
             ))}
           </div>
