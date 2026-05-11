@@ -1,6 +1,8 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { ArrowRight, ArrowDown } from 'lucide-react'
+import { LANDING_COPY } from '@/lib/landing-copy'
+import type { TipoDiagnostico } from '@/types'
 
 const DIMENSIONES = [
   { n: '01', idx: 'Intención', h: 'Sentido', pair: '¿A dónde vamos?', p: 'El propósito compartido.\nQué hace que este equipo exista y hacia qué horizonte se orienta.' },
@@ -9,28 +11,20 @@ const DIMENSIONES = [
   { n: '04', idx: 'Acción', h: 'Comportamiento', pair: '¿Qué?', p: 'Lo que se hace realmente, no lo que se dice.\nHábitos, decisiones y entregas visibles.' },
 ]
 
-const NIVELES = [
-  { tag: 'Nivel 01 · Individuo', h: 'Autoevaluación personal', p: 'Cada miembro del equipo se observa a sí mismo en las cuatro dimensiones.' },
-  { tag: 'Nivel 02 · Líder', h: 'Autoevaluación del líder', p: 'El líder se observa a sí mismo en las cuatro dimensiones.' },
-  { tag: 'Nivel 03 · Descendente', h: 'Líder evalúa al equipo', p: 'La mirada del líder sobre las conductas colectivas que observa en el equipo.' },
-  { tag: 'Nivel 04 · Ascendente', h: 'Equipo evalúa al líder', p: 'La mirada del equipo sobre las conductas que observa de su líder.' },
-]
-
 export default function LandingMobile({
   codigo,
   nombreCompania,
   totalPreguntas,
+  tipo = 'cultura_360',
 }: {
   codigo: string
   nombreCompania: string
   totalPreguntas: number | null
+  tipo?: TipoDiagnostico
 }) {
-  const PROCESO = [
-    { n: '01', h: 'Invitación y roles', p: 'Cada persona entra con el enlace compartido y selecciona si responde como miembro del equipo o como líder.', meta: '2 min · administrativo' },
-    { n: '02', h: 'Perspectivas del tema', p: 'Autoevaluación de los integrantes del equipo, autoevaluación del líder,\nel líder evalúa al equipo y equipo evalúa al líder.\nDe ahí nacen las brechas.', meta: '4–8 min · por persona' },
-    { n: '03', h: 'Preguntas por dimensión', p: 'Cada pregunta se ancla a una de las cuatro dimensiones. Las respuestas se cruzan entre perspectivas para detectar dónde la percepción no coincide con la experiencia.', meta: `4 dimensiones · ${totalPreguntas ?? 0} preguntas` },
-    { n: '04', h: 'Mapa de brechas', p: 'Entregamos un reporte visual con las brechas por dimensión, la salud cultural por perspectiva y acciones concretas para cerrar las distancias más críticas.', meta: 'Entrega inmediata · Dashboard' },
-  ]
+  const copy = LANDING_COPY[tipo]
+  const totalN = totalPreguntas ?? 0
+  const proceso = copy.proceso.map(f => ({ ...f, meta: f.meta.replace('{N}', String(totalN)) }))
 
   return (
     <div style={{ background: 'var(--paper)', minHeight: '100vh', fontFamily: "'Red Hat Display', sans-serif" }}>
@@ -41,13 +35,13 @@ export default function LandingMobile({
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10, marginTop: 22 }}>
           <span style={{ fontSize: 9, letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--mute)', fontWeight: 600 }}>
-            Producto<b style={{ display: 'block', fontSize: 9.5, color: 'var(--ink)', marginTop: 4, fontWeight: 700, letterSpacing: '.02em', lineHeight: 1.25 }}>Diagnóstico<br />de Cultura</b>
+            Producto<b style={{ display: 'block', fontSize: 9.5, color: 'var(--ink)', marginTop: 4, fontWeight: 700, letterSpacing: '.02em', lineHeight: 1.25 }}>{copy.header.producto}</b>
           </span>
           <span style={{ fontSize: 9, letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--mute)', fontWeight: 600 }}>
-            Formato<b style={{ display: 'block', fontSize: 9.5, color: 'var(--ink)', marginTop: 4, fontWeight: 700, letterSpacing: '.02em', lineHeight: 1.25 }}>Mirada 360°</b>
+            Formato<b style={{ display: 'block', fontSize: 9.5, color: 'var(--ink)', marginTop: 4, fontWeight: 700, letterSpacing: '.02em', lineHeight: 1.25 }}>{copy.header.formato}</b>
           </span>
           <span style={{ fontSize: 9, letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--mute)', fontWeight: 600 }}>
-            Tiempo<b style={{ display: 'block', fontSize: 9.5, color: 'var(--ink)', marginTop: 4, fontWeight: 700, letterSpacing: '.02em', lineHeight: 1.25 }}>5–10 minutos</b>
+            Tiempo<b style={{ display: 'block', fontSize: 9.5, color: 'var(--ink)', marginTop: 4, fontWeight: 700, letterSpacing: '.02em', lineHeight: 1.25 }}>{copy.header.tiempo}</b>
           </span>
         </div>
 
@@ -56,11 +50,11 @@ export default function LandingMobile({
         </div>
 
         <h1 style={{ fontWeight: 900, fontSize: 'clamp(20px, 5.5vw, 30px)', lineHeight: 1.04, letterSpacing: '-.02em', margin: '20px 0 0', paddingBottom: '.05em' }}>
-          exploremos las visiones,<br />entendamos las oportunidades,<br />fortalezcamos la cultura.
+          {copy.hero[0]}<br />{copy.hero[1]}<br />{copy.hero[2]}
         </h1>
 
         <p style={{ fontSize: 14.5, lineHeight: 1.5, color: 'var(--ink)', margin: '24px 0 0', fontWeight: 500 }}>
-          <b style={{ fontWeight: 900 }}>4C</b> es un modelo de diagnóstico que integra la percepción del equipo y su líder a través de cuatro dimensiones de cultura, haciendo visibles las brechas y habilitando acciones para transformarla.<br /><b style={{ fontWeight: 800 }}>Un modelo de consultoría creativa basada en la emoción.</b>
+          <b style={{ fontWeight: 900 }}>{copy.introBold}</b> {copy.introTexto}<br /><b style={{ fontWeight: 800 }}>{copy.introCierre}</b>
         </p>
 
         <Link href="#empezar" style={{
@@ -89,9 +83,9 @@ export default function LandingMobile({
         <span className="eyebrow">Contexto de diagnóstico.</span>
         <div className="rule" />
         <h2 style={{ fontWeight: 900, fontSize: 'clamp(28px, 8vw, 40px)', lineHeight: .98, letterSpacing: '-.03em', margin: '16px 0 16px' }}>
-          cuatro dimensiones de cultura para abordar cualquier reto.
+          {copy.tituloDimensiones}
         </h2>
-        <span className="chip" style={{ marginBottom: 8 }}>4 ejes · {totalPreguntas ?? 0} preguntas</span>
+        <span className="chip" style={{ marginBottom: 8 }}>4 ejes · {totalN} preguntas</span>
 
         <div style={{ display: 'flex', flexDirection: 'column', border: '1.5px solid var(--ink)', marginTop: 24 }}>
           {DIMENSIONES.map((d, i) => (
@@ -113,18 +107,18 @@ export default function LandingMobile({
         </div>
       </div>
 
-      {/* Niveles */}
+      {/* Niveles / Perspectivas */}
       <div style={{ padding: '40px 20px 48px', borderBottom: '1.5px solid var(--ink)', background: 'var(--paper)' }}>
-        <span className="eyebrow">Mirada 360°</span>
+        <span className="eyebrow">{copy.eyebrowPerspectivas}</span>
         <div className="rule" />
         <h2 style={{ fontWeight: 900, fontSize: 'clamp(28px, 8vw, 40px)', lineHeight: .96, letterSpacing: '-.03em', margin: '16px 0 12px' }}>
-          cuatro puntos de vista sobre la misma cultura.
+          {copy.tituloPerspectivas}
         </h2>
         <p style={{ color: 'var(--ink-2)', margin: '0 0 24px', fontSize: 14.5, lineHeight: 1.5, fontWeight: 500 }}>
-          Donde estas miradas coinciden, hay alineación. Donde no, hay una brecha y ahí empieza el trabajo.
+          {copy.subtituloPerspectivas}
         </p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-          {NIVELES.map(l => (
+          {copy.niveles.map(l => (
             <div key={l.tag} style={{
               border: '1.5px solid var(--ink)', padding: 18,
               display: 'flex', flexDirection: 'column', gap: 10,
@@ -132,7 +126,7 @@ export default function LandingMobile({
             }}>
               <span style={{ fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase', fontWeight: 700, color: 'var(--mute)' }}>
                 <span style={{ color: 'var(--ink)' }}>{l.tag.split(' · ')[0]}</span>
-                {' · '}{l.tag.split(' · ')[1]}
+                {l.tag.includes(' · ') ? <>{' · '}{l.tag.split(' · ')[1]}</> : null}
               </span>
               <h4 style={{ fontWeight: 900, fontSize: 19, letterSpacing: '-.02em', lineHeight: 1.05, margin: 0 }}>{l.h}</h4>
               <p style={{ margin: 0, fontSize: 13, lineHeight: 1.45, fontWeight: 500, color: 'var(--ink-2)' }}>{l.p}</p>
@@ -146,10 +140,10 @@ export default function LandingMobile({
         <span className="eyebrow">Paso a paso.</span>
         <div className="rule" />
         <h2 style={{ fontWeight: 900, fontSize: 'clamp(28px, 8vw, 40px)', lineHeight: .96, letterSpacing: '-.03em', margin: '16px 0 16px' }}>
-          cuatro fases del diagnóstico.
+          {copy.tituloProceso}
         </h2>
         <div style={{ display: 'flex', flexDirection: 'column' }}>
-          {PROCESO.map((s, i, arr) => (
+          {proceso.map((s, i, arr) => (
             <div key={s.n} style={{
               display: 'flex', flexDirection: 'column', gap: 10,
               padding: '20px 0',

@@ -5,13 +5,22 @@ import Image from 'next/image'
 import { ArrowRight, ArrowDown } from 'lucide-react'
 import EstadoNoDisponible from '@/components/diagnostico/EstadoNoDisponible'
 import LandingMobile from '@/components/diagnostico/LandingMobile'
+import { LANDING_COPY } from '@/lib/landing-copy'
+import type { TipoDiagnostico } from '@/types'
+
+const DIMENSIONES_COPY = [
+  { n: '01', idx: 'Intención',   h: 'Sentido',        pair: '¿A dónde vamos?', p: 'El propósito compartido.\nQué hace que este equipo exista y hacia qué horizonte se orienta.' },
+  { n: '02', idx: 'Motivación',  h: 'Energía',        pair: '¿Por qué?',        p: 'Lo que enciende o apaga a las personas.\nLas razones internas detrás del esfuerzo cotidiano.' },
+  { n: '03', idx: 'Interacción', h: 'Vínculos',       pair: '¿Con quién?',      p: 'Cómo nos relacionamos.\nCalidad de la conversación, confianza y colaboración entre personas.' },
+  { n: '04', idx: 'Acción',      h: 'Comportamiento', pair: '¿Qué?',            p: 'Lo que se hace realmente, no lo que se dice.\nHábitos, decisiones y entregas visibles.' },
+]
 
 export default async function LandingPage({ params }: { params: Promise<{ codigo: string }> }) {
   const { codigo } = await params
 
   const { data: diag } = await supabase
     .from('diagnosticos')
-    .select('id, nombre_compania, estado, color_neon')
+    .select('id, nombre_compania, estado, color_neon, tipo')
     .eq('codigo_participacion', codigo)
     .single()
 
@@ -25,10 +34,16 @@ export default async function LandingPage({ params }: { params: Promise<{ codigo
     .select('*', { count: 'exact', head: true })
     .eq('diagnostico_id', diag.id)
 
+  const tipo = (diag.tipo ?? 'cultura_360') as TipoDiagnostico
+  const copy = LANDING_COPY[tipo]
+  const totalN = totalPreguntas ?? 0
+  const procesoConN = copy.proceso.map(f => ({ ...f, meta: f.meta.replace('{N}', String(totalN)) }))
+  const nNiveles = copy.niveles.length
+
   return (
     <>
     <div className="only-mobile">
-      <LandingMobile codigo={codigo} nombreCompania={diag.nombre_compania} totalPreguntas={totalPreguntas ?? null} />
+      <LandingMobile codigo={codigo} nombreCompania={diag.nombre_compania} totalPreguntas={totalPreguntas ?? null} tipo={tipo} />
     </div>
     <div className="only-desktop" style={{ background: 'var(--bg)', minHeight: '100vh', fontFamily: "'Red Hat Display', sans-serif" }}>
 
@@ -38,26 +53,26 @@ export default async function LandingPage({ params }: { params: Promise<{ codigo
           <Image src="/brand/laborativo-logo.png" alt="Laborativo" width={200} height={51} style={{ objectFit: 'contain', display: 'block', marginLeft: -20, flexShrink: 0, marginTop: 15 }} />
           <div style={{ display: 'flex', gap: 32 }}>
             <span style={{ fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--mute)', fontWeight: 600, textAlign: 'right' }}>
-              Producto<b style={{ display: 'block', fontSize: 12, color: 'var(--ink)', marginTop: 6, fontWeight: 700, letterSpacing: '.04em' }}>Diagnóstico de Cultura</b>
+              Producto<b style={{ display: 'block', fontSize: 12, color: 'var(--ink)', marginTop: 6, fontWeight: 700, letterSpacing: '.04em' }}>{copy.header.producto}</b>
             </span>
             <span style={{ fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--mute)', fontWeight: 600, textAlign: 'right' }}>
-              Formato<b style={{ display: 'block', fontSize: 12, color: 'var(--ink)', marginTop: 6, fontWeight: 700, letterSpacing: '.04em' }}>Mirada 360°</b>
+              Formato<b style={{ display: 'block', fontSize: 12, color: 'var(--ink)', marginTop: 6, fontWeight: 700, letterSpacing: '.04em' }}>{copy.header.formato}</b>
             </span>
             <span style={{ fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--mute)', fontWeight: 600, textAlign: 'right' }}>
-              Tiempo<b style={{ display: 'block', fontSize: 12, color: 'var(--ink)', marginTop: 6, fontWeight: 700, letterSpacing: '.04em' }}>5–10 minutos</b>
+              Tiempo<b style={{ display: 'block', fontSize: 12, color: 'var(--ink)', marginTop: 6, fontWeight: 700, letterSpacing: '.04em' }}>{copy.header.tiempo}</b>
             </span>
           </div>
         </div>
 
         <span style={{ background: 'var(--ink)', color: 'var(--bg)', padding: '6px 12px', fontSize: 11, letterSpacing: '.08em', textTransform: 'uppercase', fontWeight: 700, display: 'inline-block' }}>{diag.nombre_compania}</span>
         <h1 style={{ fontWeight: 900, fontSize: 80, lineHeight: 1, letterSpacing: '-.020em', maxWidth: '30ch', paddingBottom: '.08em', marginTop: 24 }}>
-          exploremos las visiones,<br />entendamos las oportunidades,<br />fortalezcamos la cultura.
+          {copy.hero[0]}<br />{copy.hero[1]}<br />{copy.hero[2]}
         </h1>
 
         <div style={{ display: 'flex', gap: 40, marginTop: 42, alignItems: 'flex-end' }}>
           <p style={{ fontSize: 17, lineHeight: 1.45, width: '48ch', flexShrink: 0, color: 'var(--ink)', margin: 0, fontWeight: 500 }}>
-            <b style={{ fontWeight: 900 }}>4C</b> es un modelo de diagnóstico que integra la percepción del equipo y su líder a través de cuatro dimensiones de cultura, haciendo visibles las brechas y habilitando acciones para transformarla.<br />
-            <b style={{ fontWeight: 800 }}>Un modelo de consultoría creativa basada en la emoción.</b>
+            <b style={{ fontWeight: 900 }}>{copy.introBold}</b> {copy.introTexto}<br />
+            <b style={{ fontWeight: 800 }}>{copy.introCierre}</b>
           </p>
           <Link href="#empezar" style={{
             border: '2.5px solid var(--ink)',
@@ -89,18 +104,13 @@ export default async function LandingPage({ params }: { params: Promise<{ codigo
             <span className="eyebrow">Contexto de diagnóstico.</span>
             <div className="rule" />
             <h2 style={{ fontWeight: 900, fontSize: 'clamp(36px,4.2vw,56px)', lineHeight: .95, letterSpacing: '-.035em', maxWidth: '26ch', marginTop: 24 }}>
-              cuatro dimensiones de cultura<br />para abordar cualquier reto.
+              {copy.tituloDimensiones}
             </h2>
           </div>
-          <span className="chip">4 ejes · {totalPreguntas ?? 0} preguntas</span>
+          <span className="chip">4 ejes · {totalN} preguntas</span>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', border: '1.5px solid var(--ink)' }}>
-          {[
-            { n: '01', idx: 'Intención', h: 'Sentido', pair: '¿A dónde vamos?', p: 'El propósito compartido.\nQué hace que este equipo exista y hacia qué horizonte se orienta.' },
-            { n: '02', idx: 'Motivación', h: 'Energía', pair: '¿Por qué?', p: 'Lo que enciende o apaga a las personas.\nLas razones internas detrás del esfuerzo cotidiano.' },
-            { n: '03', idx: 'Interacción', h: 'Vínculos', pair: '¿Con quién?', p: 'Cómo nos relacionamos.\nCalidad de la conversación, confianza y colaboración entre personas.' },
-            { n: '04', idx: 'Acción', h: 'Comportamiento', pair: '¿Qué?', p: 'Lo que se hace realmente, no lo que se dice.\nHábitos, decisiones y entregas visibles.' },
-          ].map((d, i) => (
+          {DIMENSIONES_COPY.map((d, i) => (
             <div key={d.n} className="dim-card" style={{
               borderRight: i < 3 ? '1.5px solid var(--ink)' : 'none',
               padding: '28px 24px 32px',
@@ -119,23 +129,23 @@ export default async function LandingPage({ params }: { params: Promise<{ codigo
         </div>
       </div>
 
-      {/* Niveles */}
+      {/* Niveles / Perspectivas */}
       <div style={{ padding: '64px 56px', borderBottom: '1.5px solid var(--ink)', background: 'var(--paper)' }}>
-        <span className="eyebrow">Mirada 360°</span>
+        <span className="eyebrow">{copy.eyebrowPerspectivas}</span>
         <div className="rule" />
-        <h2 style={{ fontWeight: 900, fontSize: 'clamp(36px,4.2vw,56px)', lineHeight: .92, letterSpacing: '-.035em', margin: '16px 0 8px' }}>
-          cuatro puntos de vista<br />sobre la misma cultura.
+        <h2 style={{ fontWeight: 900, fontSize: 'clamp(36px,4.2vw,56px)', lineHeight: .92, letterSpacing: '-.035em', margin: '16px 0 8px', maxWidth: '28ch' }}>
+          {copy.tituloPerspectivas}
         </h2>
         <p style={{ color: 'var(--ink-2)', maxWidth: '56ch', margin: '0 0 40px', fontSize: 16, lineHeight: 1.5, fontWeight: 500 }}>
-          Donde estas miradas coinciden, hay alineación.<br />Donde no, hay una brecha y ahí empieza el trabajo.
+          {copy.subtituloPerspectivas}
         </p>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 16 }}>
-          {[
-            { tag: 'Nivel 01 · Individuo', h: 'Autoevaluación personal', p: 'Cada miembro del equipo se observa a sí mismo en las cuatro dimensiones.', accent: false },
-            { tag: 'Nivel 02 · Líder', h: 'Autoevaluación del líder', p: 'El líder se observa a sí mismo en las cuatro dimensiones.', accent: false },
-            { tag: 'Nivel 03 · Descendente', h: 'Líder evalúa al equipo', p: 'La mirada del líder sobre las conductas colectivas que observa en el equipo.', accent: false },
-            { tag: 'Nivel 04 · Ascendente', h: 'Equipo evalúa al líder', p: 'La mirada del equipo sobre las conductas que observa de su líder.', accent: false },
-          ].map(l => (
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: `repeat(${Math.min(nNiveles, 4)},1fr)`,
+          gap: 16,
+          maxWidth: nNiveles === 1 ? 640 : 'none',
+        }}>
+          {copy.niveles.map(l => (
             <div key={l.tag} style={{
               border: '1.5px solid var(--ink)', padding: 22,
               display: 'flex', flexDirection: 'column', gap: 14, minHeight: 156,
@@ -144,7 +154,7 @@ export default async function LandingPage({ params }: { params: Promise<{ codigo
             }}>
               <span style={{ fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase', fontWeight: 700, color: 'var(--mute)' }}>
                 <span style={{ color: 'var(--ink)' }}>{l.tag.split(' · ')[0]}</span>
-                {' · '}{l.tag.split(' · ')[1]}
+                {l.tag.includes(' · ') ? <>{' · '}{l.tag.split(' · ')[1]}</> : null}
               </span>
               <h4 style={{ fontWeight: 900, fontSize: 22, letterSpacing: '-.02em', lineHeight: 1.05, margin: 0 }}>{l.h}</h4>
               <p style={{ margin: 0, fontSize: 13, lineHeight: 1.45, fontWeight: 500, color: 'var(--ink-2)' }}>{l.p}</p>
@@ -159,16 +169,11 @@ export default async function LandingPage({ params }: { params: Promise<{ codigo
           <span className="eyebrow">Paso a paso.</span>
           <div className="rule" />
           <h2 style={{ fontWeight: 900, fontSize: 'clamp(36px,4vw,56px)', lineHeight: .92, letterSpacing: '-.035em', marginTop: 24 }}>
-            cuatro fases del diagnóstico.
+            {copy.tituloProceso}
           </h2>
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', marginLeft: 25 }}>
-          {[
-            { n: '01', h: 'Invitación y roles', p: 'Cada persona entra con el enlace compartido y selecciona si responde como miembro del equipo o como líder.', meta: '2 min · administrativo' },
-            { n: '02', h: 'Perspectivas del tema', p: 'Autoevaluación de los integrantes del equipo, autoevaluación del líder,\nel líder evalúa al equipo y equipo evalúa al líder.\nDe ahí nacen las brechas.', meta: '4–8 min · por persona' },
-            { n: '03', h: 'Preguntas por dimensión', p: 'Cada pregunta se ancla a una de las cuatro dimensiones. Las respuestas se cruzan entre perspectivas para detectar dónde la percepción no coincide con la experiencia.', meta: `4 dimensiones · ${totalPreguntas ?? 0} preguntas` },
-            { n: '04', h: 'Mapa de brechas', p: 'Entregamos un reporte visual con las brechas por dimensión, la salud cultural por perspectiva y acciones concretas para cerrar las distancias más críticas.', meta: 'Entrega inmediata · Dashboard' },
-          ].map((s, i, arr) => (
+          {procesoConN.map((s, i, arr) => (
             <div key={s.n} style={{ display: 'grid', gridTemplateColumns: '90px 1fr 180px', gap: 32, padding: '24px 0', borderBottom: i < arr.length - 1 ? '1.5px solid var(--ink)' : 'none', alignItems: 'start' }}>
               <span style={{ fontWeight: 900, fontSize: 44, lineHeight: .9, letterSpacing: '-.04em' }}>{s.n}</span>
               <div>
@@ -176,8 +181,8 @@ export default async function LandingPage({ params }: { params: Promise<{ codigo
                 <p style={{ margin: 0, fontSize: 14, color: 'var(--ink-2)', lineHeight: 1.5, maxWidth: '50ch', fontWeight: 500, whiteSpace: 'pre-line' }}>{s.p}</p>
               </div>
               <span style={{ fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase', fontWeight: 600, display: 'flex', flexDirection: 'column', gap: 6, paddingTop: 4, alignItems: 'flex-end' }}>
-                {s.meta.split(' · ').map((part, i) => (
-                  <span key={i} style={{ background: 'var(--ink)', color: 'var(--bg)', padding: '5px 10px', display: 'inline-block' }}>{part}</span>
+                {s.meta.split(' · ').map((part, idx) => (
+                  <span key={idx} style={{ background: 'var(--ink)', color: 'var(--bg)', padding: '5px 10px', display: 'inline-block' }}>{part}</span>
                 ))}
               </span>
             </div>
