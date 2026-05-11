@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutGrid, FileText, Users, type LucideIcon } from 'lucide-react'
+import { LayoutGrid, FileText, Users, Layers, type LucideIcon } from 'lucide-react'
 
 type Item = {
   label: string
@@ -25,7 +25,14 @@ const SECTIONS: Section[] = [
         match: p => p === '/admin'
           || (p.startsWith('/admin/')
             && !p.startsWith('/admin/preguntas-base')
-            && !p.startsWith('/admin/usuarios')),
+            && !p.startsWith('/admin/usuarios')
+            && !p.startsWith('/admin/grupos')),
+      },
+      {
+        label: 'Grupos',
+        href: '/admin/grupos',
+        icon: Layers,
+        match: p => p.startsWith('/admin/grupos'),
       },
     ],
   },

@@ -42,6 +42,16 @@ export interface Diagnostico {
   tipo: TipoDiagnostico
   diagnostico_padre_id?: string | null
   ronda?: number
+  grupo_id?: string | null
+  created_at: string
+}
+
+export interface Grupo {
+  id: string
+  nombre: string
+  cliente: string | null
+  tipo: TipoDiagnostico
+  codigo_resultados: string
   created_at: string
 }
 

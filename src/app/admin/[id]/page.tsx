@@ -88,27 +88,53 @@ export default async function DiagnosticoPage({ params }: { params: Promise<{ id
 
   const ronda = d.ronda ?? 1
 
+  // Grupo (si pertenece a uno) — para el badge "Grupo · ver comparativo"
+  const { data: grupoData } = d.grupo_id
+    ? await supabase
+        .from('grupos')
+        .select('id, nombre, codigo_resultados')
+        .eq('id', d.grupo_id)
+        .maybeSingle()
+    : { data: null }
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
 
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
         <div>
-          {ronda > 1 && (
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
-              <span style={{
-                fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase', fontWeight: 700,
-                background: 'var(--ink)', color: '#fff', padding: '3px 8px',
-              }}>Ronda {ronda}</span>
-              {padreData && (
+          {(ronda > 1 || grupoData) && (
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 10, marginBottom: 10, flexWrap: 'wrap' }}>
+              {ronda > 1 && (
+                <>
+                  <span style={{
+                    fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase', fontWeight: 700,
+                    background: 'var(--ink)', color: '#fff', padding: '3px 8px',
+                  }}>Ronda {ronda}</span>
+                  {padreData && (
+                    <Link
+                      href={`/admin/${padreData.id}`}
+                      style={{
+                        fontSize: 11, color: 'var(--ink)', fontWeight: 600, letterSpacing: '.04em',
+                        textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 4,
+                      }}
+                    >
+                      <ArrowLeft size={12} strokeWidth={2.5} /> Ronda {padreData.ronda ?? 1}
+                    </Link>
+                  )}
+                </>
+              )}
+              {grupoData && (
                 <Link
-                  href={`/admin/${padreData.id}`}
+                  href={`/admin/grupos/${grupoData.id}`}
                   style={{
-                    fontSize: 11, color: 'var(--ink)', fontWeight: 600, letterSpacing: '.04em',
-                    textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 4,
+                    fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase', fontWeight: 700,
+                    background: 'transparent', color: 'var(--ink)', padding: '3px 8px',
+                    border: '1.5px solid var(--ink)',
+                    textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 6,
                   }}
                 >
-                  <ArrowLeft size={12} strokeWidth={2.5} /> Ronda {padreData.ronda ?? 1}
+                  Grupo · {grupoData.nombre}
                 </Link>
               )}
             </div>
