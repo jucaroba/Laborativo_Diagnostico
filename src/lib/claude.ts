@@ -1,6 +1,6 @@
 import Anthropic from '@anthropic-ai/sdk'
 import { PreguntasGeneradas } from '@/lib/preguntas-base'
-import { Rol } from '@/types'
+import { Rol360 as Rol } from '@/types'
 
 function getClient() {
   return new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })

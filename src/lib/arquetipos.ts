@@ -1,4 +1,4 @@
-import { DIMENSIONES, Rol } from '@/types'
+import { DIMENSIONES, Rol360 as Rol } from '@/types'
 
 export type ArquetipoCtx = {
   promedioDim: Record<number, number | null>

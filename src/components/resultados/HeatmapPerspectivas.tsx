@@ -1,7 +1,7 @@
 'use client'
 
 import { Fragment } from 'react'
-import { DIMENSIONES, ROL_INFO, Rol } from '@/types'
+import { DIMENSIONES, ROL_INFO, Rol360 as Rol } from "@/types"
 
 const ROL_ORDEN: Rol[] = ['A', 'C', 'D', 'B']
 const ROLES: Rol[] = ['A', 'B', 'C', 'D']

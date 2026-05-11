@@ -1,5 +1,5 @@
 import Image from 'next/image'
-import { ROL_INFO, Rol } from '@/types'
+import { ROL_INFO, Rol360 as Rol } from '@/types'
 import { Arquetipo, ArquetipoCtx } from '@/lib/arquetipos'
 import VistaPerspectivasMobile from './VistaPerspectivasMobile'
 import ArquetiposEquipoMobile from './ArquetiposEquipoMobile'

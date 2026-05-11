@@ -1,6 +1,7 @@
 import { supabase } from '@/lib/supabase'
 import { notFound } from 'next/navigation'
 import { Diagnostico, Pregunta, DIMENSIONES, Rol } from '@/types'
+import { TIPOS_DIAGNOSTICO } from '@/lib/tipos-diagnostico'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import AccionesDiagnostico from '@/components/admin/AccionesDiagnostico'
 import CopiarLink from '@/components/admin/CopiarLink'
@@ -32,7 +33,10 @@ export default async function DiagnosticoPage({ params }: { params: Promise<{ id
     .eq('diagnostico_id', id)
     .not('enviado_at', 'is', null)
 
-  const preguntasPorRol: Record<Rol, Set<string>> = { A: new Set(), B: new Set(), C: new Set(), D: new Set() }
+  const preguntasPorRol: Record<Rol, Set<string>> = {
+    A: new Set(), B: new Set(), C: new Set(), D: new Set(),
+    X: new Set(), YO: new Set(), EQUIPO: new Set(),
+  }
   for (const p of (preguntas ?? []) as Pregunta[]) preguntasPorRol[p.rol].add(p.id)
 
   const partIds = ((participantes ?? []) as { id: string }[]).map(p => p.id)
@@ -68,6 +72,8 @@ export default async function DiagnosticoPage({ params }: { params: Promise<{ id
 
   const d = diag as Diagnostico
   const ps = (preguntas ?? []) as Pregunta[]
+  const tipoConfig = TIPOS_DIAGNOSTICO[d.tipo ?? 'cultura_360']
+  const rolesIter = tipoConfig?.rolesPregunta ?? (['A', 'C', 'D', 'B'] as const)
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
@@ -168,7 +174,7 @@ export default async function DiagnosticoPage({ params }: { params: Promise<{ id
           <div key={dim.id} style={{ marginBottom: 40, borderTop: idx === 0 ? 'none' : '2px solid var(--ink)', paddingTop: idx === 0 ? 16 : 16 }}>
             <p className="page-header__eyebrow" style={{ margin: '0 0 4px' }}>{dim.subtitulo}</p>
             <h3 style={{ fontSize: 20, fontWeight: 900, letterSpacing: '0', margin: '0 0 20px', fontFamily: 'Red Hat Display, sans-serif' }}>{dim.nombre}</h3>
-            {(['A', 'C', 'D', 'B'] as Rol[]).map(rol => {
+            {rolesIter.map(rol => {
               const grupo = ps.filter(p => p.dimension_id === dim.id && p.rol === rol)
               const maxOrden = grupo.length ? Math.max(...grupo.map(p => p.orden)) : ps.length
               return (

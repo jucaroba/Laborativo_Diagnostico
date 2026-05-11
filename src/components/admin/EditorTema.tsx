@@ -3,7 +3,8 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
-import { DIMENSIONES, ROL_INFO, Rol } from '@/types'
+import { DIMENSIONES, ROL_INFO, Rol, TipoDiagnostico } from '@/types'
+import { TIPOS_DIAGNOSTICO } from '@/lib/tipos-diagnostico'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
@@ -44,6 +45,7 @@ interface Props {
   temaNombre: string
   descripcion: string | null
   preguntas: PreguntaBase[]
+  tipo?: TipoDiagnostico
 }
 
 const iconBtn: React.CSSProperties = { background: 'none', border: 'none', cursor: 'pointer', padding: 2, display: 'flex' }
@@ -86,7 +88,9 @@ function BotonesAccion({ onDescartar, onGuardar, guardando }: { onDescartar: () 
   )
 }
 
-export default function EditorTema({ temaId, temaNombre, descripcion, preguntas }: Props) {
+export default function EditorTema({ temaId, temaNombre, descripcion, preguntas, tipo }: Props) {
+  const tipoConfig = TIPOS_DIAGNOSTICO[tipo ?? 'cultura_360']
+  const rolesIter = tipoConfig?.rolesPregunta ?? (['A', 'C', 'D', 'B'] as const)
   const router = useRouter()
   const [abierto, setAbierto] = useState(false)
   const [vertical, setVertical] = useState('')
@@ -231,7 +235,7 @@ export default function EditorTema({ temaId, temaNombre, descripcion, preguntas 
               <div key={dim.id} style={{ marginBottom: 40, borderTop: idx === 0 ? 'none' : '2px solid var(--ink)', paddingTop: 16 }}>
                 <p className="page-header__eyebrow" style={{ margin: '0 0 4px' }}>{dim.subtitulo}</p>
                 <h3 style={{ fontSize: 20, fontWeight: 900, letterSpacing: 0, margin: '0 0 20px', fontFamily: 'Red Hat Display, sans-serif' }}>{dim.nombre}</h3>
-                {(['A', 'C', 'D', 'B'] as Rol[]).map(rol => {
+                {rolesIter.map(rol => {
                   const grupo = generadas!.map((p, i) => ({ ...p, idx: i })).filter(p => p.dimension_id === dim.id && p.rol === rol)
                   return (
                     <div key={rol} style={{ marginBottom: 20 }}>
@@ -276,7 +280,7 @@ export default function EditorTema({ temaId, temaNombre, descripcion, preguntas 
               <div key={dim.id} style={{ marginBottom: 40, borderTop: idx === 0 ? 'none' : '2px solid var(--ink)', paddingTop: 16 }}>
                 <p className="page-header__eyebrow" style={{ margin: '0 0 4px' }}>{dim.subtitulo}</p>
                 <h3 style={{ fontSize: 20, fontWeight: 900, letterSpacing: 0, margin: '0 0 20px', fontFamily: 'Red Hat Display, sans-serif' }}>{dim.nombre}</h3>
-                {(['A', 'C', 'D', 'B'] as Rol[]).map(rol => {
+                {rolesIter.map(rol => {
                   const grupo = preguntas.filter(p => p.dimension_id === dim.id && p.rol === rol)
                   const maxOrden = grupo.length ? Math.max(...grupo.map(p => p.orden)) : 0
                   return (

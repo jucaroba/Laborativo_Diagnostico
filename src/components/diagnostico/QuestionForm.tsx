@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
-import { DIMENSIONES, Rol } from '@/types'
+import { DIMENSIONES, Rol, TipoDiagnostico } from '@/types'
 import { ArrowRight, ArrowLeft } from 'lucide-react'
 import { shuffleSeeded } from '@/lib/shuffle'
 import QuestionFormMobile from './QuestionFormMobile'
@@ -20,14 +20,16 @@ const ESCALA = [
   { n: 10, label: '', desc: '' },
 ]
 
-export default function QuestionForm({ diagnosticoId, codigo, idx }: {
+export default function QuestionForm({ diagnosticoId, codigo, idx, tipo = 'cultura_360' }: {
   diagnosticoId: string
   codigo: string
   idx: number
+  tipo?: TipoDiagnostico
 }) {
   const router = useRouter()
+  const esPulso = tipo === 'pulso_colectivo'
   const [pid, setPid] = useState<string | null>(null)
-  const [perfil, setPerfil] = useState<'equipo' | 'lider' | null>(null)
+  const [perfil, setPerfil] = useState<'equipo' | 'lider' | 'colectivo' | null>(null)
   const [preguntas, setPreguntas] = useState<{ id: string; texto: string; dimension_id: number; rol: Rol; orden: number }[]>([])
   const [valor, setValor] = useState<number | null>(null)
   const [guardando, setGuardando] = useState(false)
@@ -35,7 +37,7 @@ export default function QuestionForm({ diagnosticoId, codigo, idx }: {
 
   useEffect(() => {
     const storedPid = sessionStorage.getItem('pid')
-    const storedPerfil = sessionStorage.getItem('perfil') as 'equipo' | 'lider' | null
+    const storedPerfil = sessionStorage.getItem('perfil') as 'equipo' | 'lider' | 'colectivo' | null
     setPid(storedPid)
     setPerfil(storedPerfil)
   }, [])
@@ -46,7 +48,9 @@ export default function QuestionForm({ diagnosticoId, codigo, idx }: {
   }, [perfil, pid, diagnosticoId])
 
   async function cargarPreguntas() {
-    const roles: Rol[] = perfil === 'equipo' ? ['A', 'C'] : ['D', 'B']
+    const roles: Rol[] = esPulso
+      ? ['X']
+      : perfil === 'equipo' ? ['A', 'C'] : ['D', 'B']
     const { data } = await supabase
       .from('preguntas')
       .select('*')

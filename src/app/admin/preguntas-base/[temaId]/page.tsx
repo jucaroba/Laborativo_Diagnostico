@@ -39,6 +39,7 @@ export default async function PreguntasBaseTemaPage({ params }: { params: Promis
       temaNombre={t.nombre}
       descripcion={t.descripcion}
       preguntas={ps}
+      tipo={t.tipo}
     />
   )
 }

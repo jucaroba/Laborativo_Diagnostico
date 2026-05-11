@@ -1,10 +1,11 @@
 import { supabase } from '@/lib/supabase'
 import { notFound } from 'next/navigation'
-import { DIMENSIONES, ROL_INFO, Rol } from '@/types'
+import { DIMENSIONES, ROL_INFO, Rol360 as Rol } from '@/types'
 import Image from 'next/image'
 import VistaPerspectivas from '@/components/resultados/VistaPerspectivas'
 import ArquetiposEquipo from '@/components/resultados/ArquetiposEquipo'
 import ResultadosMobile from '@/components/resultados/ResultadosMobile'
+import ResultadosPulso from '@/components/resultados/ResultadosPulso'
 import { evaluarBrechas, evaluarRelaciones } from '@/lib/arquetipos'
 
 export const revalidate = 0
@@ -47,6 +48,47 @@ export default async function ResultadosPage({ params }: { params: Promise<{ cod
     .in('participante_id', participanteIds.length > 0 ? participanteIds : ['00000000-0000-0000-0000-000000000000'])
 
   const totalParticipantes = participantes?.length ?? 0
+
+  // ─── Branch por tipo de diagnóstico ───────────────────────────
+  // Para tipos que no son Cultura 360° tenemos cálculos y vistas
+  // dedicadas. La rama 360 (default) sigue debajo intacta.
+  const tipoDiag = (diag.tipo ?? 'cultura_360') as string
+
+  if (tipoDiag === 'pulso_colectivo') {
+    // Una sola perspectiva (rol X) con 4 dimensiones. Calculamos
+    // promedio y desviación estándar por dimensión.
+    const porDim: Record<number, number[]> = { 1: [], 2: [], 3: [], 4: [] }
+    for (const resp of respuestas ?? []) {
+      const pq = preguntas?.find(p => p.id === resp.pregunta_id)
+      if (!pq) continue
+      if (porDim[pq.dimension_id]) porDim[pq.dimension_id].push(resp.valor)
+    }
+    const resultadosPulso = DIMENSIONES.map(d => {
+      const vals = porDim[d.id]
+      if (!vals.length) return { id: d.id, nombre: d.nombre, subtitulo: d.subtitulo, promedio: null, desviacion: 0, n: 0 }
+      const avg = vals.reduce((a, b) => a + b, 0) / vals.length
+      const variance = vals.reduce((s, v) => s + (v - avg) ** 2, 0) / vals.length
+      const std = Math.sqrt(variance)
+      return {
+        id: d.id, nombre: d.nombre, subtitulo: d.subtitulo,
+        promedio: Math.round(avg * 10) / 10,
+        desviacion: Math.round(std * 10) / 10,
+        n: vals.length,
+      }
+    })
+    const totalFormulariosPulso = new Set((respuestas ?? []).map(r => r.participante_id)).size
+    return (
+      <ResultadosPulso
+        nombreCompania={diag.nombre_compania}
+        estado={diag.estado}
+        totalParticipantes={totalParticipantes}
+        totalFormularios={totalFormulariosPulso}
+        resultados={resultadosPulso}
+      />
+    )
+  }
+
+  // ─── Cultura 360° (legacy / default) ──────────────────────────
 
   const conteoPorRol: Record<Rol, number> = { A: 0, B: 0, C: 0, D: 0 }
   for (const p of participantes ?? []) conteoPorRol[p.rol as Rol]++

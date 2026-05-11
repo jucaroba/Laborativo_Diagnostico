@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Rol } from '@/types'
+import { Rol360 as Rol } from "@/types"
 import RadarPerspectivas from './RadarPerspectivas'
 import HeatmapPerspectivas, { cellBg } from './HeatmapPerspectivas'
 

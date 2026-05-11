@@ -3,13 +3,10 @@
 // Las llaves son las almacenadas en DB; los nombres son comerciales.
 // ─────────────────────────────────────────────────────────────────
 
-export type TipoDiagnostico =
-  | 'cultura_360'
-  | 'pulso_colectivo'
-  | 'equipo_en_espejo'
-  | 'termometro_4'
+import type { TipoDiagnostico, Rol } from '@/types'
 
-export type RolPregunta = 'A' | 'B' | 'C' | 'D' | 'X' | 'YO' | 'EQUIPO'
+export type { TipoDiagnostico }
+export type RolPregunta = Rol
 
 export type TipoConfig = {
   key: TipoDiagnostico
@@ -46,7 +43,7 @@ export const TIPOS_DIAGNOSTICO: Record<TipoDiagnostico, TipoConfig> = {
     descripcion: 'Todo el equipo responde las mismas preguntas, sin distinguir líder o miembros. Mide la sensación general del grupo en las cuatro dimensiones de cultura.',
     rolesPregunta: ['X'],
     rolesParticipante: ['X'],
-    disponible: false,
+    disponible: true,
     etiqueta: 'Pulso',
   },
   equipo_en_espejo: {

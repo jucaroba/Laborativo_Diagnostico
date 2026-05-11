@@ -343,12 +343,12 @@ export default function NuevoDiagnosticoForm() {
             <div key={dim.id} style={{ marginBottom: 40, borderTop: dimIdx === 0 ? 'none' : '2px solid var(--ink)', paddingTop: 16 }}>
               <p className="page-header__eyebrow" style={{ margin: '0 0 4px' }}>{dim.subtitulo}</p>
               <h3 style={{ fontSize: 20, fontWeight: 900, letterSpacing: '0', margin: '0 0 20px', fontFamily: 'Red Hat Display, sans-serif' }}>{dim.nombre}</h3>
-              {(['A', 'C', 'D', 'B'] as Rol[]).map(rol => {
+              {(tipoConfig?.rolesPregunta ?? (['A', 'C', 'D', 'B'] as const)).map(rol => {
                 const grupo = preguntas.map((p, i) => ({ ...p, idx: i })).filter(p => p.dimension_id === dim.id && p.rol === rol)
                 return (
                   <div key={rol} style={{ marginBottom: 20 }}>
                     <div style={{ background: 'var(--bg-2)', padding: '6px 12px', marginBottom: 4, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                      <span className="page-header__eyebrow" style={{ margin: 0, color: 'var(--ink)', fontWeight: 800 }}>{rol} / {ROL_INFO[rol].label}</span>
+                      <span className="page-header__eyebrow" style={{ margin: 0, color: 'var(--ink)', fontWeight: 800 }}>{rol} / {ROL_INFO[rol as Rol].label}</span>
                       <button onClick={() => setPreguntas(prev => [...prev, { dimension_id: dim.id, rol, texto: '', orden: prev.length + 1 }])}
                         style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--ink)', display: 'flex', padding: '2px 4px' }}>
                         <PlusIcon size={13} strokeWidth={2.5} />

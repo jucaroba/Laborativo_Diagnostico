@@ -1,11 +1,22 @@
-export type Rol = 'A' | 'B' | 'C' | 'D'
+// Roles de pregunta/participante.
+//   A/B/C/D pertenecen a Cultura 360°.
+//   X      perspectiva colectiva única (Pulso, Termómetro).
+//   YO     auto-mirada individual (Equipo en Espejo).
+//   EQUIPO mirada del grupo (Equipo en Espejo).
+// Subtipo de Rol exclusivo de Cultura 360°. Útil para tipar maps que solo
+// deben contener las 4 perspectivas cruzadas.
+export type Rol360 = 'A' | 'B' | 'C' | 'D'
+export type Rol = Rol360 | 'X' | 'YO' | 'EQUIPO'
 export type EstadoDiagnostico = 'borrador' | 'activo' | 'completado'
 
 export const ROL_INFO: Record<Rol, { label: string; descripcion: string; color: string }> = {
   A: { label: 'Equipo auto',     descripcion: 'Auto-evaluación del equipo',          color: '#4A7FA5' },
-  B: { label: 'Líder → Equipo', descripcion: 'El líder evalúa al equipo',           color: '#8B7355' },
-  C: { label: 'Equipo → Líder', descripcion: 'El equipo evalúa al líder',           color: '#7D3C3C' },
-  D: { label: 'Líder auto',     descripcion: 'Auto-evaluación del líder',           color: '#3D6B4F' },
+  B: { label: 'Líder → Equipo', descripcion: 'El líder evalúa al equipo',            color: '#8B7355' },
+  C: { label: 'Equipo → Líder', descripcion: 'El equipo evalúa al líder',            color: '#7D3C3C' },
+  D: { label: 'Líder auto',     descripcion: 'Auto-evaluación del líder',            color: '#3D6B4F' },
+  X: { label: 'Colectivo',      descripcion: 'Todo el equipo responde lo mismo',     color: '#0A0A0A' },
+  YO: { label: 'Yo individual', descripcion: 'Cómo me veo a mí mismo en el equipo',  color: '#0A0A0A' },
+  EQUIPO: { label: 'El equipo', descripcion: 'Cómo veo al equipo en general',        color: '#0A0A0A' },
 }
 
 export const DIMENSIONES = [
