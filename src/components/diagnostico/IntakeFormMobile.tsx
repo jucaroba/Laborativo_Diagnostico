@@ -30,19 +30,19 @@ export default function IntakeFormMobile({
   loading: boolean
   onComenzar: () => void
 }) {
-  const esPulso = tipo === 'pulso_colectivo'
-  const habilitado = esPulso ? !loading : !!perfil && !loading
+  const esSimple = tipo !== 'cultura_360'
+  const habilitado = esSimple ? !loading : !!perfil && !loading
 
   return (
     <div style={{ minHeight: '100vh', fontFamily: "'Red Hat Display', sans-serif", padding: '24px 20px 32px', display: 'flex', flexDirection: 'column', gap: 18, background: 'var(--bg)', overflowX: 'hidden' }}>
-      <span className="eyebrow">{esPulso ? 'Registro' : 'Paso 01 / 02 — Registro'}</span>
+      <span className="eyebrow">{esSimple ? 'Registro' : 'Paso 01 / 02 — Registro'}</span>
       <div className="rule" />
       <div style={{ fontSize: 12, color: 'var(--ink)', fontWeight: 700, marginTop: 8, textTransform: 'uppercase', letterSpacing: '.08em' }}>{nombreCompania}</div>
       <h2 style={{ fontWeight: 900, fontSize: 'clamp(32px, 9vw, 44px)', lineHeight: .95, letterSpacing: -.5, margin: 0 }}>
-        {esPulso ? <>Antes de empezar,<br />unas notas rápidas.</> : <>Antes de empezar,<br />elige tu rol.</>}
+        {esSimple ? <>Antes de empezar,<br />unas notas rápidas.</> : <>Antes de empezar,<br />elige tu rol.</>}
       </h2>
 
-      {esPulso ? (
+      {esSimple ? (
         <p style={{ fontSize: 14.5, lineHeight: 1.5, color: 'var(--ink-2)', margin: 0, fontWeight: 500 }}>
           Vas a responder {preguntasColectivo} preguntas sobre cómo se siente el equipo en las cuatro dimensiones de cultura. No hay respuestas correctas o incorrectas. Tus respuestas son anónimas y se promedian con las del resto del equipo.
         </p>
@@ -96,7 +96,7 @@ export default function IntakeFormMobile({
 
       <div style={{ marginTop: 'auto', paddingTop: 24 }}>
         <span className="eyebrow soft">
-          {esPulso
+          {esSimple
             ? `≈ ${Math.max(2, Math.ceil(preguntasColectivo / 3))}–${Math.max(4, Math.ceil(preguntasColectivo / 2))} min · ${preguntasColectivo} preguntas`
             : `≈ 12–18 min${perfil ? ` · ${perfil === 'lider' ? preguntasLider : preguntasEquipo} preguntas` : ''}`}
         </span>

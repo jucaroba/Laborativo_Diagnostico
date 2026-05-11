@@ -63,7 +63,7 @@ export const TIPOS_DIAGNOSTICO: Record<TipoDiagnostico, TipoConfig> = {
     descripcion: 'Pulso ultracorto, una pregunta por dimensión. Pensado para check-ins recurrentes que no reemplazan un diagnóstico profundo pero detectan movimiento.',
     rolesPregunta: ['X'],
     rolesParticipante: ['X'],
-    disponible: false,
+    disponible: true,
     etiqueta: 'Termómetro',
   },
 }

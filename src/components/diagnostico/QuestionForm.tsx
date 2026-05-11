@@ -6,6 +6,7 @@ import { DIMENSIONES, Rol, TipoDiagnostico } from '@/types'
 import { ArrowRight, ArrowLeft } from 'lucide-react'
 import { shuffleSeeded } from '@/lib/shuffle'
 import QuestionFormMobile from './QuestionFormMobile'
+import { TIPOS_DIAGNOSTICO } from '@/lib/tipos-diagnostico'
 
 const ESCALA = [
   { n: 1, label: 'Muy bajo', desc: 'Totalmente en desacuerdo' },
@@ -27,7 +28,8 @@ export default function QuestionForm({ diagnosticoId, codigo, idx, tipo = 'cultu
   tipo?: TipoDiagnostico
 }) {
   const router = useRouter()
-  const esPulso = tipo === 'pulso_colectivo'
+  const esSimple = tipo !== 'cultura_360'
+  const rolesDelTipo = TIPOS_DIAGNOSTICO[tipo].rolesPregunta
   const [pid, setPid] = useState<string | null>(null)
   const [perfil, setPerfil] = useState<'equipo' | 'lider' | 'colectivo' | null>(null)
   const [preguntas, setPreguntas] = useState<{ id: string; texto: string; dimension_id: number; rol: Rol; orden: number }[]>([])
@@ -48,8 +50,8 @@ export default function QuestionForm({ diagnosticoId, codigo, idx, tipo = 'cultu
   }, [perfil, pid, diagnosticoId])
 
   async function cargarPreguntas() {
-    const roles: Rol[] = esPulso
-      ? ['X']
+    const roles: Rol[] = esSimple
+      ? Array.from(rolesDelTipo)
       : perfil === 'equipo' ? ['A', 'C'] : ['D', 'B']
     const { data } = await supabase
       .from('preguntas')

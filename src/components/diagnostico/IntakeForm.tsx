@@ -5,6 +5,7 @@ import { supabase } from '@/lib/supabase'
 import { ArrowRight } from 'lucide-react'
 import IntakeFormMobile from './IntakeFormMobile'
 import type { TipoDiagnostico } from '@/types'
+import { TIPOS_DIAGNOSTICO } from '@/lib/tipos-diagnostico'
 
 type Perfil = 'equipo' | 'lider'
 
@@ -26,13 +27,16 @@ export default function IntakeForm({ diagnosticoId, nombreCompania, codigo, tipo
   const [perfil, setPerfil] = useState<Perfil | null>(null)
   const [loading, setLoading] = useState(false)
 
-  const esPulso = tipo === 'pulso_colectivo'
+  // En 360 el participante elige rol (equipo o líder). En el resto de tipos
+  // todos responden el mismo set y se les asigna un rol único (típicamente 'X').
+  const esSimple = tipo !== 'cultura_360'
+  const rolUnico = TIPOS_DIAGNOSTICO[tipo].rolesParticipante[0] // 'X' para pulso y termómetro
 
   async function comenzar() {
-    if (!esPulso && !perfil) return
+    if (!esSimple && !perfil) return
     setLoading(true)
 
-    const rol = esPulso ? 'X' : perfil === 'equipo' ? 'A' : 'D'
+    const rol = esSimple ? rolUnico : perfil === 'equipo' ? 'A' : 'D'
 
     const { data: participante } = await supabase
       .from('participantes')
@@ -42,7 +46,7 @@ export default function IntakeForm({ diagnosticoId, nombreCompania, codigo, tipo
 
     if (participante) {
       sessionStorage.setItem('pid', participante.id)
-      sessionStorage.setItem('perfil', esPulso ? 'colectivo' : perfil!)
+      sessionStorage.setItem('perfil', esSimple ? 'colectivo' : perfil!)
       router.push(`/d/${codigo}/q/1`)
     }
     setLoading(false)
@@ -64,14 +68,14 @@ export default function IntakeForm({ diagnosticoId, nombreCompania, codigo, tipo
       />
     </div>
     <div className="only-desktop" style={{ minHeight: '100vh', fontFamily: "'Red Hat Display', sans-serif", padding: '56px 56px 56px 106px', display: 'flex', flexDirection: 'column', gap: 24, background: 'var(--bg)', maxWidth: 870 }}>
-      <span className="eyebrow">{esPulso ? 'Registro' : 'Paso 01 / 02 — Registro'}</span>
+      <span className="eyebrow">{esSimple ? 'Registro' : 'Paso 01 / 02 — Registro'}</span>
       <div className="rule" />
       <div style={{ fontSize: 13, color: 'var(--ink)', fontWeight: 700, marginTop: 24, marginLeft: 100, textTransform: 'uppercase', letterSpacing: '.08em' }}>{nombreCompania}</div>
       <h2 style={{ fontWeight: 900, fontSize: 64, lineHeight: .92, letterSpacing: -1, marginLeft: 100 }}>
-        {esPulso ? <>Antes de empezar,<br />unas notas rápidas.</> : <>Antes de empezar,<br />elige tu rol.</>}
+        {esSimple ? <>Antes de empezar,<br />unas notas rápidas.</> : <>Antes de empezar,<br />elige tu rol.</>}
       </h2>
 
-      {esPulso ? (
+      {esSimple ? (
         <>
           <div style={{ marginLeft: 100, fontSize: 15, lineHeight: 1.55, color: 'var(--ink-2)', fontWeight: 500, maxWidth: '50ch' }}>
             Vas a responder {preguntasColectivo} preguntas sobre cómo se siente el equipo en las cuatro dimensiones de cultura. No hay respuestas correctas o incorrectas. Tus respuestas son anónimas y se promedian con las del resto del equipo.

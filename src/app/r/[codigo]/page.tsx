@@ -6,6 +6,7 @@ import VistaPerspectivas from '@/components/resultados/VistaPerspectivas'
 import ArquetiposEquipo from '@/components/resultados/ArquetiposEquipo'
 import ResultadosMobile from '@/components/resultados/ResultadosMobile'
 import ResultadosPulso from '@/components/resultados/ResultadosPulso'
+import ResultadosTermometro from '@/components/resultados/ResultadosTermometro'
 import { evaluarBrechas, evaluarRelaciones } from '@/lib/arquetipos'
 
 export const revalidate = 0
@@ -54,16 +55,16 @@ export default async function ResultadosPage({ params }: { params: Promise<{ cod
   // dedicadas. La rama 360 (default) sigue debajo intacta.
   const tipoDiag = (diag.tipo ?? 'cultura_360') as string
 
-  if (tipoDiag === 'pulso_colectivo') {
-    // Una sola perspectiva (rol X) con 4 dimensiones. Calculamos
-    // promedio y desviación estándar por dimensión.
+  // Pulso y Termómetro comparten el cálculo (1 perspectiva 'X', 4 dimensiones)
+  // pero usan dashboards distintos.
+  if (tipoDiag === 'pulso_colectivo' || tipoDiag === 'termometro_4') {
     const porDim: Record<number, number[]> = { 1: [], 2: [], 3: [], 4: [] }
     for (const resp of respuestas ?? []) {
       const pq = preguntas?.find(p => p.id === resp.pregunta_id)
       if (!pq) continue
       if (porDim[pq.dimension_id]) porDim[pq.dimension_id].push(resp.valor)
     }
-    const resultadosPulso = DIMENSIONES.map(d => {
+    const resultadosSimple = DIMENSIONES.map(d => {
       const vals = porDim[d.id]
       if (!vals.length) return { id: d.id, nombre: d.nombre, subtitulo: d.subtitulo, promedio: null, desviacion: 0, n: 0 }
       const avg = vals.reduce((a, b) => a + b, 0) / vals.length
@@ -76,16 +77,17 @@ export default async function ResultadosPage({ params }: { params: Promise<{ cod
         n: vals.length,
       }
     })
-    const totalFormulariosPulso = new Set((respuestas ?? []).map(r => r.participante_id)).size
-    return (
-      <ResultadosPulso
-        nombreCompania={diag.nombre_compania}
-        estado={diag.estado}
-        totalParticipantes={totalParticipantes}
-        totalFormularios={totalFormulariosPulso}
-        resultados={resultadosPulso}
-      />
-    )
+    const totalFormulariosSimple = new Set((respuestas ?? []).map(r => r.participante_id)).size
+    const sharedProps = {
+      nombreCompania: diag.nombre_compania,
+      estado: diag.estado,
+      totalParticipantes,
+      totalFormularios: totalFormulariosSimple,
+      resultados: resultadosSimple,
+    }
+    return tipoDiag === 'pulso_colectivo'
+      ? <ResultadosPulso {...sharedProps} />
+      : <ResultadosTermometro {...sharedProps} />
   }
 
   // ─── Cultura 360° (legacy / default) ──────────────────────────
