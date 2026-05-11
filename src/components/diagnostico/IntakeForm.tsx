@@ -78,7 +78,11 @@ export default function IntakeForm({ diagnosticoId, nombreCompania, codigo, tipo
       {esSimple ? (
         <>
           <div style={{ marginLeft: 100, fontSize: 15, lineHeight: 1.55, color: 'var(--ink-2)', fontWeight: 500, maxWidth: '50ch' }}>
-            Vas a responder {preguntasColectivo} preguntas sobre cómo se siente el equipo en las cuatro dimensiones de cultura. No hay respuestas correctas o incorrectas. Tus respuestas son anónimas y se promedian con las del resto del equipo.
+            {tipo === 'equipo_en_espejo'
+              ? <>Vas a responder {preguntasColectivo} preguntas desde dos miradas: <strong>cómo te ves a ti</strong> y <strong>cómo ves al equipo</strong>. Sin respuestas correctas, tus respuestas son anónimas.</>
+              : tipo === 'termometro_4'
+              ? <>Vas a responder {preguntasColectivo} preguntas — una por cada dimensión de cultura. Toma menos de un minuto. Tus respuestas son anónimas y se promedian con las del resto del equipo.</>
+              : <>Vas a responder {preguntasColectivo} preguntas sobre cómo se siente el equipo en las cuatro dimensiones de cultura. No hay respuestas correctas o incorrectas. Tus respuestas son anónimas y se promedian con las del resto del equipo.</>}
           </div>
           <div style={{ paddingTop: 8, marginLeft: 100 }}>
             <button onClick={comenzar} disabled={loading}

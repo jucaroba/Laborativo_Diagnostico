@@ -7,6 +7,7 @@ import ArquetiposEquipo from '@/components/resultados/ArquetiposEquipo'
 import ResultadosMobile from '@/components/resultados/ResultadosMobile'
 import ResultadosPulso from '@/components/resultados/ResultadosPulso'
 import ResultadosTermometro from '@/components/resultados/ResultadosTermometro'
+import ResultadosEspejo from '@/components/resultados/ResultadosEspejo'
 import { evaluarBrechas, evaluarRelaciones } from '@/lib/arquetipos'
 
 export const revalidate = 0
@@ -88,6 +89,57 @@ export default async function ResultadosPage({ params }: { params: Promise<{ cod
     return tipoDiag === 'pulso_colectivo'
       ? <ResultadosPulso {...sharedProps} />
       : <ResultadosTermometro {...sharedProps} />
+  }
+
+  // ─── Equipo en Espejo: 2 perspectivas (YO, EQUIPO) por dimensión
+  if (tipoDiag === 'equipo_en_espejo') {
+    type Bucket = { suma: number; n: number; valores: number[] }
+    const init = (): Bucket => ({ suma: 0, n: 0, valores: [] })
+    const acum: Record<number, { YO: Bucket; EQUIPO: Bucket }> = {
+      1: { YO: init(), EQUIPO: init() },
+      2: { YO: init(), EQUIPO: init() },
+      3: { YO: init(), EQUIPO: init() },
+      4: { YO: init(), EQUIPO: init() },
+    }
+    for (const resp of respuestas ?? []) {
+      const pq = preguntas?.find(p => p.id === resp.pregunta_id)
+      if (!pq) continue
+      const persp = pq.rol === 'YO' ? 'YO' : pq.rol === 'EQUIPO' ? 'EQUIPO' : null
+      if (!persp) continue
+      const bucket = acum[pq.dimension_id]?.[persp]
+      if (!bucket) continue
+      bucket.suma += resp.valor
+      bucket.n += 1
+      bucket.valores.push(resp.valor)
+    }
+    const calcStats = (b: Bucket) => {
+      if (b.n === 0) return { promedio: null as number | null, desviacion: 0, n: 0 }
+      const avg = b.suma / b.n
+      const variance = b.valores.reduce((s, v) => s + (v - avg) ** 2, 0) / b.n
+      return {
+        promedio: Math.round(avg * 10) / 10,
+        desviacion: Math.round(Math.sqrt(variance) * 10) / 10,
+        n: b.n,
+      }
+    }
+    const resultadosEspejo = DIMENSIONES.map(d => {
+      const yo = calcStats(acum[d.id].YO)
+      const equipo = calcStats(acum[d.id].EQUIPO)
+      const delta = (yo.promedio !== null && equipo.promedio !== null)
+        ? Math.round(Math.abs(yo.promedio - equipo.promedio) * 10) / 10
+        : 0
+      return { id: d.id, nombre: d.nombre, subtitulo: d.subtitulo, yo, equipo, delta }
+    })
+    const totalFormulariosEspejo = new Set((respuestas ?? []).map(r => r.participante_id)).size
+    return (
+      <ResultadosEspejo
+        nombreCompania={diag.nombre_compania}
+        estado={diag.estado}
+        totalParticipantes={totalParticipantes}
+        totalFormularios={totalFormulariosEspejo}
+        resultados={resultadosEspejo}
+      />
+    )
   }
 
   // ─── Cultura 360° (legacy / default) ──────────────────────────

@@ -53,7 +53,7 @@ export const TIPOS_DIAGNOSTICO: Record<TipoDiagnostico, TipoConfig> = {
     descripcion: 'Cada persona responde dos veces: cómo se ve a sí misma y cómo ve al equipo. El líder participa como uno más. La distancia entre lo individual y lo colectivo es lo que se mide.',
     rolesPregunta: ['YO', 'EQUIPO'],
     rolesParticipante: ['X'],
-    disponible: false,
+    disponible: true,
     etiqueta: 'Espejo',
   },
   termometro_4: {
