@@ -5,6 +5,7 @@ import { buttonVariants } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import AccionesRow from '@/components/admin/AccionesRow'
+import { TIPOS_DIAGNOSTICO } from '@/lib/tipos-diagnostico'
 
 export const revalidate = 0
 
@@ -43,18 +44,27 @@ export default async function AdminPage() {
         <Table>
           <TableHeader>
             <TableRow style={{ background: '#0A0A0A', borderBottom: 'none' }}>
-              {['Empresa', 'Contacto', 'Fecha', 'Estado', 'Color', ''].map(h => (
+              {['Empresa', 'Tipo', 'Contacto', 'Fecha', 'Estado', 'Color', ''].map(h => (
                 <TableHead key={h} style={{ color: '#fff', fontWeight: 700, fontSize: 12, letterSpacing: '.06em', textTransform: 'uppercase', background: 'transparent' }}>{h}</TableHead>
               ))}
             </TableRow>
           </TableHeader>
           <TableBody>
-            {diagnosticos.map((d: Diagnostico) => (
+            {diagnosticos.map((d: Diagnostico) => {
+              const tipoConfig = TIPOS_DIAGNOSTICO[(d.tipo ?? 'cultura_360') as keyof typeof TIPOS_DIAGNOSTICO]
+              return (
               <TableRow key={d.id}>
                 <TableCell>
                   <Link href={`/admin/${d.id}`} style={{ textDecoration: 'none', color: 'inherit', fontWeight: 500, fontSize: 14 }}>
                     {d.nombre_compania}
                   </Link>
+                </TableCell>
+                <TableCell>
+                  <span style={{
+                    display: 'inline-block', padding: '2px 8px',
+                    fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase',
+                    fontWeight: 700, background: 'var(--ink)', color: '#fff',
+                  }}>{tipoConfig?.etiqueta ?? '360°'}</span>
                 </TableCell>
                 <TableCell style={{ color: 'var(--ink)', fontWeight: 500, fontSize: 14 }}>{d.contacto_nombre}</TableCell>
                 <TableCell style={{ color: 'var(--ink)', fontWeight: 500, fontSize: 14 }}>
@@ -70,7 +80,8 @@ export default async function AdminPage() {
                   <AccionesRow id={d.id} />
                 </TableCell>
               </TableRow>
-            ))}
+              )
+            })}
           </TableBody>
         </Table>
         </div>

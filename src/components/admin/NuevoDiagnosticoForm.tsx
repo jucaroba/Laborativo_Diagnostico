@@ -2,14 +2,15 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
-import { DIMENSIONES, ROL_INFO, Rol, Tema } from '@/types'
+import { DIMENSIONES, ROL_INFO, Rol, Tema, TipoDiagnostico } from '@/types'
+import { TIPOS_LIST, TIPOS_DIAGNOSTICO } from '@/lib/tipos-diagnostico'
 import ColorPickerHex from './ColorPickerHex'
 import { Button } from '@/components/ui/button'
 import { ArrowRight, Plus as PlusIcon, Pencil, Trash2, Check, X } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 
-type Paso = 'datos' | 'revision'
+type Paso = 'tipo' | 'datos' | 'revision'
 interface PreguntaEditable { dimension_id: number; rol: Rol; texto: string; orden: number }
 
 function Row({ label, children }: { label: string; children: React.ReactNode }) {
@@ -57,7 +58,8 @@ const iconBtn: React.CSSProperties = { background: 'none', border: 'none', curso
 
 export default function NuevoDiagnosticoForm() {
   const router = useRouter()
-  const [paso, setPaso] = useState<Paso>('datos')
+  const [paso, setPaso] = useState<Paso>('tipo')
+  const [tipo, setTipo] = useState<TipoDiagnostico | null>(null)
   const [guardando, setGuardando] = useState(false)
   const [error, setError] = useState('')
 
@@ -121,6 +123,7 @@ export default function NuevoDiagnosticoForm() {
         contacto_cargo: datos.contacto_cargo, contacto_email: datos.contacto_email,
         color_neon: datos.color_neon, estado: 'activo',
         numero_participantes: datos.numero_participantes ? parseInt(datos.numero_participantes, 10) : null,
+        tipo: tipo ?? 'cultura_360',
       }).select().single()
       if (diagErr || !diag) throw new Error(diagErr?.message)
       const { error: pregErr } = await supabase.from('preguntas')
@@ -138,17 +141,95 @@ export default function NuevoDiagnosticoForm() {
 
   const datosValidos = datos.nombre_compania && datos.contacto_nombre && datos.contacto_cargo && datos.contacto_email
   const temaSeleccionado = temas.find(t => t.id === temaSeleccionadoId)
+  // Temas filtrados por tipo de diagnóstico. Si el tema viene sin tipo
+  // (datos legacy) lo tratamos como cultura_360.
+  const temasDelTipo = temas.filter(t => (t.tipo ?? 'cultura_360') === (tipo ?? 'cultura_360'))
+  const tipoConfig = tipo ? TIPOS_DIAGNOSTICO[tipo] : null
 
   return (
     <div>
 
       {/* Header de página */}
       <div className="page-header" style={{ marginBottom: 16 }}>
-        <span className="page-header__eyebrow">{paso === 'revision' ? 'Edición cuestionario' : 'Nuevo diagnóstico'}</span>
+        <span className="page-header__eyebrow">
+          {paso === 'tipo' ? 'Nuevo diagnóstico — tipo' : paso === 'revision' ? 'Edición cuestionario' : 'Nuevo diagnóstico'}
+        </span>
         <div className="page-header__rule" />
-        <h1 className="page-header__title">Configuración</h1>
+        <h1 className="page-header__title">
+          {paso === 'tipo' ? '¿Qué diagnóstico quieres aplicar?' : 'Configuración'}
+        </h1>
+        {paso !== 'tipo' && tipoConfig && (
+          <p className="page-header__subtitle" style={{ marginTop: 8 }}>
+            <span className="chip" style={{ marginRight: 8 }}>{tipoConfig.etiqueta}</span>
+            {tipoConfig.nombre} · {tipoConfig.bullet}
+          </p>
+        )}
       </div>
 
+      {/* PASO 0: selección de tipo */}
+      {paso === 'tipo' && (
+        <div style={{ maxWidth: 960 }}>
+          <p className="text-mute" style={{ fontSize: 14, marginBottom: 24, maxWidth: '60ch' }}>
+            Elige el tipo de diagnóstico que vas a aplicar. Esto define qué perspectivas se cruzan, qué preguntas se llenan y cómo se visualiza el resultado.
+          </p>
+          <div className="admin-form-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 16 }}>
+            {TIPOS_LIST.map(t => {
+              const seleccionado = tipo === t.key
+              return (
+                <button
+                  key={t.key}
+                  type="button"
+                  onClick={() => { if (t.disponible) setTipo(t.key) }}
+                  disabled={!t.disponible}
+                  style={{
+                    textAlign: 'left', padding: '24px 24px 26px',
+                    border: '1.5px solid var(--ink)', borderRadius: 0,
+                    background: seleccionado ? 'var(--ink)' : !t.disponible ? 'var(--bg-2)' : 'var(--card)',
+                    color: seleccionado ? '#fff' : !t.disponible ? 'var(--mute)' : 'var(--ink)',
+                    cursor: t.disponible ? 'pointer' : 'not-allowed',
+                    display: 'flex', flexDirection: 'column', gap: 12,
+                    transition: 'background .15s, color .15s',
+                    fontFamily: 'inherit',
+                    opacity: t.disponible ? 1 : .7,
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
+                    <span style={{
+                      fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase',
+                      fontWeight: 700,
+                      background: seleccionado ? '#fff' : 'var(--ink)',
+                      color: seleccionado ? 'var(--ink)' : '#fff',
+                      padding: '3px 8px',
+                    }}>{t.etiqueta}</span>
+                    {!t.disponible && (
+                      <span style={{ fontSize: 9.5, letterSpacing: '.1em', textTransform: 'uppercase', fontWeight: 700, color: 'var(--mute)' }}>
+                        Próximamente
+                      </span>
+                    )}
+                  </div>
+                  <div>
+                    <h3 style={{ fontSize: 22, fontWeight: 900, letterSpacing: '-.02em', lineHeight: 1.05, margin: 0 }}>
+                      {t.nombre}
+                    </h3>
+                    <p style={{ fontSize: 13, fontWeight: 700, margin: '4px 0 0', opacity: .85 }}>{t.bullet}</p>
+                  </div>
+                  <p style={{ fontSize: 13, lineHeight: 1.5, margin: 0, fontWeight: 500, opacity: seleccionado ? .85 : .7 }}>
+                    {t.descripcion}
+                  </p>
+                </button>
+              )
+            })}
+          </div>
+
+          <div style={{ marginTop: 24, display: 'flex', justifyContent: 'flex-end', gap: 16, alignItems: 'center' }}>
+            <Button onClick={() => setPaso('datos')} disabled={!tipo}>
+              Continuar <ArrowRight size={15} strokeWidth={2.5} />
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {paso !== 'tipo' && (
       <div style={{ maxWidth: 720 }}>
       <div style={{
         background: 'var(--ink)',
@@ -163,24 +244,33 @@ export default function NuevoDiagnosticoForm() {
         <h2 style={{ fontSize: 20, fontWeight: 900, letterSpacing: '0', margin: 0, color: '#fff', fontFamily: 'Red Hat Display, sans-serif' }}>
           {paso === 'revision' && temaSeleccionado ? temaSeleccionado.nombre : 'Datos de la empresa'}
         </h2>
-        {paso === 'revision' && (
-          <div style={{ display: 'flex', gap: 8 }}>
-            <Button
-              onClick={() => setPaso('datos')}
-              disabled={guardando}
-              style={{ background: 'transparent', color: '#fff', border: '1.5px solid #fff' }}
-            >
-              <ArrowRight size={15} strokeWidth={2.5} style={{ transform: 'rotate(180deg)' }} /> Cambiar tema
-            </Button>
-            <Button
-              onClick={guardar}
-              disabled={guardando}
-              style={{ background: '#fff', color: 'var(--ink)', border: '1.5px solid #fff' }}
-            >
-              {guardando ? 'Guardando…' : 'Guardar diagnóstico'}
-            </Button>
-          </div>
-        )}
+        <div style={{ display: 'flex', gap: 8 }}>
+          <Button
+            onClick={() => setPaso('tipo')}
+            disabled={guardando}
+            style={{ background: 'transparent', color: '#fff', border: '1.5px solid #fff' }}
+          >
+            <ArrowRight size={15} strokeWidth={2.5} style={{ transform: 'rotate(180deg)' }} /> Cambiar tipo
+          </Button>
+          {paso === 'revision' && (
+            <>
+              <Button
+                onClick={() => setPaso('datos')}
+                disabled={guardando}
+                style={{ background: 'transparent', color: '#fff', border: '1.5px solid #fff' }}
+              >
+                <ArrowRight size={15} strokeWidth={2.5} style={{ transform: 'rotate(180deg)' }} /> Cambiar tema
+              </Button>
+              <Button
+                onClick={guardar}
+                disabled={guardando}
+                style={{ background: '#fff', color: 'var(--ink)', border: '1.5px solid #fff' }}
+              >
+                {guardando ? 'Guardando…' : 'Guardar diagnóstico'}
+              </Button>
+            </>
+          )}
+        </div>
       </div>
 
       {/* PASO 1: Datos + selección de tema */}
@@ -201,13 +291,13 @@ export default function NuevoDiagnosticoForm() {
             </div>
             {cargandoTemas ? (
               <p className="text-mute" style={{ fontSize: 13 }}>Cargando temas…</p>
-            ) : !temas.length ? (
+            ) : !temasDelTipo.length ? (
               <p className="text-mute" style={{ fontSize: 13 }}>
-                Aún no hay temas. Crea uno en <strong>Preguntas base</strong>.
+                Aún no hay temas para <strong>{tipoConfig?.nombre}</strong>. Crea uno en <strong>Preguntas base</strong>.
               </p>
             ) : (
               <div className="admin-form-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-                {temas.map(t => {
+                {temasDelTipo.map(t => {
                   const seleccionado = temaSeleccionadoId === t.id
                   return (
                     <button
@@ -308,6 +398,7 @@ export default function NuevoDiagnosticoForm() {
         </div>
       )}
       </div>
+      )}
     </div>
   )
 }

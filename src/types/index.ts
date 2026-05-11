@@ -28,8 +28,15 @@ export interface Diagnostico {
   vertical: string | null
   contexto_ia: string | null
   numero_participantes: number | null
+  tipo: TipoDiagnostico
   created_at: string
 }
+
+export type TipoDiagnostico =
+  | 'cultura_360'
+  | 'pulso_colectivo'
+  | 'equipo_en_espejo'
+  | 'termometro_4'
 
 export interface Pregunta {
   id: string
@@ -44,6 +51,7 @@ export interface Tema {
   id: string
   nombre: string
   descripcion: string | null
+  tipo?: TipoDiagnostico
   created_at: string
 }
 
