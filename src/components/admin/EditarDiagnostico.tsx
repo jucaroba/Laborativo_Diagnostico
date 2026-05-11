@@ -20,6 +20,7 @@ export default function EditarDiagnostico({ diagnostico }: { diagnostico: Diagno
     contacto_email: diagnostico.contacto_email,
     numero_participantes: diagnostico.numero_participantes != null ? String(diagnostico.numero_participantes) : '',
   })
+  const [benchmark, setBenchmark] = useState(diagnostico.benchmark_habilitado ?? false)
 
   function set(field: string, value: string) {
     setForm(f => ({ ...f, [field]: value }))
@@ -31,6 +32,7 @@ export default function EditarDiagnostico({ diagnostico }: { diagnostico: Diagno
     await supabase.from('diagnosticos').update({
       ...resto,
       numero_participantes: numero_participantes ? parseInt(numero_participantes, 10) : null,
+      benchmark_habilitado: benchmark,
     }).eq('id', diagnostico.id)
     setLoading(false)
     setOpen(false)
@@ -75,6 +77,28 @@ export default function EditarDiagnostico({ diagnostico }: { diagnostico: Diagno
                 />
               </div>
             ))}
+
+            {/* Toggle Benchmark */}
+            <label style={{
+              display: 'flex', alignItems: 'flex-start', gap: 10,
+              padding: '12px 14px', border: '1.5px solid var(--ink)',
+              cursor: 'pointer', marginTop: 4,
+            }}>
+              <input
+                type="checkbox"
+                checked={benchmark}
+                onChange={e => setBenchmark(e.target.checked)}
+                style={{ marginTop: 3, accentColor: 'var(--ink)' }}
+              />
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 800, letterSpacing: '-.01em', color: 'var(--ink)' }}>
+                  Mostrar Benchmark Laborativo
+                </div>
+                <div style={{ fontSize: 12, color: 'var(--ink-2)', fontWeight: 500, marginTop: 2 }}>
+                  En el dashboard se compara cada dimensión contra el promedio histórico de todos los demás diagnósticos del mismo tipo.
+                </div>
+              </div>
+            </label>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setOpen(false)} disabled={loading}>Cancelar</Button>

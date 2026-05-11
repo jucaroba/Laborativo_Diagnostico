@@ -21,6 +21,8 @@ type Props = {
   comparacion?: DimResultado[] | null
   rondaActual?: number
   rondaAnterior?: number
+  benchmark?: DimResultado[] | null
+  benchmarkN?: number
 }
 
 function DeltaRonda({ actual, anterior, rondaAnterior }: { actual: number | null; anterior: number | null; rondaAnterior?: number }) {
@@ -92,7 +94,7 @@ function FilaPerspectiva({
   )
 }
 
-function DimCard({ dim, anterior, rondaAnterior, mobile }: { dim: DimResultado; anterior?: DimResultado | null; rondaAnterior?: number; mobile?: boolean }) {
+function DimCard({ dim, anterior, rondaAnterior, benchmark, benchmarkN, mobile }: { dim: DimResultado; anterior?: DimResultado | null; rondaAnterior?: number; benchmark?: DimResultado | null; benchmarkN?: number; mobile?: boolean }) {
   return (
     <div style={{
       padding: mobile ? '18px 20px 22px' : '28px 24px 28px',
@@ -125,6 +127,19 @@ function DimCard({ dim, anterior, rondaAnterior, mobile }: { dim: DimResultado; 
             <span style={{ fontSize: 9, letterSpacing: '.08em', textTransform: 'uppercase', fontWeight: 700, color: 'var(--mute)' }}>Equipo</span>
             <DeltaRonda actual={dim.equipo.promedio} anterior={anterior.equipo.promedio} rondaAnterior={rondaAnterior} />
           </span>
+        </div>
+      )}
+      {benchmark && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 4, borderTop: '1px solid var(--line-soft)', paddingTop: 8 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 10.5, fontWeight: 600, color: 'var(--ink-2)' }}>
+            <span style={{ width: 8, height: 8, background: 'var(--ink)', display: 'inline-block', borderRadius: '50%' }} />
+            Benchmark Laborativo
+            {benchmarkN && benchmarkN > 0 ? <span style={{ color: 'var(--mute)', fontWeight: 500 }}>· {benchmarkN} {benchmarkN === 1 ? 'equipo' : 'equipos'}</span> : null}
+          </div>
+          <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap', fontSize: 11, fontWeight: 600, color: 'var(--ink-2)' }}>
+            <span><span style={{ color: 'var(--mute)' }}>Yo</span> <b style={{ fontWeight: 800, color: 'var(--ink)', fontVariantNumeric: 'tabular-nums' }}>{benchmark.yo.promedio !== null ? benchmark.yo.promedio.toFixed(1) : '—'}</b></span>
+            <span><span style={{ color: 'var(--mute)' }}>Equipo</span> <b style={{ fontWeight: 800, color: 'var(--ink)', fontVariantNumeric: 'tabular-nums' }}>{benchmark.equipo.promedio !== null ? benchmark.equipo.promedio.toFixed(1) : '—'}</b></span>
+          </div>
         </div>
       )}
     </div>
@@ -242,9 +257,10 @@ function RadarEspejo({ resultados, maxSize }: { resultados: DimResultado[]; maxS
 
 export default function ResultadosEspejo({
   nombreCompania, estado, totalParticipantes, totalFormularios, resultados,
-  comparacion, rondaActual, rondaAnterior,
+  comparacion, rondaActual, rondaAnterior, benchmark, benchmarkN,
 }: Props) {
   const getAnterior = (id: number) => comparacion?.find(c => c.id === id) ?? null
+  const getBenchmark = (id: number) => benchmark?.find(b => b.id === id) ?? null
   return (
     <>
       {/* MOBILE */}
@@ -289,7 +305,7 @@ export default function ResultadosEspejo({
         <div style={{ borderBottom: '1.5px solid var(--ink)' }}>
           {[...resultados].sort((a, b) => b.delta - a.delta).map((dim, i, arr) => (
             <div key={dim.id} style={{ borderBottom: i < arr.length - 1 ? '1.5px solid var(--ink)' : 'none' }}>
-              <DimCard dim={dim} anterior={getAnterior(dim.id)} rondaAnterior={rondaAnterior} mobile />
+              <DimCard dim={dim} anterior={getAnterior(dim.id)} rondaAnterior={rondaAnterior} benchmark={getBenchmark(dim.id)} benchmarkN={benchmarkN} mobile />
             </div>
           ))}
         </div>
@@ -354,7 +370,7 @@ export default function ResultadosEspejo({
                 borderRight: i % 2 === 0 ? '1.5px solid var(--ink)' : 'none',
                 borderBottom: i < arr.length - 2 ? '1.5px solid var(--ink)' : 'none',
               }}>
-                <DimCard dim={dim} anterior={getAnterior(dim.id)} rondaAnterior={rondaAnterior} />
+                <DimCard dim={dim} anterior={getAnterior(dim.id)} rondaAnterior={rondaAnterior} benchmark={getBenchmark(dim.id)} benchmarkN={benchmarkN} />
               </div>
             ))}
           </div>

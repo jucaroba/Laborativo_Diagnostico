@@ -6,7 +6,7 @@
 // ─────────────────────────────────────────────────────────────
 
 import { supabase } from '@/lib/supabase'
-import { DIMENSIONES } from '@/types'
+import { DIMENSIONES, type TipoDiagnostico } from '@/types'
 
 export type DimSimple = {
   id: number
@@ -110,6 +110,66 @@ export async function fetchYCalcEspejo(diagnosticoId: string): Promise<DimEspejo
   const { preguntas, respuestas } = await fetchPreguntasYRespuestas(diagnosticoId)
   if (!preguntas.length) return null
   return calcEspejoFromData(preguntas, respuestas)
+}
+
+// ─── Benchmark Laborativo ─────────────────────────────────────
+// Promedio histórico por dimensión sobre todos los OTROS
+// diagnósticos del mismo tipo (excluye el diag actual).
+// Devuelve null si no hay datos suficientes.
+
+export type Benchmark<T> = {
+  resultados: T
+  nDiagnosticos: number
+}
+
+async function fetchPreguntasYRespuestasDeTipo(tipo: TipoDiagnostico, excluirId: string) {
+  const { data: diags } = await supabase
+    .from('diagnosticos')
+    .select('id')
+    .eq('tipo', tipo)
+    .neq('id', excluirId)
+    .in('estado', ['activo', 'completado'])
+
+  const diagIds = (diags ?? []).map(d => d.id)
+  if (!diagIds.length) {
+    return { preguntas: [] as PreguntaMin[], respuestas: [] as RespuestaMin[], nDiagnosticos: 0 }
+  }
+
+  const { data: preguntas } = await supabase
+    .from('preguntas')
+    .select('id, dimension_id, rol')
+    .in('diagnostico_id', diagIds)
+
+  const { data: participantes } = await supabase
+    .from('participantes')
+    .select('id')
+    .in('diagnostico_id', diagIds)
+
+  const partIds = (participantes ?? []).map(p => p.id)
+  const { data: respuestas } = partIds.length > 0
+    ? await supabase
+        .from('respuestas')
+        .select('pregunta_id, valor')
+        .in('participante_id', partIds)
+    : { data: [] as RespuestaMin[] }
+
+  return {
+    preguntas: (preguntas ?? []) as PreguntaMin[],
+    respuestas: (respuestas ?? []) as RespuestaMin[],
+    nDiagnosticos: diagIds.length,
+  }
+}
+
+export async function fetchBenchmarkSimple(tipo: TipoDiagnostico, excluirId: string): Promise<Benchmark<DimSimple[]> | null> {
+  const { preguntas, respuestas, nDiagnosticos } = await fetchPreguntasYRespuestasDeTipo(tipo, excluirId)
+  if (nDiagnosticos === 0) return null
+  return { resultados: calcSimpleFromData(preguntas, respuestas), nDiagnosticos }
+}
+
+export async function fetchBenchmarkEspejo(tipo: TipoDiagnostico, excluirId: string): Promise<Benchmark<DimEspejo[]> | null> {
+  const { preguntas, respuestas, nDiagnosticos } = await fetchPreguntasYRespuestasDeTipo(tipo, excluirId)
+  if (nDiagnosticos === 0) return null
+  return { resultados: calcEspejoFromData(preguntas, respuestas), nDiagnosticos }
 }
 
 async function fetchPreguntasYRespuestas(diagnosticoId: string) {

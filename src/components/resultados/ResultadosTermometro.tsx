@@ -18,7 +18,10 @@ type Props = {
   comparacion?: DimResultado[] | null
   rondaActual?: number
   rondaAnterior?: number
+  benchmark?: DimResultado[] | null
+  benchmarkN?: number
 }
+
 
 function DeltaRonda({ actual, anterior, rondaAnterior }: { actual: number | null; anterior: number | null; rondaAnterior?: number }) {
   if (actual === null || anterior === null) return null
@@ -60,7 +63,7 @@ function SectionBar({ title, subtitle, mobile }: { title: string; subtitle?: str
   )
 }
 
-function MedidorBase({ dim, sizeNumber, padding, anterior, rondaAnterior }: { dim: DimResultado; sizeNumber: number; padding: string; anterior?: number | null; rondaAnterior?: number }) {
+function MedidorBase({ dim, sizeNumber, padding, anterior, rondaAnterior, benchmark, benchmarkN }: { dim: DimResultado; sizeNumber: number; padding: string; anterior?: number | null; rondaAnterior?: number; benchmark?: number | null; benchmarkN?: number }) {
   const pct = dim.promedio !== null ? ((dim.promedio - 1) / 9) * 100 : 0
   const color = tempColor(dim.promedio)
   return (
@@ -96,20 +99,38 @@ function MedidorBase({ dim, sizeNumber, padding, anterior, rondaAnterior }: { di
             background: 'var(--ink)', opacity: .4,
           }} />
         ))}
+        {/* marca benchmark */}
+        {benchmark !== null && benchmark !== undefined && (
+          <div title={`Benchmark: ${benchmark.toFixed(1)}`} style={{
+            position: 'absolute',
+            left: `${((benchmark - 1) / 9) * 100}%`,
+            top: -5, bottom: -5, width: 2.5,
+            background: 'var(--ink)', transform: 'translateX(-1.25px)',
+          }} />
+        )}
       </div>
       <div style={{ fontSize: 11, color: 'var(--ink-2)', fontWeight: 500 }}>
         ± {dim.desviacion.toFixed(1)} de dispersión · {dim.n} respuestas
       </div>
+      {benchmark !== null && benchmark !== undefined && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, fontWeight: 600, color: 'var(--ink-2)' }}>
+          <span style={{ width: 8, height: 8, background: 'var(--ink)', display: 'inline-block', borderRadius: '50%' }} />
+          Benchmark Laborativo · <b style={{ fontWeight: 800, fontVariantNumeric: 'tabular-nums', color: 'var(--ink)' }}>{benchmark.toFixed(1)}</b>
+          {benchmarkN && benchmarkN > 0 ? <span style={{ color: 'var(--mute)', fontWeight: 500 }}>· {benchmarkN} {benchmarkN === 1 ? 'equipo' : 'equipos'}</span> : null}
+        </div>
+      )}
     </div>
   )
 }
 
 export default function ResultadosTermometro({
   nombreCompania, estado, totalParticipantes, totalFormularios, resultados,
-  comparacion, rondaActual, rondaAnterior,
+  comparacion, rondaActual, rondaAnterior, benchmark, benchmarkN,
 }: Props) {
   const hayComparacion = comparacion && comparacion.length > 0
   const getAnterior = (id: number) => comparacion?.find(c => c.id === id)?.promedio ?? null
+  const hayBenchmark = !!benchmark && benchmark.length > 0
+  const getBenchmark = (id: number) => benchmark?.find(b => b.id === id)?.promedio ?? null
   return (
     <>
       {/* MOBILE */}
@@ -154,7 +175,7 @@ export default function ResultadosTermometro({
               borderRight: i % 2 === 0 ? '1.5px solid var(--ink)' : 'none',
               borderBottom: i < resultados.length - 2 ? '1.5px solid var(--ink)' : 'none',
             }}>
-              <MedidorBase dim={dim} sizeNumber={56} padding="18px 16px 20px" anterior={hayComparacion ? getAnterior(dim.id) : null} rondaAnterior={rondaAnterior} />
+              <MedidorBase dim={dim} sizeNumber={56} padding="18px 16px 20px" anterior={hayComparacion ? getAnterior(dim.id) : null} rondaAnterior={rondaAnterior} benchmark={hayBenchmark ? getBenchmark(dim.id) : null} benchmarkN={benchmarkN} />
             </div>
           ))}
         </div>
@@ -209,7 +230,7 @@ export default function ResultadosTermometro({
               <div key={dim.id} style={{
                 borderRight: i < arr.length - 1 ? '1.5px solid var(--ink)' : 'none',
               }}>
-                <MedidorBase dim={dim} sizeNumber={96} padding="32px 24px 30px" anterior={hayComparacion ? getAnterior(dim.id) : null} rondaAnterior={rondaAnterior} />
+                <MedidorBase dim={dim} sizeNumber={96} padding="32px 24px 30px" anterior={hayComparacion ? getAnterior(dim.id) : null} rondaAnterior={rondaAnterior} benchmark={hayBenchmark ? getBenchmark(dim.id) : null} benchmarkN={benchmarkN} />
               </div>
             ))}
           </div>

@@ -8,7 +8,7 @@ import ResultadosMobile from '@/components/resultados/ResultadosMobile'
 import ResultadosPulso from '@/components/resultados/ResultadosPulso'
 import ResultadosTermometro from '@/components/resultados/ResultadosTermometro'
 import ResultadosEspejo from '@/components/resultados/ResultadosEspejo'
-import { calcSimpleFromData, calcEspejoFromData, fetchYCalcSimple, fetchYCalcEspejo } from '@/lib/calc-resultados'
+import { calcSimpleFromData, calcEspejoFromData, fetchYCalcSimple, fetchYCalcEspejo, fetchBenchmarkSimple, fetchBenchmarkEspejo } from '@/lib/calc-resultados'
 import { evaluarBrechas, evaluarRelaciones } from '@/lib/arquetipos'
 
 export const revalidate = 0
@@ -62,6 +62,9 @@ export default async function ResultadosPage({ params }: { params: Promise<{ cod
   const rondaActual = (diag as { ronda?: number }).ronda ?? 1
   const rondaAnterior = rondaActual - 1
 
+  // Benchmark Laborativo — si está habilitado, traemos el promedio histórico
+  const benchmarkHabilitado = !!(diag as { benchmark_habilitado?: boolean }).benchmark_habilitado
+
   // Pulso y Termómetro comparten el cálculo (1 perspectiva 'X', 4 dimensiones)
   // pero usan dashboards distintos.
   if (tipoDiag === 'pulso_colectivo' || tipoDiag === 'termometro_4') {
@@ -70,6 +73,9 @@ export default async function ResultadosPage({ params }: { params: Promise<{ cod
       (respuestas ?? []).map(r => ({ pregunta_id: r.pregunta_id, valor: r.valor })),
     )
     const comparacion = padreId ? await fetchYCalcSimple(padreId) : null
+    const benchmark = benchmarkHabilitado
+      ? await fetchBenchmarkSimple(tipoDiag as 'pulso_colectivo' | 'termometro_4', diag.id)
+      : null
     const totalFormulariosSimple = new Set((respuestas ?? []).map(r => r.participante_id)).size
     const sharedProps = {
       nombreCompania: diag.nombre_compania,
@@ -80,6 +86,8 @@ export default async function ResultadosPage({ params }: { params: Promise<{ cod
       comparacion,
       rondaActual,
       rondaAnterior,
+      benchmark: benchmark?.resultados ?? null,
+      benchmarkN: benchmark?.nDiagnosticos ?? 0,
     }
     return tipoDiag === 'pulso_colectivo'
       ? <ResultadosPulso {...sharedProps} />
@@ -93,6 +101,9 @@ export default async function ResultadosPage({ params }: { params: Promise<{ cod
       (respuestas ?? []).map(r => ({ pregunta_id: r.pregunta_id, valor: r.valor })),
     )
     const comparacion = padreId ? await fetchYCalcEspejo(padreId) : null
+    const benchmark = benchmarkHabilitado
+      ? await fetchBenchmarkEspejo('equipo_en_espejo', diag.id)
+      : null
     const totalFormulariosEspejo = new Set((respuestas ?? []).map(r => r.participante_id)).size
     return (
       <ResultadosEspejo
@@ -104,6 +115,8 @@ export default async function ResultadosPage({ params }: { params: Promise<{ cod
         comparacion={comparacion}
         rondaActual={rondaActual}
         rondaAnterior={rondaAnterior}
+        benchmark={benchmark?.resultados ?? null}
+        benchmarkN={benchmark?.nDiagnosticos ?? 0}
       />
     )
   }

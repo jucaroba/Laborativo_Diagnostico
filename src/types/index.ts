@@ -43,6 +43,7 @@ export interface Diagnostico {
   diagnostico_padre_id?: string | null
   ronda?: number
   grupo_id?: string | null
+  benchmark_habilitado?: boolean
   created_at: string
 }
 

@@ -19,6 +19,20 @@ type Props = {
   comparacion?: DimResultado[] | null
   rondaActual?: number
   rondaAnterior?: number
+  benchmark?: DimResultado[] | null
+  benchmarkN?: number
+}
+
+// Pinta el benchmark Laborativo (promedio histórico de OTROS diagnósticos del mismo tipo)
+function BenchmarkLabel({ valor, n }: { valor: number | null; n?: number }) {
+  if (valor === null) return null
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, fontWeight: 600, color: 'var(--ink-2)' }}>
+      <span style={{ width: 8, height: 8, background: 'var(--ink)', display: 'inline-block', borderRadius: '50%' }} />
+      Benchmark Laborativo · <b style={{ fontWeight: 800, fontVariantNumeric: 'tabular-nums', color: 'var(--ink)' }}>{valor.toFixed(1)}</b>
+      {n && n > 0 ? <span style={{ color: 'var(--mute)', fontWeight: 500 }}>· {n} {n === 1 ? 'equipo' : 'equipos'}</span> : null}
+    </div>
+  )
 }
 
 // Pinta el Δ vs ronda anterior: subió, bajó, igual.
@@ -63,10 +77,12 @@ function SectionBar({ title, subtitle, mobile }: { title: string; subtitle?: str
 
 export default function ResultadosPulso({
   nombreCompania, estado, totalParticipantes, totalFormularios, resultados,
-  comparacion, rondaActual, rondaAnterior,
+  comparacion, rondaActual, rondaAnterior, benchmark, benchmarkN,
 }: Props) {
   const hayComparacion = comparacion && comparacion.length > 0
   const getAnterior = (id: number) => comparacion?.find(c => c.id === id)?.promedio ?? null
+  const hayBenchmark = !!benchmark && benchmark.length > 0
+  const getBenchmark = (id: number) => benchmark?.find(b => b.id === id)?.promedio ?? null
   return (
     <>
       {/* MOBILE */}
@@ -109,7 +125,15 @@ export default function ResultadosPulso({
         <SectionBar title="Pulso por dimensión" subtitle="Escala 1–10" mobile />
         <div style={{ borderBottom: '1.5px solid var(--ink)' }}>
           {[...resultados].sort((a, b) => (b.promedio ?? -Infinity) - (a.promedio ?? -Infinity)).map((dim, i, arr) => (
-            <DimCardMobile key={dim.id} dim={dim} anterior={hayComparacion ? getAnterior(dim.id) : null} rondaAnterior={rondaAnterior} ultimo={i === arr.length - 1} />
+            <DimCardMobile
+              key={dim.id}
+              dim={dim}
+              anterior={hayComparacion ? getAnterior(dim.id) : null}
+              rondaAnterior={rondaAnterior}
+              benchmark={hayBenchmark ? getBenchmark(dim.id) : null}
+              benchmarkN={benchmarkN}
+              ultimo={i === arr.length - 1}
+            />
           ))}
         </div>
 
@@ -165,7 +189,15 @@ export default function ResultadosPulso({
           <SectionBar title="Pulso por dimensión" subtitle="Escala 1–10" />
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', borderBottom: '1.5px solid var(--ink)' }}>
             {[...resultados].sort((a, b) => (b.promedio ?? -Infinity) - (a.promedio ?? -Infinity)).map((dim, i, arr) => (
-              <DimCardDesktop key={dim.id} dim={dim} anterior={hayComparacion ? getAnterior(dim.id) : null} rondaAnterior={rondaAnterior} ultimo={i === arr.length - 1} />
+              <DimCardDesktop
+                key={dim.id}
+                dim={dim}
+                anterior={hayComparacion ? getAnterior(dim.id) : null}
+                rondaAnterior={rondaAnterior}
+                benchmark={hayBenchmark ? getBenchmark(dim.id) : null}
+                benchmarkN={benchmarkN}
+                ultimo={i === arr.length - 1}
+              />
             ))}
           </div>
 
@@ -186,7 +218,7 @@ export default function ResultadosPulso({
 
 // ─── DimCard ─────────────────────────────────────────────────────
 
-function DimCardMobile({ dim, anterior, rondaAnterior, ultimo }: { dim: DimResultado; anterior: number | null; rondaAnterior?: number; ultimo: boolean }) {
+function DimCardMobile({ dim, anterior, rondaAnterior, benchmark, benchmarkN, ultimo }: { dim: DimResultado; anterior: number | null; rondaAnterior?: number; benchmark: number | null; benchmarkN?: number; ultimo: boolean }) {
   return (
     <div style={{
       padding: '18px 20px 20px',
@@ -210,15 +242,16 @@ function DimCardMobile({ dim, anterior, rondaAnterior, ultimo }: { dim: DimResul
           </span>
         )}
       </div>
-      <BarraPulso valor={dim.promedio} />
+      <BarraPulso valor={dim.promedio} benchmark={benchmark} />
       <div style={{ fontSize: 11, color: 'var(--ink-2)', fontWeight: 500 }}>
         ± {dim.desviacion.toFixed(1)} de dispersión · {dim.n} respuestas
       </div>
+      {benchmark !== null && <BenchmarkLabel valor={benchmark} n={benchmarkN} />}
     </div>
   )
 }
 
-function DimCardDesktop({ dim, anterior, rondaAnterior, ultimo }: { dim: DimResultado; anterior: number | null; rondaAnterior?: number; ultimo: boolean }) {
+function DimCardDesktop({ dim, anterior, rondaAnterior, benchmark, benchmarkN, ultimo }: { dim: DimResultado; anterior: number | null; rondaAnterior?: number; benchmark: number | null; benchmarkN?: number; ultimo: boolean }) {
   return (
     <div style={{
       padding: '28px 24px 26px',
@@ -243,20 +276,28 @@ function DimCardDesktop({ dim, anterior, rondaAnterior, ultimo }: { dim: DimResu
           </span>
         )}
       </div>
-      <BarraPulso valor={dim.promedio} />
+      <BarraPulso valor={dim.promedio} benchmark={benchmark} />
       <div style={{ fontSize: 12, color: 'var(--ink-2)', fontWeight: 500 }}>
         ± {dim.desviacion.toFixed(1)} de dispersión · {dim.n} respuestas
       </div>
+      {benchmark !== null && <BenchmarkLabel valor={benchmark} n={benchmarkN} />}
     </div>
   )
 }
 
-function BarraPulso({ valor }: { valor: number | null }) {
+function BarraPulso({ valor, benchmark }: { valor: number | null; benchmark?: number | null }) {
   const pct = valor !== null ? ((valor - 1) / 9) * 100 : 0
+  const benchPct = benchmark !== null && benchmark !== undefined ? ((benchmark - 1) / 9) * 100 : null
   return (
     <div style={{ position: 'relative', height: 8, background: 'var(--bg-2)', border: '1.5px solid var(--ink)' }}>
       {valor !== null && (
         <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: `${pct}%`, background: 'var(--ink)' }} />
+      )}
+      {benchPct !== null && (
+        <div title={`Benchmark: ${benchmark!.toFixed(1)}`} style={{
+          position: 'absolute', left: `${benchPct}%`, top: -5, bottom: -5,
+          width: 2, background: 'var(--ink)', transform: 'translateX(-1px)',
+        }} />
       )}
     </div>
   )
