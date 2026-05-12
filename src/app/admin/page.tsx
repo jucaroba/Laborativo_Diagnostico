@@ -1,30 +1,38 @@
 import { supabase } from '@/lib/supabase'
 import Link from 'next/link'
-import { Diagnostico } from '@/types'
+import { Diagnostico, Equipo } from '@/types'
 import { buttonVariants } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import AccionesRow from '@/components/admin/AccionesRow'
 import { TIPOS_DIAGNOSTICO } from '@/lib/tipos-diagnostico'
 
 export const revalidate = 0
 
-const ESTADO_LABEL: Record<string, string> = {
-  borrador: 'Borrador', activo: 'Activo', completado: 'Completado',
-}
-
 const MESES = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic']
 const fechaCorta = (iso: string) => {
   const d = new Date(iso)
   return `${d.getDate()} ${MESES[d.getMonth()]} ${d.getFullYear()}`
 }
-const ESTADO_VARIANT: Record<string, 'default' | 'secondary' | 'outline'> = {
-  borrador: 'outline', activo: 'default', completado: 'secondary',
-}
 
 export default async function AdminPage() {
   const { data: diagnosticos } = await supabase
     .from('diagnosticos').select('*').order('created_at', { ascending: false })
+
+  const diagIds = (diagnosticos ?? []).map(d => d.id)
+  const { data: equipos } = diagIds.length > 0
+    ? await supabase.from('equipos').select('diagnostico_id, estado, color_neon').in('diagnostico_id', diagIds)
+    : { data: [] as Pick<Equipo, 'diagnostico_id' | 'estado' | 'color_neon'>[] }
+
+  // Agregados por compañía: nº equipos, lista de colores (para el chip), estado dominante
+  const porCompania: Record<string, { n: number; colores: string[]; activos: number; completados: number }> = {}
+  for (const eq of equipos ?? []) {
+    const cur = porCompania[eq.diagnostico_id] ?? { n: 0, colores: [], activos: 0, completados: 0 }
+    cur.n += 1
+    if (eq.color_neon && !cur.colores.includes(eq.color_neon)) cur.colores.push(eq.color_neon)
+    if (eq.estado === 'activo') cur.activos += 1
+    if (eq.estado === 'completado') cur.completados += 1
+    porCompania[eq.diagnostico_id] = cur
+  }
 
   return (
     <div>
@@ -44,7 +52,7 @@ export default async function AdminPage() {
         <Table>
           <TableHeader>
             <TableRow style={{ background: '#0A0A0A', borderBottom: 'none' }}>
-              {['Empresa', 'Tipo', 'Contacto', 'Fecha', 'Estado', 'Color', ''].map(h => (
+              {['Empresa', 'Tipo', 'Contacto', 'Fecha', 'Equipos', ''].map(h => (
                 <TableHead key={h} style={{ color: '#fff', fontWeight: 700, fontSize: 12, letterSpacing: '.06em', textTransform: 'uppercase', background: 'transparent' }}>{h}</TableHead>
               ))}
             </TableRow>
@@ -52,6 +60,7 @@ export default async function AdminPage() {
           <TableBody>
             {diagnosticos.map((d: Diagnostico) => {
               const tipoConfig = TIPOS_DIAGNOSTICO[(d.tipo ?? 'cultura_360') as keyof typeof TIPOS_DIAGNOSTICO]
+              const stats = porCompania[d.id] ?? { n: 0, colores: [], activos: 0, completados: 0 }
               return (
               <TableRow key={d.id}>
                 <TableCell>
@@ -71,10 +80,19 @@ export default async function AdminPage() {
                   {fechaCorta(d.created_at)}
                 </TableCell>
                 <TableCell>
-                  <Badge variant={ESTADO_VARIANT[d.estado]}>{ESTADO_LABEL[d.estado]}</Badge>
-                </TableCell>
-                <TableCell style={{ textAlign: 'center', paddingRight: 35 }}>
-                  <span style={{ width: 14, height: 14, background: d.color_neon, display: 'inline-block' }} />
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+                    {stats.colores.slice(0, 4).map((c, i) => (
+                      <span key={i} style={{ width: 10, height: 10, background: c, border: '1px solid var(--ink)', display: 'inline-block' }} aria-hidden />
+                    ))}
+                    <span style={{ fontSize: 13, fontWeight: 700 }}>
+                      {stats.n}
+                    </span>
+                    {(stats.activos + stats.completados) > 0 && (
+                      <span style={{ fontSize: 11, color: 'var(--mute)', fontWeight: 600 }}>
+                        · {stats.activos} activo{stats.activos === 1 ? '' : 's'}{stats.completados > 0 ? ` · ${stats.completados} completado${stats.completados === 1 ? '' : 's'}` : ''}
+                      </span>
+                    )}
+                  </span>
                 </TableCell>
                 <TableCell>
                   <AccionesRow id={d.id} />

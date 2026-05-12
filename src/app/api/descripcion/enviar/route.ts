@@ -6,19 +6,27 @@ type Entrada = { nombre: string; email: string }
 
 export async function POST(req: NextRequest) {
   try {
-    const { diagnosticoId, lista } = (await req.json()) as { diagnosticoId: string; lista: Entrada[] }
+    const { equipoId, lista } = (await req.json()) as { equipoId: string; lista: Entrada[] }
 
-    if (!diagnosticoId || !Array.isArray(lista) || lista.length === 0) {
+    if (!equipoId || !Array.isArray(lista) || lista.length === 0) {
       return NextResponse.json({ error: 'Datos inválidos' }, { status: 400 })
     }
 
-    const { data: diag } = await supabaseAdmin
-      .from('diagnosticos')
-      .select('id, nombre_compania, codigo_participacion')
-      .eq('id', diagnosticoId)
+    const { data: equipo } = await supabaseAdmin
+      .from('equipos')
+      .select('id, diagnostico_id, codigo_participacion')
+      .eq('id', equipoId)
       .single()
 
-    if (!diag) return NextResponse.json({ error: 'Diagnóstico no encontrado' }, { status: 404 })
+    if (!equipo) return NextResponse.json({ error: 'Equipo no encontrado' }, { status: 404 })
+
+    const { data: diag } = await supabaseAdmin
+      .from('diagnosticos')
+      .select('nombre_compania')
+      .eq('id', equipo.diagnostico_id)
+      .single()
+
+    if (!diag) return NextResponse.json({ error: 'Compañía no encontrada' }, { status: 404 })
 
     const limpia = lista
       .map(e => ({ nombre: (e.nombre || '').trim(), email: (e.email || '').trim().toLowerCase() }))
@@ -34,7 +42,7 @@ export async function POST(req: NextRequest) {
           participanteEmail: e.email,
           participanteNombre: e.nombre,
           nombreCompania: diag.nombre_compania,
-          codigoParticipacion: diag.codigo_participacion,
+          codigoParticipacion: equipo.codigo_participacion,
         })
       )
     )

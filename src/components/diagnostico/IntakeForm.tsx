@@ -14,8 +14,8 @@ const PERFILES = [
   { id: 'lider' as Perfil, h: 'Líder del equipo', p: 'Responderás desde tu rol de liderazgo.\nIncluye tu auto-evaluación y tu mirada sobre el equipo que lideras.' },
 ]
 
-export default function IntakeForm({ diagnosticoId, nombreCompania, codigo, tipo = 'cultura_360', preguntasEquipo, preguntasLider, preguntasColectivo = 0 }: {
-  diagnosticoId: string
+export default function IntakeForm({ equipoId, nombreCompania, codigo, tipo = 'cultura_360', preguntasEquipo, preguntasLider, preguntasColectivo = 0 }: {
+  equipoId: string
   nombreCompania: string
   codigo: string
   tipo?: TipoDiagnostico
@@ -40,7 +40,7 @@ export default function IntakeForm({ diagnosticoId, nombreCompania, codigo, tipo
 
     const { data: participante } = await supabase
       .from('participantes')
-      .insert({ diagnostico_id: diagnosticoId, rol })
+      .insert({ equipo_id: equipoId, rol })
       .select()
       .single()
 

@@ -13,12 +13,12 @@ export default function EditarDiagnostico({ diagnostico }: { diagnostico: Diagno
   const router = useRouter()
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
+  // El número de participantes vive a nivel equipo, no compañía.
   const [form, setForm] = useState({
     nombre_compania: diagnostico.nombre_compania,
     contacto_nombre: diagnostico.contacto_nombre,
     contacto_cargo: diagnostico.contacto_cargo,
     contacto_email: diagnostico.contacto_email,
-    numero_participantes: diagnostico.numero_participantes != null ? String(diagnostico.numero_participantes) : '',
   })
   const [benchmark, setBenchmark] = useState(diagnostico.benchmark_habilitado ?? false)
 
@@ -28,10 +28,8 @@ export default function EditarDiagnostico({ diagnostico }: { diagnostico: Diagno
 
   async function guardar() {
     setLoading(true)
-    const { numero_participantes, ...resto } = form
     await supabase.from('diagnosticos').update({
-      ...resto,
-      numero_participantes: numero_participantes ? parseInt(numero_participantes, 10) : null,
+      ...form,
       benchmark_habilitado: benchmark,
     }).eq('id', diagnostico.id)
     setLoading(false)
@@ -66,7 +64,6 @@ export default function EditarDiagnostico({ diagnostico }: { diagnostico: Diagno
               { label: 'Nombre contacto', field: 'contacto_nombre' },
               { label: 'Cargo', field: 'contacto_cargo' },
               { label: 'Email', field: 'contacto_email' },
-              { label: 'Número de participantes', field: 'numero_participantes' },
             ].map(({ label, field }) => (
               <div key={field}>
                 <p className="page-header__eyebrow" style={{ margin: '0 0 4px' }}>{label}</p>

@@ -123,12 +123,14 @@ export type Benchmark<T> = {
 }
 
 async function fetchPreguntasYRespuestasDeTipo(tipo: TipoDiagnostico, excluirId: string) {
+  // Benchmark histórico: agregamos las respuestas de TODOS los equipos de
+  // OTRAS compañías del mismo tipo. Solo se incluyen equipos `activo` o
+  // `completado` (no borradores).
   const { data: diags } = await supabase
     .from('diagnosticos')
     .select('id')
     .eq('tipo', tipo)
     .neq('id', excluirId)
-    .in('estado', ['activo', 'completado'])
 
   const diagIds = (diags ?? []).map(d => d.id)
   if (!diagIds.length) {
@@ -140,10 +142,20 @@ async function fetchPreguntasYRespuestasDeTipo(tipo: TipoDiagnostico, excluirId:
     .select('id, dimension_id, rol')
     .in('diagnostico_id', diagIds)
 
+  const { data: equipos } = await supabase
+    .from('equipos')
+    .select('id')
+    .in('diagnostico_id', diagIds)
+    .in('estado', ['activo', 'completado'])
+  const equipoIds = (equipos ?? []).map(e => e.id)
+  if (!equipoIds.length) {
+    return { preguntas: (preguntas ?? []) as PreguntaMin[], respuestas: [] as RespuestaMin[], nDiagnosticos: diagIds.length }
+  }
+
   const { data: participantes } = await supabase
     .from('participantes')
     .select('id')
-    .in('diagnostico_id', diagIds)
+    .in('equipo_id', equipoIds)
 
   const partIds = (participantes ?? []).map(p => p.id)
   const { data: respuestas } = partIds.length > 0
@@ -173,15 +185,26 @@ export async function fetchBenchmarkEspejo(tipo: TipoDiagnostico, excluirId: str
 }
 
 async function fetchPreguntasYRespuestas(diagnosticoId: string) {
+  // "Antes/después" a nivel compañía: agregamos a TODOS los equipos del
+  // diagnóstico padre como un solo conjunto.
   const { data: preguntas } = await supabase
     .from('preguntas')
     .select('id, dimension_id, rol')
     .eq('diagnostico_id', diagnosticoId)
 
+  const { data: equipos } = await supabase
+    .from('equipos')
+    .select('id')
+    .eq('diagnostico_id', diagnosticoId)
+  const equipoIds = (equipos ?? []).map(e => e.id)
+  if (!equipoIds.length) {
+    return { preguntas: (preguntas ?? []) as PreguntaMin[], respuestas: [] as RespuestaMin[] }
+  }
+
   const { data: participantes } = await supabase
     .from('participantes')
     .select('id')
-    .eq('diagnostico_id', diagnosticoId)
+    .in('equipo_id', equipoIds)
 
   const partIds = (participantes ?? []).map(p => p.id)
   const { data: respuestas } = partIds.length > 0

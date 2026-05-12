@@ -4,7 +4,6 @@ import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { DIMENSIONES, ROL_INFO, Rol, Tema, TipoDiagnostico } from '@/types'
 import { TIPOS_LIST, TIPOS_DIAGNOSTICO } from '@/lib/tipos-diagnostico'
-import ColorPickerHex from './ColorPickerHex'
 import { Button } from '@/components/ui/button'
 import { ArrowRight, Plus as PlusIcon, Pencil, Trash2, Check, X } from 'lucide-react'
 import { Input } from '@/components/ui/input'
@@ -65,10 +64,10 @@ export default function NuevoDiagnosticoForm() {
 
   const [intentoContinuar, setIntentoContinuar] = useState(false)
 
+  // Datos a nivel compañía. El número de participantes y el color se piden por
+  // equipo, dentro del detalle (`/admin/[id]`), no acá.
   const [datos, setDatos] = useState({
-    nombre_compania: '', contacto_nombre: '', contacto_cargo: '',
-    contacto_email: '', numero_participantes: '', color_neon: '#37FF25',
-    grupo_nombre: '',
+    nombre_compania: '', contacto_nombre: '', contacto_cargo: '', contacto_email: '',
   })
   const [preguntas, setPreguntas] = useState<PreguntaEditable[]>([])
   const [temas, setTemas] = useState<Tema[]>([])
@@ -119,46 +118,22 @@ export default function NuevoDiagnosticoForm() {
   async function guardar() {
     setGuardando(true); setError('')
     try {
-      // 1) Si el usuario asignó un grupo, lo buscamos o lo creamos.
-      let grupoId: string | null = null
-      const grupoNombre = datos.grupo_nombre.trim()
-      if (grupoNombre && tipo) {
-        const { data: grupoExistente } = await supabase
-          .from('grupos')
-          .select('id')
-          .eq('nombre', grupoNombre)
-          .eq('tipo', tipo)
-          .maybeSingle()
-        if (grupoExistente?.id) {
-          grupoId = grupoExistente.id
-        } else {
-          const { data: nuevoGrupo, error: grupoErr } = await supabase
-            .from('grupos')
-            .insert({ nombre: grupoNombre, tipo })
-            .select('id')
-            .single()
-          if (grupoErr) throw new Error(grupoErr.message)
-          grupoId = nuevoGrupo?.id ?? null
-        }
-      }
-
+      // Crear la compañía. Sin equipos todavía — esos se crean desde el detalle.
+      // Las columnas legacy (color_neon, estado, codigo_participacion, codigo_resultados)
+      // siguen en la BD con sus defaults; las leyes que las usan se eliminan en cleanup.
       const { data: diag, error: diagErr } = await supabase.from('diagnosticos').insert({
-        nombre_compania: datos.nombre_compania, contacto_nombre: datos.contacto_nombre,
-        contacto_cargo: datos.contacto_cargo, contacto_email: datos.contacto_email,
-        color_neon: datos.color_neon, estado: 'activo',
-        numero_participantes: datos.numero_participantes ? parseInt(datos.numero_participantes, 10) : null,
+        nombre_compania: datos.nombre_compania,
+        contacto_nombre: datos.contacto_nombre,
+        contacto_cargo: datos.contacto_cargo,
+        contacto_email: datos.contacto_email,
         tipo: tipo ?? 'cultura_360',
-        grupo_id: grupoId,
       }).select().single()
       if (diagErr || !diag) throw new Error(diagErr?.message)
       const { error: pregErr } = await supabase.from('preguntas')
         .insert(preguntas.map(p => ({ ...p, diagnostico_id: diag.id })))
       if (pregErr) throw new Error(pregErr.message)
-      fetch('/api/enviar-email', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ diagnosticoId: diag.id, tipo: 'activo' }),
-      }).catch(() => {})
+      // No mandamos email de activación todavía: la compañía recién creada
+      // aún no tiene equipos. El email se manda por equipo desde el detalle.
       router.push(`/admin/${diag.id}`)
     } catch (e: any) { setError(e.message || 'Error guardando') }
     finally { setGuardando(false) }
@@ -301,27 +276,15 @@ export default function NuevoDiagnosticoForm() {
       {/* PASO 1: Datos + selección de tema */}
       {paso === 'datos' && (
         <div>
-          <div className="admin-form-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 20, alignItems: 'center' }}>
+          <div className="admin-form-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 32, alignItems: 'center' }}>
             <Input style={{ height: 36 }} value={datos.nombre_compania} onChange={e => setDatos(d => ({ ...d, nombre_compania: e.target.value }))} placeholder="Nombre de la empresa" />
             <Input style={{ height: 36 }} value={datos.contacto_nombre} onChange={e => setDatos(d => ({ ...d, contacto_nombre: e.target.value }))} placeholder="Nombre del contacto" />
             <Input style={{ height: 36 }} value={datos.contacto_cargo} onChange={e => setDatos(d => ({ ...d, contacto_cargo: e.target.value }))} placeholder="Cargo" />
             <Input style={{ height: 36 }} type="email" value={datos.contacto_email} onChange={e => setDatos(d => ({ ...d, contacto_email: e.target.value }))} placeholder="Email" />
-            <Input style={{ height: 36 }} type="number" min={1} value={datos.numero_participantes} onChange={e => setDatos(d => ({ ...d, numero_participantes: e.target.value }))} placeholder="Número de participantes" />
-            <ColorPickerHex value={datos.color_neon} onChange={c => setDatos(d => ({ ...d, color_neon: c }))} />
           </div>
-
-          <div style={{ marginBottom: 32 }}>
-            <Input
-              style={{ height: 36 }}
-              value={datos.grupo_nombre}
-              onChange={e => setDatos(d => ({ ...d, grupo_nombre: e.target.value }))}
-              placeholder="Comparar con otros equipos · nombre del grupo (opcional)"
-            />
-            <p className="text-mute" style={{ fontSize: 12, margin: '6px 0 0' }}>
-              Si escribes un nombre, este diagnóstico se agrupa con otros del mismo tipo bajo el mismo nombre.
-              Eso habilita una vista comparativa entre los equipos del grupo. Deja vacío si no aplica.
-            </p>
-          </div>
+          <p className="text-mute" style={{ fontSize: 12, margin: '-20px 0 32px' }}>
+            Los equipos a evaluar (con su nombre, color y número de participantes) se agregan después, en el detalle de la compañía.
+          </p>
 
           <div style={{ marginTop: 44 }}>
             <div style={{ background: 'var(--ink)', padding: '10px 16px', marginBottom: 27 }}>

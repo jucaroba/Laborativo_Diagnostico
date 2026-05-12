@@ -26,23 +26,34 @@ const ROL_NEON: Record<Rol, string> = {
 export default async function ResultadosPage({ params }: { params: Promise<{ codigo: string }> }) {
   const { codigo } = await params
 
-  const { data: diag } = await supabase
-    .from('diagnosticos')
+  // Resolución por equipo: el dashboard es de UN equipo dentro de una compañía.
+  const { data: equipo } = await supabase
+    .from('equipos')
     .select('*')
     .eq('codigo_resultados', codigo)
     .single()
 
+  if (!equipo) notFound()
+
+  const { data: diag } = await supabase
+    .from('diagnosticos')
+    .select('*')
+    .eq('id', equipo.diagnostico_id)
+    .single()
+
   if (!diag) notFound()
 
+  // Las preguntas son a nivel compañía (compartidas entre sus equipos).
   const { data: preguntas } = await supabase
     .from('preguntas')
     .select('id, dimension_id, rol')
     .eq('diagnostico_id', diag.id)
 
+  // Los participantes son del equipo específico.
   const { data: participantes } = await supabase
     .from('participantes')
     .select('id, rol')
-    .eq('diagnostico_id', diag.id)
+    .eq('equipo_id', equipo.id)
 
   const participanteIds = (participantes ?? []).map(p => p.id)
   const { data: respuestas } = await supabase
@@ -79,7 +90,7 @@ export default async function ResultadosPage({ params }: { params: Promise<{ cod
     const totalFormulariosSimple = new Set((respuestas ?? []).map(r => r.participante_id)).size
     const sharedProps = {
       nombreCompania: diag.nombre_compania,
-      estado: diag.estado,
+      estado: equipo.estado,
       totalParticipantes,
       totalFormularios: totalFormulariosSimple,
       resultados: resultadosSimple,
@@ -108,7 +119,7 @@ export default async function ResultadosPage({ params }: { params: Promise<{ cod
     return (
       <ResultadosEspejo
         nombreCompania={diag.nombre_compania}
-        estado={diag.estado}
+        estado={equipo.estado}
         totalParticipantes={totalParticipantes}
         totalFormularios={totalFormulariosEspejo}
         resultados={resultadosEspejo}
@@ -213,7 +224,7 @@ export default async function ResultadosPage({ params }: { params: Promise<{ cod
     <div className="only-mobile">
       <ResultadosMobile
         nombreCompania={diag.nombre_compania}
-        estado={diag.estado}
+        estado={equipo.estado}
         totalParticipantes={totalParticipantes}
         personasEquipo={personasEquipo}
         personasLider={personasLider}
@@ -254,7 +265,7 @@ export default async function ResultadosPage({ params }: { params: Promise<{ cod
       {/* ============================================ */}
       {/* SECCIÓN 1 · RESUMEN DE RESPUESTAS            */}
       {/* ============================================ */}
-      <SectionBar title="Resumen de respuestas" subtitle={`Estado · ${diag.estado}`} />
+      <SectionBar title="Resumen de respuestas" subtitle={`Estado · ${equipo.estado}`} />
 
       <div style={{ padding: '32px 56px', borderBottom: '1.5px solid var(--ink)' }}>
 

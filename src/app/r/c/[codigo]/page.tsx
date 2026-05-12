@@ -1,8 +1,8 @@
 import { supabase } from '@/lib/supabase'
-import { notFound } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
 import Image from 'next/image'
 import { Fragment } from 'react'
-import { DIMENSIONES, Grupo } from '@/types'
+import { DIMENSIONES, Diagnostico, Equipo } from '@/types'
 import { TIPOS_DIAGNOSTICO } from '@/lib/tipos-diagnostico'
 
 export const revalidate = 0
@@ -10,7 +10,7 @@ export const revalidate = 0
 type EquipoStats = {
   id: string
   nombre: string
-  ronda: number
+  color: string
   estado: string
   participantes: number
   dims: { id: number; promedio: number | null; n: number }[]
@@ -20,8 +20,8 @@ type EquipoStats = {
 const round1 = (n: number) => Math.round(n * 10) / 10
 
 // Paleta diverging: rojo (bajo) → amarillo (medio) → verde (alto)
-const HEAT_LOW: [number, number, number] = [215, 48, 39]
-const HEAT_MID: [number, number, number] = [254, 224, 139]
+const HEAT_LOW: [number, number, number]  = [215, 48, 39]
+const HEAT_MID: [number, number, number]  = [254, 224, 139]
 const HEAT_HIGH: [number, number, number] = [26, 152, 80]
 
 const lerp = (a: [number, number, number], b: [number, number, number], t: number): [number, number, number] => [
@@ -40,25 +40,45 @@ const cellBg = (val: number | null) => {
 }
 const cellText = (val: number | null) => val === null ? 'var(--mute)' : '#0A0A0A'
 
-export default async function ComparativoGrupoPage({ params }: { params: Promise<{ codigo: string }> }) {
+export default async function ComparativoCompaniaPage({ params }: { params: Promise<{ codigo: string }> }) {
   const { codigo } = await params
 
-  const { data: grupoData } = await supabase.from('grupos').select('*').eq('codigo_resultados', codigo).maybeSingle()
-  if (!grupoData) notFound()
-  const grupo = grupoData as Grupo
-  const tipoConfig = TIPOS_DIAGNOSTICO[grupo.tipo]
-
-  const { data: diags } = await supabase
+  // Resolución por compañía: el código identifica al diagnóstico (compañía).
+  const { data: compania } = await supabase
     .from('diagnosticos')
-    .select('id, nombre_compania, ronda, estado, created_at')
-    .eq('grupo_id', grupo.id)
+    .select('*')
+    .eq('codigo_resultados_comparativo', codigo)
+    .maybeSingle()
+  if (!compania) notFound()
+  const c = compania as Diagnostico
+  const tipoConfig = TIPOS_DIAGNOSTICO[c.tipo ?? 'cultura_360']
+
+  const { data: equiposData } = await supabase
+    .from('equipos')
+    .select('*')
+    .eq('diagnostico_id', c.id)
     .order('created_at')
 
-  const equipos: EquipoStats[] = await Promise.all((diags ?? []).map(async d => {
-    const [{ data: preg }, { data: parts }] = await Promise.all([
-      supabase.from('preguntas').select('id, dimension_id').eq('diagnostico_id', d.id),
-      supabase.from('participantes').select('id').eq('diagnostico_id', d.id),
-    ])
+  const equiposLista = (equiposData ?? []) as Equipo[]
+
+  // Si solo hay un equipo, no hay nada que comparar. Redirige al dashboard del equipo.
+  if (equiposLista.length === 1) {
+    redirect(`/r/${equiposLista[0].codigo_resultados}`)
+  }
+
+  // Una sola pasada por preguntas (compartidas a nivel compañía)
+  const { data: preg } = await supabase
+    .from('preguntas')
+    .select('id, dimension_id')
+    .eq('diagnostico_id', c.id)
+  const preguntasIdx = new Map<string, number>()
+  for (const p of preg ?? []) preguntasIdx.set(p.id, p.dimension_id)
+
+  const equipos: EquipoStats[] = await Promise.all(equiposLista.map(async eq => {
+    const { data: parts } = await supabase
+      .from('participantes')
+      .select('id')
+      .eq('equipo_id', eq.id)
     const partIds = (parts ?? []).map(p => p.id)
     const { data: resp } = partIds.length > 0
       ? await supabase.from('respuestas').select('pregunta_id, valor').in('participante_id', partIds)
@@ -66,9 +86,9 @@ export default async function ComparativoGrupoPage({ params }: { params: Promise
 
     const porDim: Record<number, number[]> = { 1: [], 2: [], 3: [], 4: [] }
     for (const r of resp ?? []) {
-      const pq = preg?.find(p => p.id === r.pregunta_id)
-      if (!pq || !porDim[pq.dimension_id]) continue
-      porDim[pq.dimension_id].push(r.valor)
+      const dimId = preguntasIdx.get(r.pregunta_id)
+      if (!dimId || !porDim[dimId]) continue
+      porDim[dimId].push(r.valor)
     }
     const dims = DIMENSIONES.map(dim => {
       const vals = porDim[dim.id]
@@ -81,22 +101,21 @@ export default async function ComparativoGrupoPage({ params }: { params: Promise
     const allVals = Object.values(porDim).flat()
     const global = allVals.length ? round1(allVals.reduce((a, b) => a + b, 0) / allVals.length) : null
     return {
-      id: d.id,
-      nombre: d.nombre_compania,
-      ronda: d.ronda ?? 1,
-      estado: d.estado,
+      id: eq.id,
+      nombre: eq.nombre,
+      color: eq.color_neon,
+      estado: eq.estado,
       participantes: parts?.length ?? 0,
       dims,
       global,
     }
   }))
 
-  // Promedio del grupo por dimensión
-  const promedioGrupoPorDim = DIMENSIONES.map(dim => {
+  const promedioPorDim = DIMENSIONES.map(dim => {
     const vals = equipos.map(e => e.dims.find(d => d.id === dim.id)?.promedio).filter((v): v is number => typeof v === 'number')
     return vals.length ? round1(vals.reduce((a, b) => a + b, 0) / vals.length) : null
   })
-  const promedioGrupoGlobal = (() => {
+  const promedioGlobal = (() => {
     const vals = equipos.map(e => e.global).filter((v): v is number => typeof v === 'number')
     return vals.length ? round1(vals.reduce((a, b) => a + b, 0) / vals.length) : null
   })()
@@ -123,18 +142,18 @@ export default async function ComparativoGrupoPage({ params }: { params: Promise
             display: 'inline-block', padding: '2px 8px', marginBottom: 8,
             fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase',
             fontWeight: 700, background: 'var(--ink)', color: '#fff',
-          }}>{tipoConfig?.etiqueta ?? grupo.tipo}</span>
+          }}>{tipoConfig?.etiqueta ?? c.tipo}</span>
           <h1 className="page-header__title" style={{ fontSize: 'clamp(32px,4vw,48px)' }}>
-            {grupo.nombre}
+            {c.nombre_compania}
           </h1>
           <p className="page-header__subtitle" style={{ marginTop: 8 }}>
-            Comparativo entre equipos · {tipoConfig?.nombre ?? grupo.tipo}
+            Comparativo entre equipos · {tipoConfig?.nombre ?? c.tipo}
           </p>
         </div>
 
         {/* Resumen */}
         <div style={{ background: 'var(--ink)', padding: '12px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
-          <h2 style={{ fontSize: 18, fontWeight: 900, letterSpacing: '-.01em', margin: 0, color: '#fff' }}>Resumen del grupo</h2>
+          <h2 style={{ fontSize: 18, fontWeight: 900, letterSpacing: '-.01em', margin: 0, color: '#fff' }}>Resumen de la compañía</h2>
           <span style={{ fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase', fontWeight: 600, color: '#fff' }}>Escala 1–10</span>
         </div>
         <div style={{ borderBottom: '1.5px solid var(--ink)' }}>
@@ -142,7 +161,7 @@ export default async function ComparativoGrupoPage({ params }: { params: Promise
             {[
               { label: 'Equipos', count: equipos.length },
               { label: 'Participantes', count: totalParticipantes },
-              { label: 'Promedio del grupo', count: promedioGrupoGlobal !== null ? promedioGrupoGlobal.toFixed(1) : '—' },
+              { label: 'Promedio de la compañía', count: promedioGlobal !== null ? promedioGlobal.toFixed(1) : '—' },
             ].map((g, i, arr) => (
               <div key={g.label} style={{
                 padding: '16px 24px',
@@ -164,7 +183,7 @@ export default async function ComparativoGrupoPage({ params }: { params: Promise
 
         {equipos.length === 0 ? (
           <div style={{ padding: '32px 40px', borderBottom: '1.5px solid var(--ink)' }}>
-            <p className="text-mute" style={{ fontSize: 14 }}>Aún no hay diagnósticos en este grupo.</p>
+            <p className="text-mute" style={{ fontSize: 14 }}>Aún no hay equipos creados en esta compañía.</p>
           </div>
         ) : (
           <div style={{ padding: '24px 40px 40px', borderBottom: '1.5px solid var(--ink)' }}>
@@ -201,7 +220,7 @@ export default async function ComparativoGrupoPage({ params }: { params: Promise
                 <div style={{ fontSize: 16, fontWeight: 900, letterSpacing: '-.02em' }}>Promedio</div>
               </div>
 
-              {/* Body rows: por equipo */}
+              {/* Body rows */}
               {equipos.map((eq, rowIdx) => {
                 const isLast = rowIdx === equipos.length - 1
                 const rowBottom = isLast ? '3px solid var(--ink)' : '1.5px solid var(--ink)'
@@ -214,8 +233,9 @@ export default async function ComparativoGrupoPage({ params }: { params: Promise
                       display: 'flex', flexDirection: 'column', gap: 4,
                       background: 'var(--card)',
                     }}>
-                      <span style={{ fontSize: 14, fontWeight: 900, color: 'var(--ink)', letterSpacing: '-.01em' }}>
-                        {eq.nombre}{eq.ronda > 1 ? ` · R${eq.ronda}` : ''}
+                      <span style={{ fontSize: 14, fontWeight: 900, color: 'var(--ink)', letterSpacing: '-.01em', display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+                        <span style={{ width: 10, height: 10, background: eq.color, border: '1.5px solid var(--ink)', display: 'inline-block', flexShrink: 0 }} aria-hidden />
+                        {eq.nombre}
                       </span>
                       <span style={{ fontSize: 10, color: 'var(--mute)', letterSpacing: '.04em', textTransform: 'uppercase', fontWeight: 600 }}>
                         {eq.participantes} {eq.participantes === 1 ? 'participante' : 'participantes'}
@@ -250,16 +270,16 @@ export default async function ComparativoGrupoPage({ params }: { params: Promise
                 )
               })}
 
-              {/* Fila: promedio del grupo */}
+              {/* Fila: promedio de la compañía */}
               <div style={{
                 borderRight: '1.5px solid var(--ink)',
                 padding: '18px 16px', background: 'var(--card)',
                 display: 'flex', alignItems: 'center',
               }}>
-                <span style={{ fontSize: 14, fontWeight: 900, color: 'var(--ink)', letterSpacing: '-.01em' }}>Promedio del grupo</span>
+                <span style={{ fontSize: 14, fontWeight: 900, color: 'var(--ink)', letterSpacing: '-.01em' }}>Promedio de la compañía</span>
               </div>
               {DIMENSIONES.map((dim, colIdx) => {
-                const val = promedioGrupoPorDim[colIdx]
+                const val = promedioPorDim[colIdx]
                 const isLastCol = colIdx === DIMENSIONES.length - 1
                 return (
                   <div key={dim.id} style={{
@@ -275,11 +295,11 @@ export default async function ComparativoGrupoPage({ params }: { params: Promise
               })}
               <div style={{
                 padding: '22px 16px',
-                background: cellBg(promedioGrupoGlobal), color: cellText(promedioGrupoGlobal),
+                background: cellBg(promedioGlobal), color: cellText(promedioGlobal),
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 fontSize: 24, fontWeight: 900, letterSpacing: '-.03em',
               }}>
-                {promedioGrupoGlobal !== null ? promedioGrupoGlobal.toFixed(1) : '—'}
+                {promedioGlobal !== null ? promedioGlobal.toFixed(1) : '—'}
               </div>
             </div>
           </div>

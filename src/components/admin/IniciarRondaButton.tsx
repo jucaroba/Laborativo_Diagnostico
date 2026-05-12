@@ -21,7 +21,7 @@ export default function IniciarRondaButton({ padre }: Props) {
     try {
       const nuevaRonda = (padre.ronda ?? 1) + 1
 
-      // 1) Crear el diagnóstico hijo clonando los datos del padre
+      // 1) Crear la compañía hijo clonando los datos de contacto del padre
       const { data: hijo, error: errHijo } = await supabase
         .from('diagnosticos')
         .insert({
@@ -29,10 +29,7 @@ export default function IniciarRondaButton({ padre }: Props) {
           contacto_nombre: padre.contacto_nombre,
           contacto_cargo: padre.contacto_cargo,
           contacto_email: padre.contacto_email,
-          color_neon: padre.color_neon,
-          numero_participantes: padre.numero_participantes,
           tipo: padre.tipo,
-          estado: 'activo',
           diagnostico_padre_id: padre.id,
           ronda: nuevaRonda,
         })
@@ -41,7 +38,7 @@ export default function IniciarRondaButton({ padre }: Props) {
 
       if (errHijo || !hijo) throw new Error(errHijo?.message ?? 'No se pudo crear la nueva ronda')
 
-      // 2) Clonar las preguntas del padre
+      // 2) Clonar las preguntas del padre (compartidas a nivel compañía)
       const { data: preguntasPadre, error: errPreg } = await supabase
         .from('preguntas')
         .select('dimension_id, rol, texto, orden')
@@ -58,7 +55,23 @@ export default function IniciarRondaButton({ padre }: Props) {
         if (errIns) throw new Error(errIns.message)
       }
 
-      // 3) Llevar al admin del nuevo diagnóstico
+      // 3) Clonar los equipos del padre: mismo nombre/color/número, códigos nuevos.
+      const { data: equiposPadre, error: errEq } = await supabase
+        .from('equipos')
+        .select('nombre, color_neon, numero_participantes')
+        .eq('diagnostico_id', padre.id)
+        .order('created_at')
+
+      if (errEq) throw new Error(errEq.message)
+
+      if (equiposPadre && equiposPadre.length > 0) {
+        const { error: errInsEq } = await supabase.from('equipos').insert(
+          equiposPadre.map(eq => ({ ...eq, diagnostico_id: hijo.id, estado: 'activo' }))
+        )
+        if (errInsEq) throw new Error(errInsEq.message)
+      }
+
+      // 4) Llevar al admin de la nueva compañía
       router.push(`/admin/${hijo.id}`)
       router.refresh()
     } catch (e) {

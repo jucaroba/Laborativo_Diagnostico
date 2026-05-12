@@ -31,7 +31,7 @@ function parsear(texto: string): Fila[] {
   })
 }
 
-export default function InvitarEquipoDialog({ diagnosticoId, variant = 'button', copyUrl }: { diagnosticoId: string; variant?: 'button' | 'card' | 'iconOnly' | 'cardWithCopy'; copyUrl?: string }) {
+export default function InvitarEquipoDialog({ equipoId, variant = 'button', copyUrl }: { equipoId: string; variant?: 'button' | 'card' | 'iconOnly' | 'cardWithCopy'; copyUrl?: string }) {
   const router = useRouter()
   const [open, setOpen] = useState(false)
   const [texto, setTexto] = useState('')
@@ -49,7 +49,7 @@ export default function InvitarEquipoDialog({ diagnosticoId, variant = 'button',
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          diagnosticoId,
+          equipoId,
           lista: validos.map(f => ({ nombre: f.nombre, email: f.email })),
         }),
       })
@@ -107,7 +107,7 @@ export default function InvitarEquipoDialog({ diagnosticoId, variant = 'button',
             }
           }}
           style={{
-            border: '1.5px solid var(--ink)',
+            borderLeft: '1.5px solid var(--ink)',
             padding: '12px 16px',
             display: 'flex',
             alignItems: 'center',

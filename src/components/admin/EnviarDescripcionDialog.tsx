@@ -31,10 +31,10 @@ function parsear(texto: string): Fila[] {
 }
 
 export default function EnviarDescripcionDialog({
-  diagnosticoId,
+  equipoId,
   linkUrl,
 }: {
-  diagnosticoId: string
+  equipoId: string
   linkUrl: string
 }) {
   const [open, setOpen] = useState(false)
@@ -53,7 +53,7 @@ export default function EnviarDescripcionDialog({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          diagnosticoId,
+          equipoId,
           lista: validos.map(f => ({ nombre: f.nombre, email: f.email })),
         }),
       })
@@ -78,7 +78,6 @@ export default function EnviarDescripcionDialog({
   return (
     <>
       <div style={{
-        border: '1.5px solid var(--ink)',
         padding: '12px 16px',
         display: 'flex',
         alignItems: 'center',

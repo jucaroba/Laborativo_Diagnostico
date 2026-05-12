@@ -26,32 +26,36 @@ export const DIMENSIONES = [
   { id: 4, nombre: 'Acción',      subtitulo: 'Comportamiento', pregunta: '¿Qué?' },
 ] as const
 
+// ─── Modelo de datos ────────────────────────────────────────────────
+//   Diagnóstico = compañía cliente (datos de contacto, tipo, contexto IA, preguntas).
+//   Equipo      = unidad evaluada dentro de la compañía (color, link de
+//                 participación, link de resultados, estado, conteo).
+//   Una compañía puede tener N equipos; las preguntas se comparten entre ellos.
 export interface Diagnostico {
   id: string
   nombre_compania: string
   contacto_nombre: string
   contacto_cargo: string
   contacto_email: string
-  codigo_participacion: string
-  codigo_resultados: string
-  estado: EstadoDiagnostico
-  color_neon: string
+  /** Código público de la vista comparativa entre equipos: `/r/c/[codigo]`. */
+  codigo_resultados_comparativo: string
   vertical: string | null
   contexto_ia: string | null
-  numero_participantes: number | null
   tipo: TipoDiagnostico
   diagnostico_padre_id?: string | null
   ronda?: number
-  grupo_id?: string | null
   benchmark_habilitado?: boolean
   created_at: string
 }
 
-export interface Grupo {
+export interface Equipo {
   id: string
+  diagnostico_id: string
   nombre: string
-  cliente: string | null
-  tipo: TipoDiagnostico
+  color_neon: string
+  numero_participantes: number | null
+  estado: EstadoDiagnostico
+  codigo_participacion: string
   codigo_resultados: string
   created_at: string
 }
@@ -81,7 +85,7 @@ export interface Tema {
 
 export interface Participante {
   id: string
-  diagnostico_id: string
+  equipo_id: string
   rol: Rol
   created_at: string
 }

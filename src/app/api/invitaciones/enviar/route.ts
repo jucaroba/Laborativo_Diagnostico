@@ -6,25 +6,36 @@ type Entrada = { nombre: string; email: string }
 
 export async function POST(req: NextRequest) {
   try {
-    const { diagnosticoId, lista } = (await req.json()) as { diagnosticoId: string; lista: Entrada[] }
+    const body = (await req.json()) as { equipoId?: string; diagnosticoId?: string; lista: Entrada[] }
+    const { lista } = body
+    const equipoId = body.equipoId
 
-    if (!diagnosticoId || !Array.isArray(lista) || lista.length === 0) {
+    if (!equipoId || !Array.isArray(lista) || lista.length === 0) {
       return NextResponse.json({ error: 'Datos inválidos' }, { status: 400 })
     }
 
-    const { data: diag } = await supabaseAdmin
-      .from('diagnosticos')
-      .select('id, nombre_compania, codigo_participacion, estado')
-      .eq('id', diagnosticoId)
+    // Cargar el equipo (necesitamos diagnostico_id para el nombre de la compañía).
+    const { data: equipo } = await supabaseAdmin
+      .from('equipos')
+      .select('id, diagnostico_id, nombre, estado, codigo_participacion')
+      .eq('id', equipoId)
       .single()
 
-    if (!diag) return NextResponse.json({ error: 'Diagnóstico no encontrado' }, { status: 404 })
+    if (!equipo) return NextResponse.json({ error: 'Equipo no encontrado' }, { status: 404 })
 
-    if (diag.estado === 'completado') {
+    const { data: diag } = await supabaseAdmin
+      .from('diagnosticos')
+      .select('id, nombre_compania')
+      .eq('id', equipo.diagnostico_id)
+      .single()
+
+    if (!diag) return NextResponse.json({ error: 'Compañía no encontrada' }, { status: 404 })
+
+    if (equipo.estado === 'completado') {
       await supabaseAdmin
-        .from('diagnosticos')
+        .from('equipos')
         .update({ estado: 'activo' })
-        .eq('id', diagnosticoId)
+        .eq('id', equipoId)
     }
 
     const limpia = lista
@@ -38,8 +49,12 @@ export async function POST(req: NextRequest) {
     const { data: filas, error: upsertError } = await supabaseAdmin
       .from('invitaciones')
       .upsert(
-        limpia.map(e => ({ diagnostico_id: diagnosticoId, nombre: e.nombre, email: e.email })),
-        { onConflict: 'diagnostico_id,email' }
+        limpia.map(e => ({
+          equipo_id: equipoId,
+          nombre: e.nombre,
+          email: e.email,
+        })),
+        { onConflict: 'equipo_id,email' }
       )
       .select('id, nombre, email')
 
@@ -53,7 +68,7 @@ export async function POST(req: NextRequest) {
           participanteEmail: f.email,
           participanteNombre: f.nombre,
           nombreCompania: diag.nombre_compania,
-          codigoParticipacion: diag.codigo_participacion,
+          codigoParticipacion: equipo.codigo_participacion,
         }).then(() => f.id)
       )
     )
