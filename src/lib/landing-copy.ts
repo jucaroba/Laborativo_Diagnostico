@@ -58,7 +58,7 @@ const CULTURA_360: LandingCopy = {
   introTexto: 'es un modelo de diagnóstico que integra la percepción del equipo y su líder a través de cuatro dimensiones de cultura, haciendo visibles las brechas y habilitando acciones para transformarla.',
   introCierre: 'Un modelo de consultoría creativa basada en la emoción.',
   eyebrowPerspectivas: 'Mirada 360°',
-  tituloPerspectivas: 'cuatro puntos de vista sobre la misma cultura.',
+  tituloPerspectivas: 'cuatro puntos de vista\nsobre la misma cultura.',
   subtituloPerspectivas: 'Donde estas miradas coinciden, hay alineación. Donde no, hay una brecha y ahí empieza el trabajo.',
   niveles: [
     { tag: 'Nivel 01 · Individuo',   h: 'Autoevaluación personal', p: 'Cada miembro del equipo se observa a sí mismo en las cuatro dimensiones.' },
@@ -73,7 +73,7 @@ const CULTURA_360: LandingCopy = {
     { n: '03', h: 'Preguntas por dimensión', p: 'Cada pregunta se ancla a una de las cuatro dimensiones. Las respuestas se cruzan entre perspectivas para detectar dónde la percepción no coincide con la experiencia.', meta: '4 dimensiones · {N} preguntas' },
     { n: '04', h: 'Mapa de brechas', p: 'Entregamos un reporte visual con las brechas por dimensión, la salud cultural por perspectiva y acciones concretas para cerrar las distancias más críticas.', meta: 'Entrega inmediata · Dashboard' },
   ],
-  tituloDimensiones: 'cuatro dimensiones de cultura para abordar cualquier reto.',
+  tituloDimensiones: 'cuatro dimensiones de cultura\npara abordar cualquier reto.',
 }
 
 // ─── Pulso Colectivo (una sola mirada del grupo) ───────────────

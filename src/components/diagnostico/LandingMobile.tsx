@@ -82,7 +82,7 @@ export default function LandingMobile({
       <div style={{ padding: '40px 20px 48px', borderBottom: '1.5px solid var(--ink)', background: 'var(--paper)' }}>
         <span className="eyebrow">Contexto de diagnóstico.</span>
         <div className="rule" />
-        <h2 style={{ fontWeight: 900, fontSize: 'clamp(28px, 8vw, 40px)', lineHeight: .98, letterSpacing: '-.03em', margin: '16px 0 16px' }}>
+        <h2 style={{ fontWeight: 900, fontSize: 'clamp(28px, 8vw, 40px)', lineHeight: .98, letterSpacing: '-.03em', margin: '16px 0 16px', whiteSpace: 'pre-line' }}>
           {copy.tituloDimensiones}
         </h2>
         <span className="chip" style={{ marginBottom: 8 }}>4 ejes · {totalN} preguntas</span>
@@ -111,7 +111,7 @@ export default function LandingMobile({
       <div style={{ padding: '40px 20px 48px', borderBottom: '1.5px solid var(--ink)', background: 'var(--paper)' }}>
         <span className="eyebrow">{copy.eyebrowPerspectivas}</span>
         <div className="rule" />
-        <h2 style={{ fontWeight: 900, fontSize: 'clamp(28px, 8vw, 40px)', lineHeight: .96, letterSpacing: '-.03em', margin: '16px 0 12px' }}>
+        <h2 style={{ fontWeight: 900, fontSize: 'clamp(28px, 8vw, 40px)', lineHeight: .96, letterSpacing: '-.03em', margin: '16px 0 12px', whiteSpace: 'pre-line' }}>
           {copy.tituloPerspectivas}
         </h2>
         <p style={{ color: 'var(--ink-2)', margin: '0 0 24px', fontSize: 14.5, lineHeight: 1.5, fontWeight: 500 }}>

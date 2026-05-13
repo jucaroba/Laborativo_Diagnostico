@@ -112,7 +112,7 @@ export default async function LandingPage({ params }: { params: Promise<{ codigo
           <div>
             <span className="eyebrow">Contexto de diagnóstico.</span>
             <div className="rule" />
-            <h2 style={{ fontWeight: 900, fontSize: 'clamp(36px,4.2vw,56px)', lineHeight: .95, letterSpacing: '-.035em', maxWidth: '26ch', marginTop: 24 }}>
+            <h2 style={{ fontWeight: 900, fontSize: 'clamp(36px,4.2vw,56px)', lineHeight: .95, letterSpacing: '-.035em', maxWidth: '26ch', marginTop: 24, whiteSpace: 'pre-line' }}>
               {copy.tituloDimensiones}
             </h2>
           </div>
@@ -142,7 +142,7 @@ export default async function LandingPage({ params }: { params: Promise<{ codigo
       <div style={{ padding: '64px 56px', borderBottom: '1.5px solid var(--ink)', background: 'var(--paper)' }}>
         <span className="eyebrow">{copy.eyebrowPerspectivas}</span>
         <div className="rule" />
-        <h2 style={{ fontWeight: 900, fontSize: 'clamp(36px,4.2vw,56px)', lineHeight: .92, letterSpacing: '-.035em', margin: '16px 0 8px', maxWidth: '28ch' }}>
+        <h2 style={{ fontWeight: 900, fontSize: 'clamp(36px,4.2vw,56px)', lineHeight: .92, letterSpacing: '-.035em', margin: '16px 0 8px', maxWidth: '28ch', whiteSpace: 'pre-line' }}>
           {copy.tituloPerspectivas}
         </h2>
         <p style={{ color: 'var(--ink-2)', maxWidth: '56ch', margin: '0 0 40px', fontSize: 16, lineHeight: 1.5, fontWeight: 500 }}>

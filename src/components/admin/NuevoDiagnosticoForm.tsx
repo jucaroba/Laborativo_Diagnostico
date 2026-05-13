@@ -246,29 +246,20 @@ export default function NuevoDiagnosticoForm() {
         </h2>
         <div style={{ display: 'flex', gap: 8 }}>
           <Button
-            onClick={() => setPaso('tipo')}
+            onClick={() => setPaso(paso === 'revision' ? 'datos' : 'tipo')}
             disabled={guardando}
             style={{ background: 'transparent', color: '#fff', border: '1.5px solid #fff' }}
           >
-            <ArrowRight size={15} strokeWidth={2.5} style={{ transform: 'rotate(180deg)' }} /> Cambiar tipo
+            <ArrowRight size={15} strokeWidth={2.5} style={{ transform: 'rotate(180deg)' }} /> Cambiar tipo / tema
           </Button>
           {paso === 'revision' && (
-            <>
-              <Button
-                onClick={() => setPaso('datos')}
-                disabled={guardando}
-                style={{ background: 'transparent', color: '#fff', border: '1.5px solid #fff' }}
-              >
-                <ArrowRight size={15} strokeWidth={2.5} style={{ transform: 'rotate(180deg)' }} /> Cambiar tema
-              </Button>
-              <Button
-                onClick={guardar}
-                disabled={guardando}
-                style={{ background: '#fff', color: 'var(--ink)', border: '1.5px solid #fff' }}
-              >
-                {guardando ? 'Guardando…' : 'Guardar diagnóstico'}
-              </Button>
-            </>
+            <Button
+              onClick={guardar}
+              disabled={guardando}
+              style={{ background: '#fff', color: 'var(--ink)', border: '1.5px solid #fff' }}
+            >
+              {guardando ? 'Guardando…' : 'Guardar diagnóstico'}
+            </Button>
           )}
         </div>
       </div>
@@ -386,7 +377,7 @@ export default function NuevoDiagnosticoForm() {
               disabled={guardando}
               style={{ background: 'transparent', color: '#fff', border: '1.5px solid #fff' }}
             >
-              <ArrowRight size={15} strokeWidth={2.5} style={{ transform: 'rotate(180deg)' }} /> Cambiar tema
+              <ArrowRight size={15} strokeWidth={2.5} style={{ transform: 'rotate(180deg)' }} /> Cambiar tipo / tema
             </Button>
             <Button
               onClick={guardar}
