@@ -11,7 +11,7 @@ export default async function QuestionPage({ params }: { params: Promise<{ codig
   // Resolución por equipo: el código identifica a UN equipo dentro de una compañía.
   const { data: equipo } = await supabase
     .from('equipos')
-    .select('id, diagnostico_id, estado, color_neon')
+    .select('id, diagnostico_id, estado')
     .eq('codigo_participacion', codigo)
     .single()
 
@@ -25,7 +25,7 @@ export default async function QuestionPage({ params }: { params: Promise<{ codig
 
   if (!diag) notFound()
   if (equipo.estado !== 'activo') {
-    return <EstadoNoDisponible estado={equipo.estado as 'borrador' | 'completado'} nombreCompania={diag.nombre_compania} neon={equipo.color_neon || undefined} />
+    return <EstadoNoDisponible estado={equipo.estado as 'borrador' | 'completado'} nombreCompania={diag.nombre_compania} />
   }
 
   return <QuestionForm diagnosticoId={diag.id} codigo={codigo} idx={numIdx} tipo={(diag.tipo ?? 'cultura_360') as TipoDiagnostico} />

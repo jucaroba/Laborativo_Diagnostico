@@ -10,7 +10,7 @@ export default async function IntakePage({ params }: { params: Promise<{ codigo:
   // Resolución por equipo: el código identifica a UN equipo dentro de una compañía.
   const { data: equipo } = await supabase
     .from('equipos')
-    .select('id, diagnostico_id, estado, color_neon')
+    .select('id, diagnostico_id, estado')
     .eq('codigo_participacion', codigo)
     .single()
 
@@ -24,7 +24,7 @@ export default async function IntakePage({ params }: { params: Promise<{ codigo:
 
   if (!diag) notFound()
   if (equipo.estado !== 'activo') {
-    return <EstadoNoDisponible estado={equipo.estado as 'borrador' | 'completado'} nombreCompania={diag.nombre_compania} neon={equipo.color_neon || undefined} />
+    return <EstadoNoDisponible estado={equipo.estado as 'borrador' | 'completado'} nombreCompania={diag.nombre_compania} />
   }
 
   const { data: preguntas } = await supabase

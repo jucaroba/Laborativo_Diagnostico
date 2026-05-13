@@ -55,10 +55,10 @@ export default function IniciarRondaButton({ padre }: Props) {
         if (errIns) throw new Error(errIns.message)
       }
 
-      // 3) Clonar los equipos del padre: mismo nombre/color/número, códigos nuevos.
+      // 3) Clonar los equipos del padre: mismo nombre y número, códigos nuevos.
       const { data: equiposPadre, error: errEq } = await supabase
         .from('equipos')
-        .select('nombre, color_neon, numero_participantes')
+        .select('nombre, numero_participantes')
         .eq('diagnostico_id', padre.id)
         .order('created_at')
 

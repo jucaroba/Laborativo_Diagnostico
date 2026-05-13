@@ -5,7 +5,6 @@ type Estado = 'borrador' | 'completado' | 'no-encontrado'
 type Props = {
   estado: Estado
   nombreCompania?: string
-  neon?: string
 }
 
 const COPY: Record<Estado, { eyebrow: string | null; titulo: string | null; mensaje: string }> = {
@@ -26,13 +25,13 @@ const COPY: Record<Estado, { eyebrow: string | null; titulo: string | null; mens
   },
 }
 
-export default function EstadoNoDisponible({ estado, nombreCompania, neon = '#D8FF00' }: Props) {
+export default function EstadoNoDisponible({ estado, nombreCompania }: Props) {
   const copy = COPY[estado]
   const eyebrow = copy.eyebrow ?? nombreCompania ?? 'Diagnóstico'
   const titulo = copy.titulo ?? nombreCompania ?? 'Diagnóstico'
 
   return (
-    <div style={{ ['--neon' as string]: neon, background: 'var(--bg)', minHeight: '100vh', fontFamily: "'Red Hat Display', sans-serif", display: 'flex', flexDirection: 'column' }}>
+    <div style={{ background: 'var(--bg)', minHeight: '100vh', fontFamily: "'Red Hat Display', sans-serif", display: 'flex', flexDirection: 'column' }}>
 
       <div style={{ padding: '48px 56px 32px', borderBottom: '1.5px solid var(--ink)' }}>
         <Image src="/brand/laborativo-logo.png" alt="Laborativo" width={200} height={51} style={{ objectFit: 'contain', display: 'block', marginLeft: -15, marginTop: 15 }} />

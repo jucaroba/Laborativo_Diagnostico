@@ -10,7 +10,6 @@ export const revalidate = 0
 type EquipoStats = {
   id: string
   nombre: string
-  color: string
   estado: string
   participantes: number
   dims: { id: number; promedio: number | null; n: number }[]
@@ -103,7 +102,6 @@ export default async function ComparativoCompaniaPage({ params }: { params: Prom
     return {
       id: eq.id,
       nombre: eq.nombre,
-      color: eq.color_neon,
       estado: eq.estado,
       participantes: parts?.length ?? 0,
       dims,
@@ -233,8 +231,7 @@ export default async function ComparativoCompaniaPage({ params }: { params: Prom
                       display: 'flex', flexDirection: 'column', gap: 4,
                       background: 'var(--card)',
                     }}>
-                      <span style={{ fontSize: 14, fontWeight: 900, color: 'var(--ink)', letterSpacing: '-.01em', display: 'inline-flex', alignItems: 'center', gap: 8 }}>
-                        <span style={{ width: 10, height: 10, background: eq.color, border: '1.5px solid var(--ink)', display: 'inline-block', flexShrink: 0 }} aria-hidden />
+                      <span style={{ fontSize: 14, fontWeight: 900, color: 'var(--ink)', letterSpacing: '-.01em' }}>
                         {eq.nombre}
                       </span>
                       <span style={{ fontSize: 10, color: 'var(--mute)', letterSpacing: '.04em', textTransform: 'uppercase', fontWeight: 600 }}>

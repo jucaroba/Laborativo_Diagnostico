@@ -8,7 +8,7 @@ import EquiposSection from '@/components/admin/EquiposSection'
 import GrupoPreguntas from '@/components/admin/GrupoPreguntas'
 import IniciarRondaButton from '@/components/admin/IniciarRondaButton'
 import Link from 'next/link'
-import { ArrowRight } from 'lucide-react'
+import { ArrowLeft } from 'lucide-react'
 
 export const revalidate = 0
 
@@ -57,7 +57,7 @@ export default async function DiagnosticoPage({ params }: { params: Promise<{ id
                     textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 4,
                   }}
                 >
-                  Ronda {padreData.ronda ?? 1} <ArrowRight size={12} strokeWidth={2.5} />
+                  <ArrowLeft size={12} strokeWidth={2.5} /> Ronda {padreData.ronda ?? 1}
                 </Link>
               )}
               <span style={{

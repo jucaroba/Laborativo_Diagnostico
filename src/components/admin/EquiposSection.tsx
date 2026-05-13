@@ -10,7 +10,6 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle,
   DialogDescription, DialogFooter,
 } from '@/components/ui/dialog'
-import ColorPickerHex from './ColorPickerHex'
 import InvitarEquipoDialog from './InvitarEquipoDialog'
 import EnviarDescripcionDialog from './EnviarDescripcionDialog'
 import CopiarLink from './CopiarLink'
@@ -178,10 +177,6 @@ function EquipoCard({
         display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px',
         borderBottom: '1.5px solid var(--ink)',
       }}>
-        <span style={{
-          display: 'inline-block', width: 14, height: 14, background: equipo.color_neon,
-          border: '1.5px solid var(--ink)', flexShrink: 0,
-        }} aria-hidden />
         <h3 style={{ fontSize: 17, fontWeight: 900, margin: 0, fontFamily: 'Red Hat Display, sans-serif', flex: 1 }}>
           {equipo.nombre}
         </h3>
@@ -268,12 +263,11 @@ function DialogCrearEquipo({
   onCreado: (equipo: Equipo) => void
 }) {
   const [nombre, setNombre] = useState('')
-  const [color, setColor] = useState('#37FF25')
   const [numero, setNumero] = useState('')
   const [error, setError] = useState('')
   const [guardando, setGuardando] = useState(false)
 
-  function reset() { setNombre(''); setColor('#37FF25'); setNumero(''); setError('') }
+  function reset() { setNombre(''); setNumero(''); setError('') }
 
   async function guardar() {
     const limpio = nombre.trim()
@@ -284,7 +278,6 @@ function DialogCrearEquipo({
       .insert({
         diagnostico_id: diagnosticoId,
         nombre: limpio,
-        color_neon: color,
         numero_participantes: numero ? parseInt(numero, 10) : null,
         estado: 'activo',
       })
@@ -304,7 +297,7 @@ function DialogCrearEquipo({
             {existentes === 0 ? 'Primer equipo de la compañía' : 'Nuevo equipo'}
           </DialogTitle>
           <DialogDescription style={{ color: 'var(--ink)' }}>
-            Nombre con el que reconocerás a este equipo. El color y el número de participantes son opcionales.
+            Nombre con el que reconocerás a este equipo. El número de participantes es opcional.
           </DialogDescription>
         </DialogHeader>
 
@@ -316,16 +309,13 @@ function DialogCrearEquipo({
             placeholder="Nombre del equipo (ej. Marketing)"
             onKeyDown={e => { if (e.key === 'Enter') guardar() }}
           />
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-            <Input
-              type="number"
-              min={1}
-              value={numero}
-              onChange={e => setNumero(e.target.value)}
-              placeholder="Número de participantes"
-            />
-            <ColorPickerHex value={color} onChange={setColor} />
-          </div>
+          <Input
+            type="number"
+            min={1}
+            value={numero}
+            onChange={e => setNumero(e.target.value)}
+            placeholder="Número de participantes"
+          />
         </div>
 
         {error && <p style={{ fontSize: 12, fontWeight: 700, color: '#FF3366', margin: '0 0 4px' }}>{error}</p>}

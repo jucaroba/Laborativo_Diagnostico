@@ -52,7 +52,6 @@ export interface Equipo {
   id: string
   diagnostico_id: string
   nombre: string
-  color_neon: string
   numero_participantes: number | null
   estado: EstadoDiagnostico
   codigo_participacion: string

@@ -20,15 +20,14 @@ export default async function AdminPage() {
 
   const diagIds = (diagnosticos ?? []).map(d => d.id)
   const { data: equipos } = diagIds.length > 0
-    ? await supabase.from('equipos').select('diagnostico_id, estado, color_neon').in('diagnostico_id', diagIds)
-    : { data: [] as Pick<Equipo, 'diagnostico_id' | 'estado' | 'color_neon'>[] }
+    ? await supabase.from('equipos').select('diagnostico_id, estado').in('diagnostico_id', diagIds)
+    : { data: [] as Pick<Equipo, 'diagnostico_id' | 'estado'>[] }
 
-  // Agregados por compañía: nº equipos, lista de colores (para el chip), estado dominante
-  const porCompania: Record<string, { n: number; colores: string[]; activos: number; completados: number }> = {}
+  // Agregados por compañía: nº equipos y conteo por estado
+  const porCompania: Record<string, { n: number; activos: number; completados: number }> = {}
   for (const eq of equipos ?? []) {
-    const cur = porCompania[eq.diagnostico_id] ?? { n: 0, colores: [], activos: 0, completados: 0 }
+    const cur = porCompania[eq.diagnostico_id] ?? { n: 0, activos: 0, completados: 0 }
     cur.n += 1
-    if (eq.color_neon && !cur.colores.includes(eq.color_neon)) cur.colores.push(eq.color_neon)
     if (eq.estado === 'activo') cur.activos += 1
     if (eq.estado === 'completado') cur.completados += 1
     porCompania[eq.diagnostico_id] = cur
@@ -60,7 +59,7 @@ export default async function AdminPage() {
           <TableBody>
             {diagnosticos.map((d: Diagnostico) => {
               const tipoConfig = TIPOS_DIAGNOSTICO[(d.tipo ?? 'cultura_360') as keyof typeof TIPOS_DIAGNOSTICO]
-              const stats = porCompania[d.id] ?? { n: 0, colores: [], activos: 0, completados: 0 }
+              const stats = porCompania[d.id] ?? { n: 0, activos: 0, completados: 0 }
               return (
               <TableRow key={d.id}>
                 <TableCell>
@@ -81,9 +80,6 @@ export default async function AdminPage() {
                 </TableCell>
                 <TableCell>
                   <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
-                    {stats.colores.slice(0, 4).map((c, i) => (
-                      <span key={i} style={{ width: 10, height: 10, background: c, border: '1px solid var(--ink)', display: 'inline-block' }} aria-hidden />
-                    ))}
                     <span style={{ fontSize: 13, fontWeight: 700 }}>
                       {stats.n}
                     </span>
