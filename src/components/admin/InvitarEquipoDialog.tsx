@@ -115,6 +115,7 @@ export default function InvitarEquipoDialog({ equipoId, variant = 'button', copy
             gap: 12,
             cursor: 'pointer',
             background: 'transparent',
+            outline: 'none',
           }}
         >
           <span style={{ fontSize: 14, fontWeight: 700 }}>Invitación</span>

@@ -93,6 +93,7 @@ export default function EnviarDescripcionDialog({
             fontWeight: 700,
             color: 'var(--ink)',
             textDecoration: 'none',
+            outline: 'none',
           }}
         >
           Descripción

@@ -193,7 +193,7 @@ function EquipoCard({
           padding: '2px 8px',
         }}>{equipo.estado}</span>
         {equipo.numero_participantes != null && (
-          <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--mute)' }}>
+          <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--ink)' }}>
             {equipo.numero_participantes} participantes
           </span>
         )}
@@ -236,7 +236,7 @@ function LinkCard({ label, url }: { label: string; url: string }) {
         href={url}
         target="_blank"
         rel="noopener noreferrer"
-        style={{ fontSize: 14, fontWeight: 700, color: 'var(--ink)', textDecoration: 'none' }}
+        style={{ fontSize: 14, fontWeight: 700, color: 'var(--ink)', textDecoration: 'none', outline: 'none' }}
       >
         {label}
       </a>
@@ -248,7 +248,7 @@ function LinkCard({ label, url }: { label: string; url: string }) {
           rel="noopener noreferrer"
           title="Abrir link"
           aria-label="Abrir link"
-          style={{ display: 'flex', padding: 4, color: 'var(--ink)' }}
+          style={{ display: 'flex', padding: 4, color: 'var(--ink)', outline: 'none' }}
         >
           <ArrowUpRight size={16} strokeWidth={2.5} />
         </a>

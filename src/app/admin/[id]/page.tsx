@@ -8,7 +8,7 @@ import EquiposSection from '@/components/admin/EquiposSection'
 import GrupoPreguntas from '@/components/admin/GrupoPreguntas'
 import IniciarRondaButton from '@/components/admin/IniciarRondaButton'
 import Link from 'next/link'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowRight } from 'lucide-react'
 
 export const revalidate = 0
 
@@ -49,10 +49,6 @@ export default async function DiagnosticoPage({ params }: { params: Promise<{ id
         <div>
           {ronda > 1 && (
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: 10, marginBottom: 10, flexWrap: 'wrap' }}>
-              <span style={{
-                fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase', fontWeight: 700,
-                background: 'var(--ink)', color: '#fff', padding: '3px 8px',
-              }}>Ronda {ronda}</span>
               {padreData && (
                 <Link
                   href={`/admin/${padreData.id}`}
@@ -61,9 +57,13 @@ export default async function DiagnosticoPage({ params }: { params: Promise<{ id
                     textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 4,
                   }}
                 >
-                  <ArrowLeft size={12} strokeWidth={2.5} /> Ronda {padreData.ronda ?? 1}
+                  Ronda {padreData.ronda ?? 1} <ArrowRight size={12} strokeWidth={2.5} />
                 </Link>
               )}
+              <span style={{
+                fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase', fontWeight: 700,
+                background: 'var(--ink)', color: '#fff', padding: '3px 8px',
+              }}>Ronda {ronda}</span>
             </div>
           )}
           <h1 className="page-header__title" style={{ fontSize: 32, letterSpacing: '0px' }}>{d.nombre_compania}</h1>
