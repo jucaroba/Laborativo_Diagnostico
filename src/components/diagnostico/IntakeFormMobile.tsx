@@ -102,7 +102,7 @@ export default function IntakeFormMobile({
         <span className="eyebrow soft">
           {esSimple
             ? `≈ ${Math.max(2, Math.ceil(preguntasColectivo / 3))}–${Math.max(4, Math.ceil(preguntasColectivo / 2))} min · ${preguntasColectivo} preguntas`
-            : `≈ 12–18 min${perfil ? ` · ${perfil === 'lider' ? preguntasLider : preguntasEquipo} preguntas` : ''}`}
+            : `≈ 5–8 min${perfil ? ` · ${perfil === 'lider' ? preguntasLider : preguntasEquipo} preguntas` : ''}`}
         </span>
       </div>
     </div>

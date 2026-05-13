@@ -132,7 +132,7 @@ export default function IntakeForm({ equipoId, nombreCompania, codigo, tipo = 'c
 
           <div style={{ marginTop: 'auto' }}>
             <span className="eyebrow soft">
-              ≈ 12–18 min{perfil ? ` · ${perfil === 'lider' ? preguntasLider : preguntasEquipo} preguntas` : ''}
+              ≈ 5–8 min{perfil ? ` · ${perfil === 'lider' ? preguntasLider : preguntasEquipo} preguntas` : ''}
             </span>
           </div>
         </>
