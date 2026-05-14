@@ -71,6 +71,9 @@ export default function IntakeForm({ equipoId, nombreCompania, codigo, tipo = 'c
       <span className="eyebrow">{esSimple ? 'Registro' : 'Paso 01 / 02 — Registro'}</span>
       <div className="rule" />
       <div style={{ fontSize: 13, color: 'var(--ink)', fontWeight: 700, marginTop: 24, marginLeft: 100, textTransform: 'uppercase', letterSpacing: '.08em' }}>{nombreCompania}</div>
+      <p style={{ fontSize: 13, lineHeight: 1.5, color: 'var(--ink-2)', fontWeight: 500, margin: '8px 0 0', marginLeft: 100, maxWidth: '54ch' }}>
+        Laborativo como tercero independiente revisará las respuestas, la compañía solo verá los resultados consolidados.
+      </p>
       <h2 style={{ fontWeight: 900, fontSize: 64, lineHeight: .92, letterSpacing: -1, marginLeft: 100 }}>
         {esSimple ? <>Antes de empezar,<br />unas notas rápidas.</> : <>Antes de empezar,<br />elige tu rol.</>}
       </h2>
