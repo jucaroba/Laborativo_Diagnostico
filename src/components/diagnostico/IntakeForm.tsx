@@ -70,10 +70,12 @@ export default function IntakeForm({ equipoId, nombreCompania, codigo, tipo = 'c
     <div className="only-desktop" style={{ minHeight: '100vh', fontFamily: "'Red Hat Display', sans-serif", padding: '56px 56px 56px 106px', display: 'flex', flexDirection: 'column', gap: 24, background: 'var(--bg)', maxWidth: 870 }}>
       <span className="eyebrow">{esSimple ? 'Registro' : 'Paso 01 / 02 — Registro'}</span>
       <div className="rule" />
-      <div style={{ fontSize: 13, color: 'var(--ink)', fontWeight: 700, marginTop: 24, marginLeft: 100, textTransform: 'uppercase', letterSpacing: '.08em' }}>{nombreCompania}</div>
-      <p style={{ fontSize: 13, lineHeight: 1.5, color: 'var(--ink-2)', fontWeight: 500, margin: '8px 0 0', marginLeft: 100, maxWidth: '54ch' }}>
-        Laborativo como tercero independiente revisará las respuestas, la compañía solo verá los resultados consolidados.
-      </p>
+      <div style={{ marginTop: 24, marginLeft: 100, display: 'flex', flexDirection: 'column', gap: 6 }}>
+        <div style={{ fontSize: 13, color: 'var(--ink)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.08em' }}>{nombreCompania}</div>
+        <p style={{ fontSize: 13, lineHeight: 1.4, color: 'var(--ink)', fontWeight: 500, margin: 0, maxWidth: '54ch' }}>
+          Laborativo como tercero independiente revisará las respuestas, la compañía solo verá los resultados consolidados.
+        </p>
+      </div>
       <h2 style={{ fontWeight: 900, fontSize: 64, lineHeight: .92, letterSpacing: -1, marginLeft: 100 }}>
         {esSimple ? <>Antes de empezar,<br />unas notas rápidas.</> : <>Antes de empezar,<br />elige tu rol.</>}
       </h2>
@@ -119,7 +121,7 @@ export default function IntakeForm({ equipoId, nombreCompania, codigo, tipo = 'c
                     transition: 'all .15s',
                   }}>
                   <h5 style={{ margin: 0, fontSize: 16, fontWeight: 800, letterSpacing: '-.01em' }}>{p.h}</h5>
-                  <p style={{ margin: 0, fontSize: 13, fontWeight: 500, lineHeight: 1.4, opacity: perfil === p.id ? .6 : .7, color: 'inherit', whiteSpace: 'pre-line' }}>{p.p}</p>
+                  <p style={{ margin: 0, fontSize: 13, fontWeight: 500, lineHeight: 1.4, color: 'inherit', whiteSpace: 'pre-line' }}>{p.p}</p>
                 </div>
               ))}
             </div>

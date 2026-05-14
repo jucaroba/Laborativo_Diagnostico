@@ -37,10 +37,12 @@ export default function IntakeFormMobile({
     <div style={{ minHeight: '100vh', fontFamily: "'Red Hat Display', sans-serif", padding: '24px 20px 32px', display: 'flex', flexDirection: 'column', gap: 18, background: 'var(--bg)', overflowX: 'hidden' }}>
       <span className="eyebrow">{esSimple ? 'Registro' : 'Paso 01 / 02 — Registro'}</span>
       <div className="rule" />
-      <div style={{ fontSize: 12, color: 'var(--ink)', fontWeight: 700, marginTop: 8, textTransform: 'uppercase', letterSpacing: '.08em' }}>{nombreCompania}</div>
-      <p style={{ fontSize: 13, lineHeight: 1.5, color: 'var(--ink-2)', fontWeight: 500, margin: 0 }}>
-        Laborativo como tercero independiente revisará las respuestas, la compañía solo verá los resultados consolidados.
-      </p>
+      <div style={{ marginTop: 8, display: 'flex', flexDirection: 'column', gap: 6 }}>
+        <div style={{ fontSize: 12, color: 'var(--ink)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.08em' }}>{nombreCompania}</div>
+        <p style={{ fontSize: 12.5, lineHeight: 1.4, color: 'var(--ink)', fontWeight: 500, margin: 0 }}>
+          Laborativo como tercero independiente revisará las respuestas, la compañía solo verá los resultados consolidados.
+        </p>
+      </div>
       <h2 style={{ fontWeight: 900, fontSize: 'clamp(32px, 9vw, 44px)', lineHeight: .95, letterSpacing: -.5, margin: 0 }}>
         {esSimple ? <>Antes de empezar,<br />unas notas rápidas.</> : <>Antes de empezar,<br />elige tu rol.</>}
       </h2>
@@ -70,7 +72,7 @@ export default function IntakeFormMobile({
                   transition: 'all .15s',
                 }}>
                 <h5 style={{ margin: 0, fontSize: 15, fontWeight: 800, letterSpacing: '-.01em' }}>{p.h}</h5>
-                <p style={{ margin: 0, fontSize: 12.5, fontWeight: 500, lineHeight: 1.4, opacity: perfil === p.id ? .6 : .7, color: 'inherit', whiteSpace: 'pre-line' }}>{p.p}</p>
+                <p style={{ margin: 0, fontSize: 12.5, fontWeight: 500, lineHeight: 1.4, color: 'inherit', whiteSpace: 'pre-line' }}>{p.p}</p>
               </div>
             ))}
           </div>
