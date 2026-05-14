@@ -70,12 +70,7 @@ export default function IntakeForm({ equipoId, nombreCompania, codigo, tipo = 'c
     <div className="only-desktop" style={{ minHeight: '100vh', fontFamily: "'Red Hat Display', sans-serif", padding: '56px 56px 56px 106px', display: 'flex', flexDirection: 'column', gap: 24, background: 'var(--bg)', maxWidth: 870 }}>
       <span className="eyebrow">{esSimple ? 'Registro' : 'Paso 01 / 02 — Registro'}</span>
       <div className="rule" />
-      <div style={{ marginTop: 24, marginLeft: 100, display: 'flex', flexDirection: 'column', gap: 6 }}>
-        <div style={{ fontSize: 13, color: 'var(--ink)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.08em' }}>{nombreCompania}</div>
-        <p style={{ fontSize: 13, lineHeight: 1.4, color: 'var(--ink)', fontWeight: 500, margin: 0, maxWidth: '54ch' }}>
-          Laborativo como tercero independiente revisará las respuestas, la compañía solo verá los resultados consolidados.
-        </p>
-      </div>
+      <div style={{ fontSize: 13, color: 'var(--ink)', fontWeight: 700, marginTop: 24, marginLeft: 100, textTransform: 'uppercase', letterSpacing: '.08em' }}>{nombreCompania}</div>
       <h2 style={{ fontWeight: 900, fontSize: 64, lineHeight: .92, letterSpacing: -1, marginLeft: 100 }}>
         {esSimple ? <>Antes de empezar,<br />unas notas rápidas.</> : <>Antes de empezar,<br />elige tu rol.</>}
       </h2>
@@ -89,6 +84,9 @@ export default function IntakeForm({ equipoId, nombreCompania, codigo, tipo = 'c
               ? <>Vas a responder {preguntasColectivo} preguntas — una por cada dimensión de cultura. Toma menos de un minuto. Tus respuestas son anónimas y se promedian con las del resto del equipo.</>
               : <>Vas a responder {preguntasColectivo} preguntas sobre cómo se siente el equipo en las cuatro dimensiones de cultura. No hay respuestas correctas o incorrectas. Tus respuestas son anónimas y se promedian con las del resto del equipo.</>}
           </div>
+          <p style={{ marginLeft: 100, fontSize: 13, lineHeight: 1.4, color: 'var(--ink)', fontWeight: 500, margin: '8px 0 0', maxWidth: '54ch' }}>
+            Laborativo como tercero independiente revisará las respuestas, la compañía solo verá los resultados consolidados.
+          </p>
           <div style={{ paddingTop: 8, marginLeft: 100 }}>
             <button onClick={comenzar} disabled={loading}
               className="btn primary"
@@ -127,6 +125,9 @@ export default function IntakeForm({ equipoId, nombreCompania, codigo, tipo = 'c
             </div>
           </div>
 
+          <p style={{ marginLeft: 100, fontSize: 13, lineHeight: 1.4, color: 'var(--ink)', fontWeight: 500, margin: '8px 0 0', maxWidth: '54ch' }}>
+            Laborativo como tercero independiente revisará las respuestas, la compañía solo verá los resultados consolidados.
+          </p>
           <div style={{ paddingTop: 8, marginLeft: 100 }}>
             <button onClick={comenzar} disabled={!perfil || loading}
               className="btn primary"
