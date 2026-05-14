@@ -23,9 +23,10 @@ interface Props {
   tipo: TipoDiagnostico
   codigoResultadosComparativo: string
   equiposIniciales: Equipo[]
+  completadosPorEquipo: Record<string, number>
 }
 
-export default function EquiposSection({ diagnosticoId, tipo, codigoResultadosComparativo, equiposIniciales }: Props) {
+export default function EquiposSection({ diagnosticoId, tipo, codigoResultadosComparativo, equiposIniciales, completadosPorEquipo }: Props) {
   const router = useRouter()
   const [equipos, setEquipos] = useState<Equipo[]>(equiposIniciales)
   const [crearOpen, setCrearOpen] = useState(false)
@@ -111,6 +112,7 @@ export default function EquiposSection({ diagnosticoId, tipo, codigoResultadosCo
               key={e.id}
               equipo={e}
               tipoConfig={tipoConfig}
+              completados={completadosPorEquipo[e.id] ?? 0}
               onEliminar={() => abrirEliminar(e)}
             />
           ))}
@@ -164,8 +166,8 @@ type TipoConfig = (typeof TIPOS_DIAGNOSTICO)[TipoDiagnostico]
 
 // ─── Card de cada equipo ─────────────────────────────────────────────
 function EquipoCard({
-  equipo, tipoConfig, onEliminar,
-}: { equipo: Equipo; tipoConfig: TipoConfig | undefined; onEliminar: () => void }) {
+  equipo, tipoConfig, completados, onEliminar,
+}: { equipo: Equipo; tipoConfig: TipoConfig | undefined; completados: number; onEliminar: () => void }) {
   const linkParticipacion = `${BASE_URL}/d/${equipo.codigo_participacion}`
   const linkFormulario   = `${BASE_URL}/d/${equipo.codigo_participacion}/intake`
   const linkDashboard    = `${BASE_URL}/r/${equipo.codigo_resultados}`
@@ -189,7 +191,9 @@ function EquipoCard({
         }}>{equipo.estado}</span>
         {equipo.numero_participantes != null && (
           <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--ink)' }}>
-            {equipo.numero_participantes} participantes
+            {equipo.numero_participantes} participantes{' '}
+            <span style={{ color: 'var(--mute)', fontWeight: 600 }}>/</span>{' '}
+            <span title="Cuestionarios completados">{completados}</span>
           </span>
         )}
         <button

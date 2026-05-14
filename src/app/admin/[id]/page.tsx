@@ -30,6 +30,54 @@ export default async function DiagnosticoPage({ params }: { params: Promise<{ id
   const tipoConfig = TIPOS_DIAGNOSTICO[d.tipo ?? 'cultura_360']
   const rolesIter = tipoConfig?.rolesPregunta ?? (['A', 'C', 'D', 'B'] as const)
 
+  // ─── Cuántos participantes completaron el cuestionario por equipo.
+  // Un participante "completó" cuando respondió todas las preguntas que le
+  // corresponden según su rol (A responde A+C, D responde D+B, X/YO/EQUIPO
+  // responden solo su propio rol).
+  const equipoIds = eqs.map(e => e.id)
+  const { data: parts } = equipoIds.length > 0
+    ? await supabase
+        .from('participantes')
+        .select('id, equipo_id, rol')
+        .in('equipo_id', equipoIds)
+    : { data: [] as { id: string; equipo_id: string; rol: Rol }[] }
+  const partIds = (parts ?? []).map(p => p.id)
+  const { data: resps } = partIds.length > 0
+    ? await supabase
+        .from('respuestas')
+        .select('participante_id, pregunta_id')
+        .in('participante_id', partIds)
+    : { data: [] as { participante_id: string; pregunta_id: string }[] }
+
+  const preguntasPorRol: Record<Rol, Set<string>> = {
+    A: new Set(), B: new Set(), C: new Set(), D: new Set(),
+    X: new Set(), YO: new Set(), EQUIPO: new Set(),
+  }
+  for (const p of ps) preguntasPorRol[p.rol].add(p.id)
+
+  const respPorParticipante: Record<string, Set<string>> = {}
+  for (const r of resps ?? []) {
+    if (!respPorParticipante[r.participante_id]) respPorParticipante[r.participante_id] = new Set()
+    respPorParticipante[r.participante_id].add(r.pregunta_id)
+  }
+
+  const completadosPorEquipo: Record<string, number> = {}
+  for (const p of parts ?? []) {
+    const r = p.rol as Rol
+    const esperadas: Set<string> = r === 'A'
+      ? new Set<string>([...preguntasPorRol.A, ...preguntasPorRol.C])
+      : r === 'D'
+      ? new Set<string>([...preguntasPorRol.D, ...preguntasPorRol.B])
+      : new Set<string>([...preguntasPorRol[r]])
+    if (esperadas.size === 0) continue
+    const dadas = respPorParticipante[p.id] ?? new Set<string>()
+    let completo = true
+    for (const pid of esperadas) if (!dadas.has(pid)) { completo = false; break }
+    if (completo) {
+      completadosPorEquipo[p.equipo_id] = (completadosPorEquipo[p.equipo_id] ?? 0) + 1
+    }
+  }
+
   // Padre (si esta es una ronda 2+) — para el badge "Ronda N · ← ver ronda anterior"
   const { data: padreData } = d.diagnostico_padre_id
     ? await supabase
@@ -82,6 +130,7 @@ export default async function DiagnosticoPage({ params }: { params: Promise<{ id
         tipo={d.tipo ?? 'cultura_360'}
         codigoResultadosComparativo={d.codigo_resultados_comparativo}
         equiposIniciales={eqs}
+        completadosPorEquipo={completadosPorEquipo}
       />
 
       {/* Preguntas */}
