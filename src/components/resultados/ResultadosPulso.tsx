@@ -295,8 +295,6 @@ function PromedioCardDesktop({ resultados }: { resultados: DimResultado[] }) {
     <div style={{
       padding: '28px 24px 26px',
       display: 'flex', flexDirection: 'column', gap: 12,
-      borderLeft: '1.5px solid var(--ink)',
-      background: 'var(--bg-2)',
     }}>
       <div>
         <div style={{ fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--ink)', fontWeight: 700 }}>Global</div>
@@ -352,7 +350,7 @@ function BarraPulso({ valor, benchmark }: { valor: number | null; benchmark?: nu
   const pct = valor !== null ? ((valor - 1) / 9) * 100 : 0
   const benchPct = benchmark !== null && benchmark !== undefined ? ((benchmark - 1) / 9) * 100 : null
   return (
-    <div style={{ position: 'relative', height: 8, background: 'var(--bg-2)', border: '1.5px solid var(--ink)' }}>
+    <div style={{ position: 'relative', height: 8, border: '1.5px solid var(--ink)' }}>
       {valor !== null && (
         <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: `${pct}%`, background: promedioBg(valor) }} />
       )}

@@ -363,8 +363,8 @@ export default async function ResultadosPage({ params }: { params: Promise<{ cod
       {/* ============================================ */}
       <SectionBar title="Promedios por dimensión" subtitle="Escala 1–10" />
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', borderBottom: '1.5px solid var(--ink)' }}>
-        {[...resultados].sort((a, b) => (b.promedioGeneral ?? -Infinity) - (a.promedioGeneral ?? -Infinity)).map((dim, i) => (
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', borderBottom: '1.5px solid var(--ink)' }}>
+        {[...resultados].sort((a, b) => (b.promedioGeneral ?? -Infinity) - (a.promedioGeneral ?? -Infinity)).map((dim) => (
           <div key={dim.id} style={{
             display: 'flex', flexDirection: 'column',
             paddingTop: 28,
@@ -415,6 +415,64 @@ export default async function ResultadosPage({ params }: { params: Promise<{ cod
             </div>
           </div>
         ))}
+
+        {/* Card "Promedio" — quinta columna, promedio global */}
+        {(() => {
+          // Promedio general (de los promedios generales de cada dimensión)
+          const valsDim = resultados.map(r => r.promedioGeneral).filter((v): v is number => typeof v === 'number')
+          const promGlobal = valsDim.length ? Math.round((valsDim.reduce((a, b) => a + b, 0) / valsDim.length) * 10) / 10 : null
+          return (
+            <div style={{
+              display: 'flex', flexDirection: 'column',
+              paddingTop: 28,
+            }}>
+              <div style={{
+                padding: '0 24px',
+                display: 'flex', flexDirection: 'column', gap: 14,
+              }}>
+                <div>
+                  <div style={{ fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--ink)', fontWeight: 700 }}>Global</div>
+                  <h3 style={{ fontSize: 22, fontWeight: 900, letterSpacing: '-.02em', lineHeight: 1, margin: '4px 0 0' }}>Promedio</h3>
+                </div>
+
+                <div style={{ width: 42, height: 8, background: 'var(--ink)' }} />
+
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, color: 'var(--ink)' }}>
+                  <span style={{ fontWeight: 900, fontSize: 72, lineHeight: 1, letterSpacing: '-.04em' }}>
+                    {promGlobal !== null ? promGlobal.toFixed(1) : '—'}
+                  </span>
+                  {promGlobal !== null && (
+                    <span style={{ fontWeight: 700, fontSize: 36, lineHeight: 1, letterSpacing: '-.02em', color: 'var(--ink)' }}>
+                      <span style={{ position: 'relative', top: -5 }}>/</span>
+                      <span style={{ position: 'relative', top: 0 }}>10</span>
+                    </span>
+                  )}
+                </div>
+              </div>
+              {/* Desglose por rol — usa el promedio global por rol */}
+              <div style={{ padding: '14px 24px 24px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', borderTop: '1.5px solid var(--ink)', marginTop: 8 }}>
+                  {[...ROL_ORDEN].sort((a, b) => (promedioGlobalPorRol[b] ?? -Infinity) - (promedioGlobalPorRol[a] ?? -Infinity)).map((rol, idx, arr) => {
+                    const val = promedioGlobalPorRol[rol]
+                    return (
+                      <div key={rol} style={{
+                        display: 'grid', gridTemplateColumns: '14px 1fr auto', gap: 10, alignItems: 'center',
+                        padding: '8px 0',
+                        borderBottom: idx < arr.length - 1 ? '1px solid var(--line-soft)' : 'none',
+                      }}>
+                        <span style={{ width: 10, height: 10, borderRadius: '50%', background: ROL_NEON[rol] }} />
+                        <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--ink-2)' }}>{ROL_INFO[rol].label}</span>
+                        <b style={{ fontSize: 14, fontWeight: 900, fontVariantNumeric: 'tabular-nums', color: val !== null ? 'var(--ink)' : 'var(--mute)' }}>
+                          {val !== null ? val.toFixed(1) : '—'}
+                        </b>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            </div>
+          )
+        })()}
       </div>
 
       {/* ============================================ */}
