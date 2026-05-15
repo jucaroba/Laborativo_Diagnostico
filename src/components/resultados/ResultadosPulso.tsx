@@ -216,6 +216,7 @@ export default function ResultadosPulso({
                     nombre={dim.nombre}
                     subtitulo={dim.subtitulo}
                     promedio={dim.promedio}
+                    desviacion={dim.desviacion}
                     valores={dispersionPorDim[dim.id] ?? []}
                   />
                 ))}
@@ -427,8 +428,8 @@ function RadarPulso({ resultados, maxSize }: { resultados: DimResultado[]; maxSi
 // histograma de ESTA dimensión (no se normaliza global, así cada uno
 // usa su rango visual completo).
 function HistogramaDim({
-  nombre, subtitulo, promedio, valores,
-}: { nombre: string; subtitulo: string; promedio: number | null; valores: number[] }) {
+  nombre, subtitulo, promedio, desviacion, valores,
+}: { nombre: string; subtitulo: string; promedio: number | null; desviacion: number; valores: number[] }) {
   const buckets = Array(10).fill(0) as number[]
   for (const v of valores) {
     const b = Math.max(1, Math.min(10, Math.round(v))) - 1
@@ -463,6 +464,15 @@ function HistogramaDim({
             {promedio !== null ? promedio.toFixed(1) : '—'}
           </span>
           <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--mute)' }}>/ 10</span>
+        </div>
+        {/* Indicador de dispersión (desviación estándar) */}
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, fontVariantNumeric: 'tabular-nums', marginLeft: 'auto' }}>
+          <span style={{ fontSize: 10, letterSpacing: '.06em', textTransform: 'uppercase', color: 'var(--mute)', fontWeight: 700 }}>
+            Dispersión
+          </span>
+          <span style={{ fontSize: 14, fontWeight: 800, color: 'var(--ink)' }}>
+            ± {desviacion.toFixed(1)}
+          </span>
         </div>
       </div>
 
@@ -510,6 +520,9 @@ function HistogramaDim({
             )
           })}
         </div>
+
+        {/* Línea base del eje (de 1 a 10) */}
+        <div style={{ height: 1, background: 'var(--ink)' }} aria-hidden />
 
         {/* Eje 1..10 */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(10, 1fr)', gap: 4, marginTop: 6 }}>
