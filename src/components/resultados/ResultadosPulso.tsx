@@ -62,6 +62,18 @@ const avgColor = (v: number | null) => {
   return v === null ? 'var(--mute)' : 'var(--ink)'
 }
 
+// Color de fondo del badge de dispersión según los rangos interpretativos.
+//   0.0–0.5  alineado total      → verde fuerte
+//   0.6–1.2  buena cohesión       → verde claro
+//   1.3–2.0  dispersión notable   → amarillo
+//   2.0+     equipo dividido      → rojo claro
+function dispersionBg(d: number): string {
+  if (d <= 0.5) return '#A6D9A6'
+  if (d <= 1.2) return '#C8E6C9'
+  if (d <= 2.0) return '#FCE99A'
+  return '#F2C2C2'
+}
+
 function SectionBar({ title, subtitle, mobile }: { title: string; subtitle?: string; mobile?: boolean }) {
   return (
     <div style={{
@@ -468,7 +480,13 @@ function HistogramaDim({
         </div>
         {/* Separador vertical antes del indicador de dispersión */}
         <span aria-hidden style={{ width: 1.5, alignSelf: 'stretch', background: 'var(--ink)' }} />
-        <span style={{ fontSize: 22, fontWeight: 900, letterSpacing: '-.02em', color: 'var(--ink)', fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>
+        <span style={{
+          fontSize: 22, fontWeight: 900, letterSpacing: '-.02em', color: 'var(--ink)',
+          fontVariantNumeric: 'tabular-nums', lineHeight: 1,
+          background: dispersionBg(desviacion),
+          padding: '6px 10px',
+          display: 'inline-block',
+        }}>
           ± {desviacion.toFixed(1)}
         </span>
       </div>
@@ -539,11 +557,11 @@ function HistogramaDim({
 }
 
 // ─── Leyenda interpretativa de la dispersión ─────────────────────
-const RANGOS_DISPERSION: Array<{ rango: string; lectura: string }> = [
-  { rango: '± 0.0 – 0.5', lectura: 'Equipo totalmente alineado. Todos sienten lo mismo.' },
-  { rango: '± 0.6 – 1.2', lectura: 'Buena cohesión. Diferencias normales entre personas.' },
-  { rango: '± 1.3 – 2.0', lectura: 'Dispersión notable. Vale revisar por qué algunos lo ven distinto.' },
-  { rango: '± 2.0+',      lectura: 'Equipo dividido. El promedio esconde dos (o más) lecturas distintas.' },
+const RANGOS_DISPERSION: Array<{ rango: string; lectura: string; color: string }> = [
+  { rango: '± 0.0 – 0.5', lectura: 'Equipo totalmente alineado. Todos sienten lo mismo.',                    color: '#A6D9A6' },
+  { rango: '± 0.6 – 1.2', lectura: 'Buena cohesión. Diferencias normales entre personas.',                   color: '#C8E6C9' },
+  { rango: '± 1.3 – 2.0', lectura: 'Dispersión notable. Vale revisar por qué algunos lo ven distinto.',      color: '#FCE99A' },
+  { rango: '± 2.0+',      lectura: 'Equipo dividido. El promedio esconde dos (o más) lecturas distintas.',   color: '#F2C2C2' },
 ]
 
 function LeyendaDispersion() {
@@ -562,13 +580,16 @@ function LeyendaDispersion() {
             <div
               key={r.rango}
               style={{
-                display: 'grid', gridTemplateColumns: '140px 1fr',
+                display: 'grid', gridTemplateColumns: '160px 1fr',
                 padding: '10px 16px',
                 borderTop: i === 0 ? 'none' : '1px solid var(--line-soft)',
-                alignItems: 'baseline', gap: 16,
+                alignItems: 'center', gap: 16,
               }}
             >
-              <span style={{ fontSize: 14, fontWeight: 800, color: 'var(--ink)', fontVariantNumeric: 'tabular-nums' }}>
+              <span style={{
+                fontSize: 14, fontWeight: 800, color: 'var(--ink)', fontVariantNumeric: 'tabular-nums',
+                background: r.color, padding: '4px 10px', display: 'inline-block', justifySelf: 'start',
+              }}>
                 {r.rango}
               </span>
               <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--ink-2)', lineHeight: 1.4 }}>
