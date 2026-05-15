@@ -72,6 +72,17 @@ function dispersionBg(d: number): string {
   return '#F2C2C2'
 }
 
+// Color de fondo del badge del promedio: semáforo simple sobre la escala 1–10.
+//   ≥ 7   → verde claro
+//   5–7   → amarillo
+//   < 5   → rojo claro
+function promedioBg(v: number | null): string {
+  if (v === null) return 'transparent'
+  if (v >= 7) return '#C8E6C9'
+  if (v >= 5) return '#FCE99A'
+  return '#F2C2C2'
+}
+
 function SectionBar({ title, subtitle, mobile }: { title: string; subtitle?: string; mobile?: boolean }) {
   return (
     <div style={{
@@ -458,7 +469,7 @@ function HistogramaDim({
   const ALTO_BARRA = ALTO - ROTULO
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
         <div>
           <div style={{ fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--ink)', fontWeight: 700 }}>
@@ -470,12 +481,15 @@ function HistogramaDim({
         </div>
         {/* Separador vertical negro */}
         <span aria-hidden style={{ width: 1.5, alignSelf: 'stretch', background: 'var(--ink)' }} />
-        <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>
-          <span style={{ fontSize: 22, fontWeight: 900, letterSpacing: '-.02em' }}>
-            {promedio !== null ? promedio.toFixed(1) : '—'}
-          </span>
-          <span style={{ fontSize: 22, fontWeight: 900, letterSpacing: '-.02em', color: 'var(--ink)' }}>/ 10</span>
-        </div>
+        <span style={{
+          fontSize: 22, fontWeight: 900, letterSpacing: '-.02em', color: 'var(--ink)',
+          fontVariantNumeric: 'tabular-nums', lineHeight: 1,
+          background: promedioBg(promedio),
+          padding: '6px 10px',
+          display: 'inline-block',
+        }}>
+          {promedio !== null ? promedio.toFixed(1) : '—'} / 10
+        </span>
         {/* Separador vertical antes del indicador de dispersión */}
         <span aria-hidden style={{ width: 1.5, alignSelf: 'stretch', background: 'var(--ink)' }} />
         <span style={{
