@@ -697,7 +697,13 @@ function BloquePreguntas({
               <span style={{ fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--ink)', fontWeight: 700 }}>
                 {dimNombre(p.dimension_id)}
               </span>
-              <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--ink)', lineHeight: 1.4 }}>
+              {/* min-height = 2.8em (1.4 line-height × 2 líneas): reserva
+                  espacio para 2 líneas aunque el texto sea corto, así todas
+                  las filas (top y bottom) quedan alineadas verticalmente. */}
+              <span style={{
+                display: 'block', fontSize: 14, fontWeight: 600, color: 'var(--ink)',
+                lineHeight: 1.4, minHeight: '2.8em',
+              }}>
                 {p.texto}
               </span>
             </div>

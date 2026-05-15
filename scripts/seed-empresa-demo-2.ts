@@ -24,6 +24,16 @@ const CENTROS: Record<number, number> = {
   4: 4.0, // Acción
 }
 
+// Sigma por dimensión: controla la dispersión de las respuestas. Subimos
+// el sigma de Interacción para conseguir una dispersión > 2.0 (equipo
+// dividido / banda roja).
+const SIGMAS: Record<number, number> = {
+  1: 1.5, // Intención    → dispersión ~1.5 (notable)
+  2: 1.5, // Motivación   → dispersión ~1.5 (notable)
+  3: 2.6, // Interacción  → dispersión > 2.0 (dividido)
+  4: 1.6, // Acción       → dispersión ~1.6 (notable)
+}
+
 // Generador con DISPERSIÓN real. Antes mezclaba sólo floor y ceil del centro
 // (rango ±1, casi sin variación). Ahora genera valores con distribución
 // gaussiana alrededor del centro, con σ configurable, y al final corrige
@@ -101,9 +111,10 @@ async function main() {
   const respuestas: { participante_id: string; pregunta_id: string; valor: number }[] = []
   for (let dim = 1; dim <= 4; dim++) {
     const centro = CENTROS[dim]
+    const sigma = SIGMAS[dim]
     const preguntasDim = preguntas.filter(p => p.dimension_id === dim && p.rol === 'X')
     const total = preguntasDim.length * partsX.length
-    const valores = generarValores(centro, total)
+    const valores = generarValores(centro, total, sigma)
     let idx = 0
     for (const partId of partsX) {
       for (const preg of preguntasDim) {
