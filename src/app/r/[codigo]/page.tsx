@@ -425,7 +425,13 @@ export default async function ResultadosPage({ params }: { params: Promise<{ cod
             <div style={{
               display: 'flex', flexDirection: 'column',
               paddingTop: 28,
+              position: 'relative',
             }}>
+              {/* Separador vertical corto (no toca ni el top ni el bottom de la card) */}
+              <span aria-hidden style={{
+                position: 'absolute', left: 0, top: '18%', bottom: '18%',
+                width: 1.5, background: 'var(--ink)',
+              }} />
               <div style={{
                 padding: '0 24px',
                 display: 'flex', flexDirection: 'column', gap: 14,

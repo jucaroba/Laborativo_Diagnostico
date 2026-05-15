@@ -295,7 +295,13 @@ function PromedioCardDesktop({ resultados }: { resultados: DimResultado[] }) {
     <div style={{
       padding: '28px 24px 26px',
       display: 'flex', flexDirection: 'column', gap: 12,
+      position: 'relative',
     }}>
+      {/* Separador vertical corto (no toca ni el top ni el bottom de la card) */}
+      <span aria-hidden style={{
+        position: 'absolute', left: 0, top: '18%', bottom: '18%',
+        width: 1.5, background: 'var(--ink)',
+      }} />
       <div>
         <div style={{ fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--ink)', fontWeight: 700 }}>Global</div>
         <h3 style={{ fontSize: 22, fontWeight: 900, letterSpacing: '-.02em', lineHeight: 1, margin: '4px 0 0' }}>Promedio</h3>
