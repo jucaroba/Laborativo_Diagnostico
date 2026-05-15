@@ -158,11 +158,6 @@ export default function ResultadosPulso({
           ))}
         </div>
 
-        <SectionBar title="Forma del pulso" subtitle="Vista radar" mobile />
-        <div style={{ padding: '24px 20px 32px', borderBottom: '1.5px solid var(--ink)' }}>
-          <RadarPulso resultados={resultados} maxSize={420} />
-        </div>
-
         <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: 6, fontSize: 9.5, color: 'var(--ink)', letterSpacing: '.08em', textTransform: 'uppercase', fontWeight: 600 }}>
           <span>Laborativo / Consultoría Creativa Basada en la Emoción</span>
           <span>Pulso · V1.0</span>
@@ -222,11 +217,6 @@ export default function ResultadosPulso({
             ))}
           </div>
 
-          <SectionBar title="Forma del pulso" subtitle="Las 4 dimensiones como polígono" />
-          <div style={{ padding: '12px 56px 20px', borderBottom: '1.5px solid var(--ink)', display: 'flex', justifyContent: 'center' }}>
-            <RadarPulso resultados={resultados} maxSize={520} />
-          </div>
-
           {dispersionPorDim && (
             <>
               <SectionBar title="Dispersión del equipo" subtitle="Frecuencia de respuestas por dimensión" />
@@ -283,19 +273,15 @@ function DimCardMobile({ dim, anterior, rondaAnterior, benchmark, benchmarkN, ul
         )}
       </div>
       <BarraPulso valor={dim.promedio} benchmark={benchmark} />
-      <div style={{ fontSize: 11, color: 'var(--ink-2)', fontWeight: 500 }}>
-        ± {dim.desviacion.toFixed(1)} de dispersión · {dim.n} respuestas
-      </div>
       {benchmark !== null && <BenchmarkLabel valor={benchmark} n={benchmarkN} />}
     </div>
   )
 }
 
-function DimCardDesktop({ dim, anterior, rondaAnterior, benchmark, benchmarkN, ultimo }: { dim: DimResultado; anterior: number | null; rondaAnterior?: number; benchmark: number | null; benchmarkN?: number; ultimo: boolean }) {
+function DimCardDesktop({ dim, anterior, rondaAnterior, benchmark, benchmarkN }: { dim: DimResultado; anterior: number | null; rondaAnterior?: number; benchmark: number | null; benchmarkN?: number; ultimo: boolean }) {
   return (
     <div style={{
       padding: '28px 24px 26px',
-      borderRight: ultimo ? 'none' : '1.5px solid var(--ink)',
       display: 'flex', flexDirection: 'column', gap: 12,
     }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
@@ -317,9 +303,6 @@ function DimCardDesktop({ dim, anterior, rondaAnterior, benchmark, benchmarkN, u
         )}
       </div>
       <BarraPulso valor={dim.promedio} benchmark={benchmark} />
-      <div style={{ fontSize: 12, color: 'var(--ink-2)', fontWeight: 500 }}>
-        ± {dim.desviacion.toFixed(1)} de dispersión · {dim.n} respuestas
-      </div>
       {benchmark !== null && <BenchmarkLabel valor={benchmark} n={benchmarkN} />}
     </div>
   )
