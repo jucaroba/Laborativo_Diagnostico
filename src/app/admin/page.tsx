@@ -118,10 +118,10 @@ export default async function AdminPage() {
         <Table>
           <TableHeader>
             <TableRow style={{ background: '#0A0A0A', borderBottom: 'none' }}>
-              {['Empresa', 'Tipo', 'Contacto', 'Fecha', 'Equipos', 'Participantes', ''].map(h => (
+              {['Empresa', 'Tipo', 'Contacto', 'Fecha', 'Ronda', 'Equipos', 'PAX', ''].map(h => (
                 <TableHead key={h} style={{
                   color: '#fff', fontWeight: 700, fontSize: 12, letterSpacing: '.06em', textTransform: 'uppercase', background: 'transparent',
-                  textAlign: (h === 'Equipos' || h === 'Participantes') ? 'center' : 'left',
+                  textAlign: (h === 'Equipos' || h === 'PAX' || h === 'Ronda') ? 'center' : 'left',
                 }}>{h}</TableHead>
               ))}
             </TableRow>
@@ -134,18 +134,9 @@ export default async function AdminPage() {
               return (
               <TableRow key={d.id}>
                 <TableCell>
-                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
-                    <Link href={`/admin/${d.id}`} style={{ textDecoration: 'none', color: 'inherit', fontWeight: 500, fontSize: 14 }}>
-                      {d.nombre_compania}
-                    </Link>
-                    {(d.ronda ?? 1) > 1 && (
-                      <span style={{
-                        fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase', fontWeight: 700,
-                        background: 'transparent', color: 'var(--ink)', border: '1.5px solid var(--ink)',
-                        padding: '1px 6px',
-                      }}>Ronda {d.ronda}</span>
-                    )}
-                  </span>
+                  <Link href={`/admin/${d.id}`} style={{ textDecoration: 'none', color: 'inherit', fontWeight: 500, fontSize: 14 }}>
+                    {d.nombre_compania}
+                  </Link>
                 </TableCell>
                 <TableCell>
                   <span style={{
@@ -157,6 +148,9 @@ export default async function AdminPage() {
                 <TableCell style={{ color: 'var(--ink)', fontWeight: 500, fontSize: 14 }}>{d.contacto_nombre}</TableCell>
                 <TableCell style={{ color: 'var(--ink)', fontWeight: 500, fontSize: 14 }}>
                   {fechaCorta(d.created_at)}
+                </TableCell>
+                <TableCell style={{ textAlign: 'center', fontSize: 13, fontWeight: 700, color: 'var(--ink)' }}>
+                  {d.ronda ?? 1}
                 </TableCell>
                 <TableCell style={{ textAlign: 'center' }}>
                   <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--ink)' }}>
