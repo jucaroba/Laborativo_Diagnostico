@@ -201,7 +201,7 @@ export default function ResultadosPulso({
 
           <SectionBar title="Forma del pulso" subtitle="Las 4 dimensiones como polígono" />
           <div style={{ padding: '12px 56px 20px', borderBottom: '1.5px solid var(--ink)', display: 'flex', justifyContent: 'center' }}>
-            <RadarPulso resultados={resultados} maxSize={380} />
+            <RadarPulso resultados={resultados} maxSize={520} />
           </div>
         </div>
 
