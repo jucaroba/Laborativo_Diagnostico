@@ -273,9 +273,6 @@ export default function NuevoDiagnosticoForm() {
             <Input style={{ height: 36 }} value={datos.contacto_cargo} onChange={e => setDatos(d => ({ ...d, contacto_cargo: e.target.value }))} placeholder="Cargo" />
             <Input style={{ height: 36 }} type="email" value={datos.contacto_email} onChange={e => setDatos(d => ({ ...d, contacto_email: e.target.value }))} placeholder="Email" />
           </div>
-          <p className="text-mute" style={{ fontSize: 12, margin: '-20px 0 32px' }}>
-            Los equipos a evaluar (con su nombre, color y número de participantes) se agregan después, en el detalle de la compañía.
-          </p>
 
           <div style={{ marginTop: 44 }}>
             <div style={{ background: 'var(--ink)', padding: '10px 16px', marginBottom: 27 }}>
