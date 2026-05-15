@@ -209,7 +209,7 @@ export default function ResultadosPulso({
           {dispersionPorDim && (
             <>
               <SectionBar title="Dispersión del equipo" subtitle="Frecuencia de respuestas por dimensión" />
-              <div style={{ padding: '24px 56px 32px', borderBottom: '1.5px solid var(--ink)', display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 24 }}>
+              <div style={{ padding: '24px 56px 32px', borderBottom: '1.5px solid var(--ink)', display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', columnGap: 64, rowGap: 32 }}>
                 {resultados.map(dim => (
                   <HistogramaDim
                     key={dim.id}
@@ -465,15 +465,11 @@ function HistogramaDim({
           </span>
           <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--mute)' }}>/ 10</span>
         </div>
-        {/* Indicador de dispersión (desviación estándar) */}
-        <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, fontVariantNumeric: 'tabular-nums', marginLeft: 'auto' }}>
-          <span style={{ fontSize: 10, letterSpacing: '.06em', textTransform: 'uppercase', color: 'var(--mute)', fontWeight: 700 }}>
-            Dispersión
-          </span>
-          <span style={{ fontSize: 14, fontWeight: 800, color: 'var(--ink)' }}>
-            ± {desviacion.toFixed(1)}
-          </span>
-        </div>
+        {/* Separador vertical antes del indicador de dispersión */}
+        <span aria-hidden style={{ width: 1.5, alignSelf: 'stretch', background: 'var(--ink)' }} />
+        <span style={{ fontSize: 14, fontWeight: 800, color: 'var(--ink)', fontVariantNumeric: 'tabular-nums' }}>
+          ± {desviacion.toFixed(1)}
+        </span>
       </div>
 
       <div style={{ position: 'relative' }}>
@@ -488,7 +484,11 @@ function HistogramaDim({
         )}
 
         {/* Cada columna: número arriba + barra creciendo desde abajo */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(10, 1fr)', gap: 4, height: ALTO, position: 'relative', zIndex: 1 }}>
+        <div style={{
+          display: 'grid', gridTemplateColumns: 'repeat(10, 1fr)', gap: 4,
+          height: ALTO, position: 'relative', zIndex: 1,
+          borderBottom: '1px solid var(--ink)',
+        }}>
           {buckets.map((n, i) => {
             const h = (n / maxFreq) * ALTO_BARRA
             return (
@@ -520,9 +520,6 @@ function HistogramaDim({
             )
           })}
         </div>
-
-        {/* Línea base del eje (de 1 a 10) */}
-        <div style={{ height: 1, background: 'var(--ink)' }} aria-hidden />
 
         {/* Eje 1..10 */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(10, 1fr)', gap: 4, marginTop: 6 }}>
