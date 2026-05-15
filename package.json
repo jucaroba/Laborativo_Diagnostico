@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "seed": "node --env-file=.env.local --experimental-strip-types --no-warnings scripts/seed-data.ts",
-    "dry-run-equipos": "node --env-file=.env.local --experimental-strip-types --no-warnings scripts/dry-run-equipos.ts"
+    "dry-run-equipos": "node --env-file=.env.local --experimental-strip-types --no-warnings scripts/dry-run-equipos.ts",
+    "seed-empresa-demo": "node --env-file=.env.local --experimental-strip-types --no-warnings scripts/seed-empresa-demo.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.90.0",
