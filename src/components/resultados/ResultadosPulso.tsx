@@ -297,9 +297,10 @@ function PromedioCardDesktop({ resultados }: { resultados: DimResultado[] }) {
       display: 'flex', flexDirection: 'column', gap: 12,
       position: 'relative',
     }}>
-      {/* Separador vertical corto (no toca ni el top ni el bottom de la card) */}
+      {/* Separador vertical: de la altura del eyebrow GLOBAL hasta el
+          final de la barra de progreso. */}
       <span aria-hidden style={{
-        position: 'absolute', left: 0, top: '18%', bottom: '18%',
+        position: 'absolute', left: 0, top: 28, bottom: 26,
         width: 1.5, background: 'var(--ink)',
       }} />
       <div>
