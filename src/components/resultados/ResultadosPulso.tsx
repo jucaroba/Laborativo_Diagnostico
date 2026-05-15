@@ -354,7 +354,7 @@ function BarraPulso({ valor, benchmark }: { valor: number | null; benchmark?: nu
   return (
     <div style={{ position: 'relative', height: 8, background: 'var(--bg-2)', border: '1.5px solid var(--ink)' }}>
       {valor !== null && (
-        <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: `${pct}%`, background: 'var(--ink)' }} />
+        <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: `${pct}%`, background: promedioBg(valor) }} />
       )}
       {benchPct !== null && (
         <div title={`Benchmark: ${benchmark!.toFixed(1)}`} style={{
@@ -674,7 +674,6 @@ function BloquePreguntas({
         <h3 style={{ fontSize: 22, fontWeight: 900, letterSpacing: '-.02em', margin: '4px 0 0', lineHeight: 1 }}>
           {titulo}
         </h3>
-        <div style={{ width: 42, height: 8, background: color, marginTop: 8 }} />
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column' }}>
@@ -697,7 +696,7 @@ function BloquePreguntas({
               {p.promedio.toFixed(1)}
             </span>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-              <span style={{ fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--mute)', fontWeight: 700 }}>
+              <span style={{ fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--ink)', fontWeight: 700 }}>
                 {dimNombre(p.dimension_id)}
               </span>
               <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--ink)', lineHeight: 1.4 }}>
