@@ -240,7 +240,7 @@ export default function EditorTema({ temaId, temaNombre, descripcion, preguntas,
                   return (
                     <div key={rol} style={{ marginBottom: 20 }}>
                       <div style={{ background: 'var(--bg-2)', padding: '6px 12px', marginBottom: 4, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                        <span className="page-header__eyebrow" style={{ margin: 0, color: 'var(--ink)', fontWeight: 800 }}>{rol} / {ROL_INFO[rol].label}</span>
+                        <span className="page-header__eyebrow" style={{ margin: 0, color: 'var(--ink)', fontWeight: 800 }}>{['A','B','C','D'].includes(rol) ? `${rol} / ${ROL_INFO[rol].label}` : ROL_INFO[rol].label}</span>
                         <button
                           onClick={() => setGeneradas(prev => prev ? [...prev, { dimension_id: dim.id, rol, texto: '', orden: prev.length }] : null)}
                           style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--ink)', display: 'flex', padding: '2px 4px' }}

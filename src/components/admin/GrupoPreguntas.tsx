@@ -69,7 +69,9 @@ export default function GrupoPreguntas({ grupo, rol, diagnosticoId, temaId, dime
       {/* Band header */}
       <div style={{ background: 'var(--bg-2)', padding: '6px 12px', marginBottom: 4, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <span className="page-header__eyebrow" style={{ margin: 0, color: 'var(--ink)', fontWeight: 800 }}>
-          {rol} / {ROL_INFO[rol].label}
+          {/* Solo en Cultura 360° (roles A/B/C/D) la letra identifica la perspectiva;
+              en el resto de tipos (X, YO, EQUIPO) hay un solo rol así que la letra es ruido. */}
+          {['A','B','C','D'].includes(rol) ? `${rol} / ${ROL_INFO[rol].label}` : ROL_INFO[rol].label}
         </span>
         <button
           onClick={() => { setAgregando(true); setTextoNuevo('') }}
