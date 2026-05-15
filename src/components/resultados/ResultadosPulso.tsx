@@ -448,7 +448,7 @@ function HistogramaDim({
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+      <div style={{ display: 'flex', alignItems: 'flex-end', gap: 14 }}>
         <div>
           <div style={{ fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--ink)', fontWeight: 700 }}>
             {subtitulo}
@@ -459,15 +459,15 @@ function HistogramaDim({
         </div>
         {/* Separador vertical negro */}
         <span aria-hidden style={{ width: 1.5, alignSelf: 'stretch', background: 'var(--ink)' }} />
-        <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, fontVariantNumeric: 'tabular-nums' }}>
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>
           <span style={{ fontSize: 22, fontWeight: 900, letterSpacing: '-.02em' }}>
             {promedio !== null ? promedio.toFixed(1) : '—'}
           </span>
-          <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--mute)' }}>/ 10</span>
+          <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--ink)' }}>/ 10</span>
         </div>
         {/* Separador vertical antes del indicador de dispersión */}
         <span aria-hidden style={{ width: 1.5, alignSelf: 'stretch', background: 'var(--ink)' }} />
-        <span style={{ fontSize: 14, fontWeight: 800, color: 'var(--ink)', fontVariantNumeric: 'tabular-nums' }}>
+        <span style={{ fontSize: 14, fontWeight: 800, color: 'var(--ink)', fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>
           ± {desviacion.toFixed(1)}
         </span>
       </div>
@@ -483,29 +483,30 @@ function HistogramaDim({
           }} aria-hidden />
         )}
 
-        {/* Cada columna: número arriba + barra creciendo desde abajo */}
+        {/* Cada columna: número arriba + barra creciendo desde abajo.
+            `alignItems: end` en el grid ancla cada celda al fondo, así
+            la barra queda exactamente sobre la línea base. */}
         <div style={{
           display: 'grid', gridTemplateColumns: 'repeat(10, 1fr)', gap: 4,
           height: ALTO, position: 'relative', zIndex: 1,
           borderBottom: '1px solid var(--ink)',
+          alignItems: 'end',
         }}>
           {buckets.map((n, i) => {
             const h = (n / maxFreq) * ALTO_BARRA
             return (
               <div key={i} style={{
-                display: 'flex', flexDirection: 'column', alignItems: 'center',
-                justifyContent: 'flex-end',
-                height: '100%',
+                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
               }}>
-                {/* Rótulo: cantidad arriba de la barra (solo si hay datos) */}
+                {/* Rótulo: cantidad arriba de la barra (espacio reservado siempre) */}
                 <span style={{
                   fontSize: 11, fontWeight: 800, color: 'var(--ink)',
                   fontVariantNumeric: 'tabular-nums',
-                  marginBottom: 4,
                   visibility: n > 0 ? 'visible' : 'hidden',
+                  lineHeight: 1,
                 }}>{n}</span>
 
-                {/* Barra: crece desde abajo hacia arriba */}
+                {/* Barra: el bottom toca la línea base del grid */}
                 <div
                   title={`${i + 1}: ${n} ${n === 1 ? 'persona' : 'personas'}`}
                   style={{
@@ -514,6 +515,7 @@ function HistogramaDim({
                     minHeight: n > 0 ? 4 : 0,
                     background: 'var(--ink)',
                     transition: 'height .15s',
+                    display: 'block',
                   }}
                 />
               </div>
