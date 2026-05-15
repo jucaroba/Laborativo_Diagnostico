@@ -581,18 +581,18 @@ function LeyendaDispersion() {
               key={r.rango}
               style={{
                 display: 'grid', gridTemplateColumns: '160px 1fr',
-                padding: '10px 16px',
-                borderTop: i === 0 ? 'none' : '1px solid var(--line-soft)',
+                padding: '12px 16px',
+                borderTop: i === 0 ? 'none' : '1px solid var(--ink)',
                 alignItems: 'center', gap: 16,
+                background: r.color,
               }}
             >
               <span style={{
                 fontSize: 14, fontWeight: 800, color: 'var(--ink)', fontVariantNumeric: 'tabular-nums',
-                background: r.color, padding: '4px 10px', display: 'inline-block', justifySelf: 'start',
               }}>
                 {r.rango}
               </span>
-              <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--ink-2)', lineHeight: 1.4 }}>
+              <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--ink)', lineHeight: 1.4 }}>
                 {r.lectura}
               </span>
             </div>
