@@ -15,10 +15,20 @@ const fechaCorta = (iso: string) => {
 }
 
 export default async function AdminPage() {
-  const { data: diagnosticos } = await supabase
+  const { data: diagnosticosRaw } = await supabase
     .from('diagnosticos').select('*').order('created_at', { ascending: false })
 
-  const diagIds = (diagnosticos ?? []).map(d => d.id)
+  // Una "cadena" de rondas (Ronda 1 → 2 → 3 …) son N filas distintas en
+  // `diagnosticos` ligadas por `diagnostico_padre_id`. En el listado solo
+  // mostramos la punta más reciente de cada cadena (la que NO es padre de
+  // ningún otro diagnóstico). Las rondas anteriores se ven desde el detalle.
+  const padresConHijo = new Set<string>()
+  for (const d of diagnosticosRaw ?? []) {
+    if (d.diagnostico_padre_id) padresConHijo.add(d.diagnostico_padre_id as string)
+  }
+  const diagnosticos = (diagnosticosRaw ?? []).filter(d => !padresConHijo.has(d.id))
+
+  const diagIds = diagnosticos.map(d => d.id)
   const { data: equipos } = diagIds.length > 0
     ? await supabase.from('equipos').select('id, diagnostico_id, estado, numero_participantes').in('diagnostico_id', diagIds)
     : { data: [] as { id: string; diagnostico_id: string; estado: string; numero_participantes: number | null }[] }
@@ -109,7 +119,10 @@ export default async function AdminPage() {
           <TableHeader>
             <TableRow style={{ background: '#0A0A0A', borderBottom: 'none' }}>
               {['Empresa', 'Tipo', 'Contacto', 'Fecha', 'Equipos', 'Participantes', ''].map(h => (
-                <TableHead key={h} style={{ color: '#fff', fontWeight: 700, fontSize: 12, letterSpacing: '.06em', textTransform: 'uppercase', background: 'transparent' }}>{h}</TableHead>
+                <TableHead key={h} style={{
+                  color: '#fff', fontWeight: 700, fontSize: 12, letterSpacing: '.06em', textTransform: 'uppercase', background: 'transparent',
+                  textAlign: (h === 'Equipos' || h === 'Participantes') ? 'center' : 'left',
+                }}>{h}</TableHead>
               ))}
             </TableRow>
           </TableHeader>
@@ -121,9 +134,18 @@ export default async function AdminPage() {
               return (
               <TableRow key={d.id}>
                 <TableCell>
-                  <Link href={`/admin/${d.id}`} style={{ textDecoration: 'none', color: 'inherit', fontWeight: 500, fontSize: 14 }}>
-                    {d.nombre_compania}
-                  </Link>
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+                    <Link href={`/admin/${d.id}`} style={{ textDecoration: 'none', color: 'inherit', fontWeight: 500, fontSize: 14 }}>
+                      {d.nombre_compania}
+                    </Link>
+                    {(d.ronda ?? 1) > 1 && (
+                      <span style={{
+                        fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase', fontWeight: 700,
+                        background: 'transparent', color: 'var(--ink)', border: '1.5px solid var(--ink)',
+                        padding: '1px 6px',
+                      }}>Ronda {d.ronda}</span>
+                    )}
+                  </span>
                 </TableCell>
                 <TableCell>
                   <span style={{
@@ -136,19 +158,14 @@ export default async function AdminPage() {
                 <TableCell style={{ color: 'var(--ink)', fontWeight: 500, fontSize: 14 }}>
                   {fechaCorta(d.created_at)}
                 </TableCell>
-                <TableCell>
-                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
-                    <span style={{ fontSize: 13, fontWeight: 700 }}>
-                      {stats.n}
-                    </span>
-                    {(stats.activos + stats.completados) > 0 && (
-                      <span style={{ fontSize: 11, color: 'var(--mute)', fontWeight: 600 }}>
-                        · {stats.activos} activo{stats.activos === 1 ? '' : 's'}{stats.completados > 0 ? ` · ${stats.completados} completado${stats.completados === 1 ? '' : 's'}` : ''}
-                      </span>
-                    )}
+                <TableCell style={{ textAlign: 'center' }}>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--ink)' }}>
+                    {stats.n}{' '}
+                    <span style={{ color: 'var(--mute)', fontWeight: 600 }}>/</span>{' '}
+                    {stats.activos} activo{stats.activos === 1 ? '' : 's'}
                   </span>
                 </TableCell>
-                <TableCell>
+                <TableCell style={{ textAlign: 'center' }}>
                   <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--ink)' }}>
                     {stats.invitados}{' '}
                     <span style={{ color: 'var(--mute)', fontWeight: 600 }}>/</span>{' '}
