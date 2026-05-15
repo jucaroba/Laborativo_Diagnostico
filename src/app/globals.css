@@ -128,6 +128,20 @@ input[type="number"]::-webkit-inner-spin-button {
 }
 input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
 
+/* Neutraliza el autofill azul/amarillo de Chrome/Safari: el fondo del
+   input se queda como el del tema y el texto en color tinta normal. */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px var(--bg) inset !important;
+  -webkit-text-fill-color: var(--ink) !important;
+  caret-color: var(--ink);
+  transition: background-color 5000s ease-in-out 0s;
+}
+
 /* =============================================
    PARTICIPANTE — Switch desktop / mobile
    ============================================= */
