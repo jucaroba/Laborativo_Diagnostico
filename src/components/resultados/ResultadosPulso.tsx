@@ -209,7 +209,7 @@ export default function ResultadosPulso({
           {dispersionPorDim && (
             <>
               <SectionBar title="Dispersión del equipo" subtitle="Frecuencia de respuestas por dimensión" />
-              <div style={{ padding: '24px 56px 32px', borderBottom: '1.5px solid var(--ink)', display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', columnGap: 64, rowGap: 32 }}>
+              <div style={{ padding: '24px 56px 8px', display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', columnGap: 64, rowGap: 32 }}>
                 {resultados.map(dim => (
                   <HistogramaDim
                     key={dim.id}
@@ -221,6 +221,7 @@ export default function ResultadosPulso({
                   />
                 ))}
               </div>
+              <LeyendaDispersion />
             </>
           )}
         </div>
@@ -467,7 +468,7 @@ function HistogramaDim({
         </div>
         {/* Separador vertical antes del indicador de dispersión */}
         <span aria-hidden style={{ width: 1.5, alignSelf: 'stretch', background: 'var(--ink)' }} />
-        <span style={{ fontSize: 14, fontWeight: 800, color: 'var(--ink)', fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>
+        <span style={{ fontSize: 22, fontWeight: 900, letterSpacing: '-.02em', color: 'var(--ink)', fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>
           ± {desviacion.toFixed(1)}
         </span>
       </div>
@@ -530,6 +531,50 @@ function HistogramaDim({
               fontSize: 10, color: 'var(--mute)', fontWeight: 600,
               textAlign: 'center', fontVariantNumeric: 'tabular-nums',
             }}>{i + 1}</span>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ─── Leyenda interpretativa de la dispersión ─────────────────────
+const RANGOS_DISPERSION: Array<{ rango: string; lectura: string }> = [
+  { rango: '± 0.0 – 0.5', lectura: 'Equipo totalmente alineado. Todos sienten lo mismo.' },
+  { rango: '± 0.6 – 1.2', lectura: 'Buena cohesión. Diferencias normales entre personas.' },
+  { rango: '± 1.3 – 2.0', lectura: 'Dispersión notable. Vale revisar por qué algunos lo ven distinto.' },
+  { rango: '± 2.0+',      lectura: 'Equipo dividido. El promedio esconde dos (o más) lecturas distintas.' },
+]
+
+function LeyendaDispersion() {
+  return (
+    <div style={{ padding: '8px 56px 32px', borderBottom: '1.5px solid var(--ink)' }}>
+      <div style={{
+        border: '1.5px solid var(--ink)', background: 'var(--card)',
+      }}>
+        <div style={{ background: 'var(--ink)', padding: '8px 16px' }}>
+          <span style={{ fontSize: 11, fontWeight: 800, color: '#fff', letterSpacing: '.06em', textTransform: 'uppercase' }}>
+            Cómo leer la dispersión
+          </span>
+        </div>
+        <div>
+          {RANGOS_DISPERSION.map((r, i) => (
+            <div
+              key={r.rango}
+              style={{
+                display: 'grid', gridTemplateColumns: '140px 1fr',
+                padding: '10px 16px',
+                borderTop: i === 0 ? 'none' : '1px solid var(--line-soft)',
+                alignItems: 'baseline', gap: 16,
+              }}
+            >
+              <span style={{ fontSize: 14, fontWeight: 800, color: 'var(--ink)', fontVariantNumeric: 'tabular-nums' }}>
+                {r.rango}
+              </span>
+              <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--ink-2)', lineHeight: 1.4 }}>
+                {r.lectura}
+              </span>
+            </div>
           ))}
         </div>
       </div>
