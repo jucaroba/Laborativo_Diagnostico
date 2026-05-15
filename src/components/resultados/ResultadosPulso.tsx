@@ -230,7 +230,7 @@ export default function ResultadosPulso({
           {dispersionPorDim && (
             <>
               <SectionBar title="Dispersión del equipo" subtitle="Frecuencia de respuestas por dimensión" />
-              <div style={{ padding: '24px 56px 40px', display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', columnGap: 64, rowGap: 32 }}>
+              <div style={{ padding: '48px 56px 56px', display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', columnGap: 64, rowGap: 64 }}>
                 {resultados.map(dim => (
                   <HistogramaDim
                     key={dim.id}
@@ -564,8 +564,13 @@ const RANGOS_DISPERSION: Array<{ rango: string; lectura: string; color: string }
 
 function LeyendaDispersion() {
   return (
-    <div style={{ padding: '24px 56px 24px', borderBottom: '1.5px solid var(--ink)' }}>
-      <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 24, rowGap: 12 }}>
+    <div style={{ padding: '24px 56px 32px', borderBottom: '1.5px solid var(--ink)' }}>
+      <div style={{
+        border: '1.5px solid var(--ink)', background: 'var(--card)',
+        padding: '16px 20px',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        flexWrap: 'wrap', gap: 28, rowGap: 12,
+      }}>
         <span style={{
           fontSize: 11, fontWeight: 800, color: 'var(--ink)',
           letterSpacing: '.06em', textTransform: 'uppercase',
