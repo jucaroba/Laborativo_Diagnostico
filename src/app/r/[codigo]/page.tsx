@@ -47,7 +47,7 @@ export default async function ResultadosPage({ params }: { params: Promise<{ cod
   // Las preguntas son a nivel compañía (compartidas entre sus equipos).
   const { data: preguntas } = await supabase
     .from('preguntas')
-    .select('id, dimension_id, rol')
+    .select('id, dimension_id, rol, texto')
     .eq('diagnostico_id', diag.id)
 
   // Los participantes son del equipo específico.
@@ -114,6 +114,32 @@ export default async function ResultadosPage({ params }: { params: Promise<{ cod
       }
     }
 
+    // Ranking de preguntas: para cada pregunta, su promedio de respuestas.
+    // Sirve para mostrar "lo más alto" y "lo más bajo" del cuestionario,
+    // con el texto exacto de la pregunta — la lectura más accionable del
+    // dashboard.
+    const respPorPregunta: Record<string, { suma: number; n: number }> = {}
+    for (const r of respuestas ?? []) {
+      if (!respPorPregunta[r.pregunta_id]) respPorPregunta[r.pregunta_id] = { suma: 0, n: 0 }
+      respPorPregunta[r.pregunta_id].suma += r.valor
+      respPorPregunta[r.pregunta_id].n += 1
+    }
+    type PreguntaRanking = { id: string; texto: string; dimension_id: number; promedio: number; n: number }
+    const preguntasRanking: PreguntaRanking[] = (preguntas ?? [])
+      .map(p => {
+        const cell = respPorPregunta[p.id]
+        if (!cell || cell.n === 0) return null
+        return {
+          id: p.id,
+          texto: (p as { texto: string }).texto,
+          dimension_id: p.dimension_id,
+          promedio: Math.round((cell.suma / cell.n) * 10) / 10,
+          n: cell.n,
+        } as PreguntaRanking
+      })
+      .filter((p): p is PreguntaRanking => p !== null)
+      .sort((a, b) => b.promedio - a.promedio)
+
     const sharedProps = {
       nombreCompania: diag.nombre_compania,
       estado: equipo.estado,
@@ -126,6 +152,7 @@ export default async function ResultadosPage({ params }: { params: Promise<{ cod
       benchmark: benchmark?.resultados ?? null,
       benchmarkN: benchmark?.nDiagnosticos ?? 0,
       dispersionPorDim,
+      preguntasRanking,
     }
     return tipoDiag === 'pulso_colectivo'
       ? <ResultadosPulso {...sharedProps} />

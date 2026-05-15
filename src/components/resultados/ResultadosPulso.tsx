@@ -23,6 +23,8 @@ type Props = {
   benchmarkN?: number
   /** Para cada dimensión (id 1..4), array de promedios por persona. */
   dispersionPorDim?: Record<number, number[]>
+  /** Ranking de preguntas (todas) con su promedio, para mostrar top/bottom. */
+  preguntasRanking?: Array<{ id: string; texto: string; dimension_id: number; promedio: number; n: number }>
 }
 
 // Pinta el benchmark Laborativo (promedio histórico de OTROS diagnósticos del mismo tipo)
@@ -99,6 +101,7 @@ function SectionBar({ title, subtitle, mobile }: { title: string; subtitle?: str
 export default function ResultadosPulso({
   nombreCompania, estado, totalParticipantes, totalFormularios, resultados,
   comparacion, rondaActual, rondaAnterior, benchmark, benchmarkN, dispersionPorDim,
+  preguntasRanking,
 }: Props) {
   const hayComparacion = comparacion && comparacion.length > 0
   const getAnterior = (id: number) => comparacion?.find(c => c.id === id)?.promedio ?? null
@@ -203,7 +206,7 @@ export default function ResultadosPulso({
           </div>
 
           <SectionBar title="Pulso por dimensión" subtitle="Escala 1–10" />
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', borderBottom: '1.5px solid var(--ink)' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', borderBottom: '1.5px solid var(--ink)' }}>
             {[...resultados].sort((a, b) => (b.promedio ?? -Infinity) - (a.promedio ?? -Infinity)).map((dim, i, arr) => (
               <DimCardDesktop
                 key={dim.id}
@@ -215,6 +218,7 @@ export default function ResultadosPulso({
                 ultimo={i === arr.length - 1}
               />
             ))}
+            <PromedioCardDesktop resultados={resultados} />
           </div>
 
           {dispersionPorDim && (
@@ -234,6 +238,10 @@ export default function ResultadosPulso({
               </div>
               <LeyendaDispersion />
             </>
+          )}
+
+          {preguntasRanking && preguntasRanking.length > 0 && (
+            <RankingPreguntas preguntas={preguntasRanking} />
           )}
         </div>
 
@@ -274,6 +282,38 @@ function DimCardMobile({ dim, anterior, rondaAnterior, benchmark, benchmarkN, ul
       </div>
       <BarraPulso valor={dim.promedio} benchmark={benchmark} />
       {benchmark !== null && <BenchmarkLabel valor={benchmark} n={benchmarkN} />}
+    </div>
+  )
+}
+
+// Card de "Promedio" — quinta columna del grid de "Pulso por dimensión".
+// Es el promedio simple de los 4 promedios de dimensión disponibles.
+function PromedioCardDesktop({ resultados }: { resultados: DimResultado[] }) {
+  const vals = resultados.map(r => r.promedio).filter((v): v is number => typeof v === 'number')
+  const prom = vals.length ? Math.round((vals.reduce((a, b) => a + b, 0) / vals.length) * 10) / 10 : null
+  return (
+    <div style={{
+      padding: '28px 24px 26px',
+      display: 'flex', flexDirection: 'column', gap: 12,
+      borderLeft: '1.5px solid var(--ink)',
+      background: 'var(--bg-2)',
+    }}>
+      <div>
+        <div style={{ fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--ink)', fontWeight: 700 }}>Global</div>
+        <h3 style={{ fontSize: 22, fontWeight: 900, letterSpacing: '-.02em', lineHeight: 1, margin: '4px 0 0' }}>Promedio</h3>
+      </div>
+      <div style={{ width: 42, height: 8, background: 'var(--ink)' }} />
+      <div style={{ display: 'flex', alignItems: 'baseline', gap: 12 }}>
+        <span style={{ fontWeight: 900, fontSize: 72, lineHeight: 1, letterSpacing: '-.04em', color: 'var(--ink)' }}>
+          {prom !== null ? prom.toFixed(1) : '—'}
+        </span>
+        {prom !== null && (
+          <span style={{ fontWeight: 700, fontSize: 36, lineHeight: 1, letterSpacing: '-.02em' }}>
+            <span style={{ position: 'relative', top: -5 }}>/</span><span style={{ position: 'relative', top: 0 }}>10</span>
+          </span>
+        )}
+      </div>
+      <BarraPulso valor={prom} />
     </div>
   )
 }
@@ -572,6 +612,99 @@ function LeyendaDispersion() {
               {r.lectura}
             </span>
           </span>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+// ─── Ranking de preguntas: lo más fuerte y lo más débil ──────────
+type PregItem = { id: string; texto: string; dimension_id: number; promedio: number; n: number }
+
+function RankingPreguntas({ preguntas }: { preguntas: PregItem[] }) {
+  // Top y bottom 3 (ya viene ordenado de mayor a menor desde el server).
+  const top = preguntas.slice(0, 3)
+  const bottom = [...preguntas].slice(-3).reverse()  // de la peor hacia arriba
+
+  // Nombre de la dimensión por id, sin recalcular acá.
+  const dimNombre = (id: number) => DIMENSIONES.find(d => d.id === id)?.nombre ?? ''
+
+  return (
+    <>
+      <SectionBar title="Lo que más se destaca" subtitle="Pregunta por pregunta · escala 1–10" />
+      <div style={{
+        padding: '40px 56px 48px',
+        display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', columnGap: 56, rowGap: 32,
+        borderBottom: '1.5px solid var(--ink)',
+      }}>
+        <BloquePreguntas
+          titulo="Lo más fuerte del equipo"
+          subtitulo="Las 3 preguntas con promedio más alto"
+          color="#C8E6C9"
+          preguntas={top}
+          dimNombre={dimNombre}
+        />
+        <BloquePreguntas
+          titulo="Lo que más duele"
+          subtitulo="Las 3 preguntas con promedio más bajo"
+          color="#F2C2C2"
+          preguntas={bottom}
+          dimNombre={dimNombre}
+        />
+      </div>
+    </>
+  )
+}
+
+function BloquePreguntas({
+  titulo, subtitulo, color, preguntas, dimNombre,
+}: {
+  titulo: string
+  subtitulo: string
+  color: string
+  preguntas: PregItem[]
+  dimNombre: (id: number) => string
+}) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <div>
+        <div style={{ fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--ink)', fontWeight: 700 }}>
+          {subtitulo}
+        </div>
+        <h3 style={{ fontSize: 22, fontWeight: 900, letterSpacing: '-.02em', margin: '4px 0 0', lineHeight: 1 }}>
+          {titulo}
+        </h3>
+        <div style={{ width: 42, height: 8, background: color, marginTop: 8 }} />
+      </div>
+
+      <div style={{ display: 'flex', flexDirection: 'column' }}>
+        {preguntas.map((p, i) => (
+          <div
+            key={p.id}
+            style={{
+              display: 'grid', gridTemplateColumns: '76px 1fr',
+              padding: '14px 0', gap: 16,
+              borderTop: i === 0 ? '1.5px solid var(--ink)' : '1px solid var(--line-soft)',
+              alignItems: 'center',
+            }}
+          >
+            <span style={{
+              fontSize: 28, fontWeight: 900, letterSpacing: '-.03em', color: 'var(--ink)',
+              fontVariantNumeric: 'tabular-nums', lineHeight: 1,
+              background: color, padding: '4px 10px',
+              display: 'inline-block', justifySelf: 'start',
+            }}>
+              {p.promedio.toFixed(1)}
+            </span>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+              <span style={{ fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--mute)', fontWeight: 700 }}>
+                {dimNombre(p.dimension_id)}
+              </span>
+              <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--ink)', lineHeight: 1.4 }}>
+                {p.texto}
+              </span>
+            </div>
+          </div>
         ))}
       </div>
     </div>
