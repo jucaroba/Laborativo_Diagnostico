@@ -63,12 +63,10 @@ const avgColor = (v: number | null) => {
 }
 
 // Color de fondo del badge de dispersión según los rangos interpretativos.
-//   0.0–0.5  alineado total      → verde fuerte
-//   0.6–1.2  buena cohesión       → verde claro
+//   0.0–1.2  equipo alineado      → verde claro
 //   1.3–2.0  dispersión notable   → amarillo
 //   2.0+     equipo dividido      → rojo claro
 function dispersionBg(d: number): string {
-  if (d <= 0.5) return '#A6D9A6'
   if (d <= 1.2) return '#C8E6C9'
   if (d <= 2.0) return '#FCE99A'
   return '#F2C2C2'
@@ -461,7 +459,7 @@ function HistogramaDim({
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-      <div style={{ display: 'flex', alignItems: 'flex-end', gap: 14 }}>
+      <div style={{ display: 'flex', alignItems: 'baseline', gap: 14 }}>
         <div>
           <div style={{ fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--ink)', fontWeight: 700 }}>
             {subtitulo}
@@ -558,8 +556,7 @@ function HistogramaDim({
 
 // ─── Leyenda interpretativa de la dispersión ─────────────────────
 const RANGOS_DISPERSION: Array<{ rango: string; lectura: string; color: string }> = [
-  { rango: '± 0.0 – 0.5', lectura: 'Equipo totalmente alineado. Todos sienten lo mismo.',                    color: '#A6D9A6' },
-  { rango: '± 0.6 – 1.2', lectura: 'Buena cohesión. Diferencias normales entre personas.',                   color: '#C8E6C9' },
+  { rango: '± 0.0 – 1.2', lectura: 'Equipo alineado. Diferencias chicas entre personas.',                    color: '#C8E6C9' },
   { rango: '± 1.3 – 2.0', lectura: 'Dispersión notable. Vale revisar por qué algunos lo ven distinto.',      color: '#FCE99A' },
   { rango: '± 2.0+',      lectura: 'Equipo dividido. El promedio esconde dos (o más) lecturas distintas.',   color: '#F2C2C2' },
 ]
@@ -582,17 +579,18 @@ function LeyendaDispersion() {
               style={{
                 display: 'grid', gridTemplateColumns: '160px 1fr',
                 padding: '12px 16px',
-                borderTop: i === 0 ? 'none' : '1px solid var(--ink)',
+                borderTop: i === 0 ? 'none' : '1px solid var(--line-soft)',
                 alignItems: 'center', gap: 16,
-                background: r.color,
               }}
             >
               <span style={{
                 fontSize: 14, fontWeight: 800, color: 'var(--ink)', fontVariantNumeric: 'tabular-nums',
+                background: r.color, padding: '4px 10px',
+                justifySelf: 'start',
               }}>
                 {r.rango}
               </span>
-              <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--ink)', lineHeight: 1.4 }}>
+              <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--ink-2)', lineHeight: 1.4 }}>
                 {r.lectura}
               </span>
             </div>
