@@ -88,6 +88,31 @@ export default async function ResultadosPage({ params }: { params: Promise<{ cod
       ? await fetchBenchmarkSimple(tipoDiag as 'pulso_colectivo' | 'termometro_4', diag.id)
       : null
     const totalFormulariosSimple = new Set((respuestas ?? []).map(r => r.participante_id)).size
+
+    // Dispersión: para cada dimensión, lista de promedios por persona.
+    // Una persona da varias respuestas dentro de una dimensión (1 a 3 según
+    // tipo); su "promedio en la dimensión" es la media de esas respuestas.
+    // El histograma agrupa esos promedios redondeados al entero 1–10.
+    const preguntaToDim = new Map<string, number>()
+    for (const p of preguntas ?? []) preguntaToDim.set(p.id, p.dimension_id)
+    const acumPorParticipante: Record<string, Record<number, { suma: number; n: number }>> = {}
+    for (const r of respuestas ?? []) {
+      const dim = preguntaToDim.get(r.pregunta_id)
+      if (!dim) continue
+      if (!acumPorParticipante[r.participante_id]) acumPorParticipante[r.participante_id] = {}
+      if (!acumPorParticipante[r.participante_id][dim]) acumPorParticipante[r.participante_id][dim] = { suma: 0, n: 0 }
+      acumPorParticipante[r.participante_id][dim].suma += r.valor
+      acumPorParticipante[r.participante_id][dim].n += 1
+    }
+    const dispersionPorDim: Record<number, number[]> = { 1: [], 2: [], 3: [], 4: [] }
+    for (const partId of Object.keys(acumPorParticipante)) {
+      for (const dimStr of Object.keys(acumPorParticipante[partId])) {
+        const dim = Number(dimStr)
+        const cell = acumPorParticipante[partId][dim]
+        if (cell.n > 0) dispersionPorDim[dim].push(cell.suma / cell.n)
+      }
+    }
+
     const sharedProps = {
       nombreCompania: diag.nombre_compania,
       estado: equipo.estado,
@@ -99,6 +124,7 @@ export default async function ResultadosPage({ params }: { params: Promise<{ cod
       rondaAnterior,
       benchmark: benchmark?.resultados ?? null,
       benchmarkN: benchmark?.nDiagnosticos ?? 0,
+      dispersionPorDim,
     }
     return tipoDiag === 'pulso_colectivo'
       ? <ResultadosPulso {...sharedProps} />

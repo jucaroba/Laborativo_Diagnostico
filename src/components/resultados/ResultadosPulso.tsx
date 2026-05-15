@@ -21,6 +21,8 @@ type Props = {
   rondaAnterior?: number
   benchmark?: DimResultado[] | null
   benchmarkN?: number
+  /** Para cada dimensión (id 1..4), array de promedios por persona. */
+  dispersionPorDim?: Record<number, number[]>
 }
 
 // Pinta el benchmark Laborativo (promedio histórico de OTROS diagnósticos del mismo tipo)
@@ -75,7 +77,7 @@ function SectionBar({ title, subtitle, mobile }: { title: string; subtitle?: str
 
 export default function ResultadosPulso({
   nombreCompania, estado, totalParticipantes, totalFormularios, resultados,
-  comparacion, rondaActual, rondaAnterior, benchmark, benchmarkN,
+  comparacion, rondaActual, rondaAnterior, benchmark, benchmarkN, dispersionPorDim,
 }: Props) {
   const hayComparacion = comparacion && comparacion.length > 0
   const getAnterior = (id: number) => comparacion?.find(c => c.id === id)?.promedio ?? null
@@ -203,6 +205,23 @@ export default function ResultadosPulso({
           <div style={{ padding: '12px 56px 20px', borderBottom: '1.5px solid var(--ink)', display: 'flex', justifyContent: 'center' }}>
             <RadarPulso resultados={resultados} maxSize={520} />
           </div>
+
+          {dispersionPorDim && (
+            <>
+              <SectionBar title="Dispersión del equipo" subtitle="Frecuencia de respuestas por dimensión" />
+              <div style={{ padding: '24px 56px 32px', borderBottom: '1.5px solid var(--ink)', display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 24 }}>
+                {resultados.map(dim => (
+                  <HistogramaDim
+                    key={dim.id}
+                    nombre={dim.nombre}
+                    subtitulo={dim.subtitulo}
+                    promedio={dim.promedio}
+                    valores={dispersionPorDim[dim.id] ?? []}
+                  />
+                ))}
+              </div>
+            </>
+          )}
         </div>
 
         <div style={{ maxWidth: 1100, margin: '0 auto', padding: '24px', display: 'flex', justifyContent: 'space-between', fontSize: 10, color: 'var(--ink)', letterSpacing: '.08em', textTransform: 'uppercase', fontWeight: 600 }}>
@@ -399,5 +418,94 @@ function RadarPulso({ resultados, maxSize }: { resultados: DimResultado[]; maxSi
         )
       })}
     </svg>
+  )
+}
+
+// ─── Mini-histograma por dimensión ────────────────────────────────
+// Cada barra = cantidad de personas cuyo promedio en esa dimensión cae
+// en el bucket entero (1..10). La altura es proporcional al máximo del
+// histograma de ESTA dimensión (no se normaliza global, así cada uno
+// usa su rango visual completo).
+function HistogramaDim({
+  nombre, subtitulo, promedio, valores,
+}: { nombre: string; subtitulo: string; promedio: number | null; valores: number[] }) {
+  const buckets = Array(10).fill(0) as number[]
+  for (const v of valores) {
+    const b = Math.max(1, Math.min(10, Math.round(v))) - 1
+    buckets[b] += 1
+  }
+  const maxFreq = Math.max(1, ...buckets)
+  const total = valores.length
+
+  // Posición del promedio (1..10) → 0..1 normalizado para línea vertical.
+  const promFrac = promedio !== null ? (promedio - 1) / 9 : null
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 12 }}>
+        <div>
+          <div style={{ fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--ink)', fontWeight: 700 }}>
+            {subtitulo}
+          </div>
+          <div style={{ fontSize: 18, fontWeight: 900, letterSpacing: '-.02em', lineHeight: 1, marginTop: 2 }}>
+            {nombre}
+          </div>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, fontVariantNumeric: 'tabular-nums' }}>
+          <span style={{ fontSize: 22, fontWeight: 900, letterSpacing: '-.02em' }}>
+            {promedio !== null ? promedio.toFixed(1) : '—'}
+          </span>
+          <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--mute)' }}>/ 10</span>
+        </div>
+      </div>
+
+      <div style={{ position: 'relative' }}>
+        {/* Línea vertical del promedio */}
+        {promFrac !== null && (
+          <div style={{
+            position: 'absolute', top: 0, bottom: 16,
+            left: `${promFrac * 100}%`,
+            width: 1.5, background: 'var(--ink)', opacity: .25,
+            zIndex: 0,
+          }} aria-hidden />
+        )}
+
+        {/* Barras */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(10, 1fr)', alignItems: 'end', gap: 4, height: 92, position: 'relative', zIndex: 1 }}>
+          {buckets.map((n, i) => {
+            const h = (n / maxFreq) * 100
+            return (
+              <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, height: '100%' }}>
+                <div style={{ display: 'flex', flexDirection: 'column-reverse', flex: 1, alignSelf: 'stretch', justifyContent: 'flex-end' }}>
+                  <div
+                    title={`${i + 1}: ${n} ${n === 1 ? 'persona' : 'personas'}`}
+                    style={{
+                      height: `${h}%`,
+                      minHeight: n > 0 ? 4 : 0,
+                      background: 'var(--ink)',
+                      transition: 'height .15s',
+                    }}
+                  />
+                </div>
+              </div>
+            )
+          })}
+        </div>
+
+        {/* Eje 1..10 */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(10, 1fr)', gap: 4, marginTop: 6 }}>
+          {Array.from({ length: 10 }, (_, i) => (
+            <span key={i} style={{
+              fontSize: 10, color: 'var(--mute)', fontWeight: 600,
+              textAlign: 'center', fontVariantNumeric: 'tabular-nums',
+            }}>{i + 1}</span>
+          ))}
+        </div>
+      </div>
+
+      <div style={{ fontSize: 10, color: 'var(--mute)', letterSpacing: '.04em', fontWeight: 500 }}>
+        {total} {total === 1 ? 'persona' : 'personas'} · barra = cuántas respondieron ese valor
+      </div>
+    </div>
   )
 }
