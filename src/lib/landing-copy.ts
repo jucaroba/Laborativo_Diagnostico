@@ -165,7 +165,7 @@ const EQUIPO_EN_ESPEJO: LandingCopy = {
     { n: '03', h: 'Preguntas por dimensión', p: 'Cada pregunta se ancla a una de las cuatro dimensiones. Las respuestas se cruzan entre las dos miradas para detectar la distancia.', meta: '4 dimensiones · {N} preguntas' },
     { n: '04', h: 'Mapa del espejo', p: 'Entregamos un reporte visual con la brecha entre la mirada individual y la colectiva en cada dimensión.', meta: 'Entrega inmediata · Dashboard' },
   ],
-  tituloDimensiones: 'cuatro dimensiones de cultura, vistas en dos espejos.',
+  tituloDimensiones: 'cuatro dimensiones de cultura,\nvistas en dos espejos.',
 }
 
 export const LANDING_COPY: Record<TipoDiagnostico, LandingCopy> = {
