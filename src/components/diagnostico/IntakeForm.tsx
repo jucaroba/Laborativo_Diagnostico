@@ -84,6 +84,8 @@ export default function IntakeForm({ equipoId, nombreCompania, codigo, tipo = 'c
               ? <>Vas a responder {preguntasColectivo} preguntas — una por cada dimensión de cultura. Toma menos de un minuto. Tus respuestas son anónimas y se promedian con las del resto del equipo.</>
               : <>Vas a responder {preguntasColectivo} preguntas sobre cómo se siente el equipo en las cuatro dimensiones de cultura. No hay respuestas correctas o incorrectas. Tus respuestas son anónimas y se promedian con las del resto del equipo.</>}
           </div>
+          {/* Separador corto entre las dos notas */}
+          <div aria-hidden style={{ marginLeft: 100, width: 42, height: 1.5, background: 'var(--ink)', marginTop: 16 }} />
           <p style={{ fontSize: 13, lineHeight: 1.4, color: 'var(--ink)', fontWeight: 500, margin: '8px 0 0', marginLeft: 100, maxWidth: '54ch' }}>
             Laborativo como tercero independiente revisará las respuestas, la compañía solo verá los resultados consolidados.
           </p>
