@@ -55,11 +55,9 @@ function DeltaRonda({ actual, anterior, rondaAnterior }: { actual: number | null
 }
 
 const avgColor = (v: number | null) => {
-  if (v === null) return 'var(--mute)'
-  if (v >= 8) return '#1A9850'
-  if (v >= 6) return '#A2C859'
-  if (v >= 4) return '#FEE08B'
-  return '#D73027'
+  // Nota: el dashboard ahora muestra los promedios en negro pleno —
+  // se prefirió legibilidad sobre semáforo de color.
+  return v === null ? 'var(--mute)' : 'var(--ink)'
 }
 
 function SectionBar({ title, subtitle, mobile }: { title: string; subtitle?: string; mobile?: boolean }) {
@@ -202,8 +200,8 @@ export default function ResultadosPulso({
           </div>
 
           <SectionBar title="Forma del pulso" subtitle="Las 4 dimensiones como polígono" />
-          <div style={{ padding: '32px 56px 48px', borderBottom: '1.5px solid var(--ink)', display: 'flex', justifyContent: 'center' }}>
-            <RadarPulso resultados={resultados} maxSize={520} />
+          <div style={{ padding: '12px 56px 20px', borderBottom: '1.5px solid var(--ink)', display: 'flex', justifyContent: 'center' }}>
+            <RadarPulso resultados={resultados} maxSize={380} />
           </div>
         </div>
 
