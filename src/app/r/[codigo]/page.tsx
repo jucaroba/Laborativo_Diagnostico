@@ -10,6 +10,7 @@ import ResultadosTermometro from '@/components/resultados/ResultadosTermometro'
 import ResultadosEspejo from '@/components/resultados/ResultadosEspejo'
 import { calcSimpleFromData, calcEspejoFromData, fetchYCalcSimple, fetchYCalcEspejo, fetchBenchmarkSimple, fetchBenchmarkEspejo } from '@/lib/calc-resultados'
 import { evaluarBrechas, evaluarRelaciones } from '@/lib/arquetipos'
+import { TIPOS_DIAGNOSTICO } from '@/lib/tipos-diagnostico'
 
 export const revalidate = 0
 
@@ -281,8 +282,18 @@ export default async function ResultadosPage({ params }: { params: Promise<{ cod
 
       {/* Título del diagnóstico */}
       <div style={{ padding: '40px 56px 32px', borderBottom: '1.5px solid var(--ink)' }}>
-        <span className="page-header__eyebrow">Diagnóstico organizacional{rondaActual > 1 ? ` · Ronda ${rondaActual}` : ''}</span>
-        <div className="page-header__rule" />
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 10, marginBottom: 12, flexWrap: 'wrap' }}>
+          <span style={{
+            fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase', fontWeight: 700,
+            background: 'var(--ink)', color: '#fff', padding: '3px 8px',
+          }}>{TIPOS_DIAGNOSTICO[(diag.tipo ?? 'cultura_360') as keyof typeof TIPOS_DIAGNOSTICO]?.etiqueta ?? diag.tipo}</span>
+          {rondaActual > 1 && (
+            <span style={{
+              fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase', fontWeight: 700,
+              background: 'transparent', color: 'var(--ink)', border: '1.5px solid var(--ink)', padding: '2px 8px',
+            }}>Ronda {rondaActual}</span>
+          )}
+        </div>
         <h1 className="page-header__title" style={{ fontSize: 'clamp(32px,4vw,48px)' }}>
           {diag.nombre_compania}
         </h1>

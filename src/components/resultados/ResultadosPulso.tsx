@@ -435,10 +435,15 @@ function HistogramaDim({
     buckets[b] += 1
   }
   const maxFreq = Math.max(1, ...buckets)
-  const total = valores.length
 
   // Posición del promedio (1..10) → 0..1 normalizado para línea vertical.
   const promFrac = promedio !== null ? (promedio - 1) / 9 : null
+
+  // Altura del cuerpo del histograma. La etiqueta del número y la barra
+  // negra viven dentro de este alto; el eje 1..10 va debajo.
+  const ALTO = 120
+  const ROTULO = 16  // espacio reservado arriba para el número
+  const ALTO_BARRA = ALTO - ROTULO
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -463,30 +468,42 @@ function HistogramaDim({
         {/* Línea vertical del promedio */}
         {promFrac !== null && (
           <div style={{
-            position: 'absolute', top: 0, bottom: 16,
+            position: 'absolute', top: 0, height: ALTO,
             left: `${promFrac * 100}%`,
             width: 1.5, background: 'var(--ink)', opacity: .25,
             zIndex: 0,
           }} aria-hidden />
         )}
 
-        {/* Barras */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(10, 1fr)', alignItems: 'end', gap: 4, height: 92, position: 'relative', zIndex: 1 }}>
+        {/* Cada columna: número arriba + barra creciendo desde abajo */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(10, 1fr)', gap: 4, height: ALTO, position: 'relative', zIndex: 1 }}>
           {buckets.map((n, i) => {
-            const h = (n / maxFreq) * 100
+            const h = (n / maxFreq) * ALTO_BARRA
             return (
-              <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, height: '100%' }}>
-                <div style={{ display: 'flex', flexDirection: 'column-reverse', flex: 1, alignSelf: 'stretch', justifyContent: 'flex-end' }}>
-                  <div
-                    title={`${i + 1}: ${n} ${n === 1 ? 'persona' : 'personas'}`}
-                    style={{
-                      height: `${h}%`,
-                      minHeight: n > 0 ? 4 : 0,
-                      background: 'var(--ink)',
-                      transition: 'height .15s',
-                    }}
-                  />
-                </div>
+              <div key={i} style={{
+                display: 'flex', flexDirection: 'column', alignItems: 'center',
+                justifyContent: 'flex-end',
+                height: '100%',
+              }}>
+                {/* Rótulo: cantidad arriba de la barra (solo si hay datos) */}
+                <span style={{
+                  fontSize: 11, fontWeight: 800, color: 'var(--ink)',
+                  fontVariantNumeric: 'tabular-nums',
+                  marginBottom: 4,
+                  visibility: n > 0 ? 'visible' : 'hidden',
+                }}>{n}</span>
+
+                {/* Barra: crece desde abajo hacia arriba */}
+                <div
+                  title={`${i + 1}: ${n} ${n === 1 ? 'persona' : 'personas'}`}
+                  style={{
+                    width: '100%',
+                    height: `${h}px`,
+                    minHeight: n > 0 ? 4 : 0,
+                    background: 'var(--ink)',
+                    transition: 'height .15s',
+                  }}
+                />
               </div>
             )
           })}
@@ -501,10 +518,6 @@ function HistogramaDim({
             }}>{i + 1}</span>
           ))}
         </div>
-      </div>
-
-      <div style={{ fontSize: 10, color: 'var(--mute)', letterSpacing: '.04em', fontWeight: 500 }}>
-        {total} {total === 1 ? 'persona' : 'personas'} · barra = cuántas respondieron ese valor
       </div>
     </div>
   )

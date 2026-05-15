@@ -24,18 +24,37 @@ const CENTROS: Record<number, number> = {
   4: 4.0, // Acción
 }
 
-function generarValores(centro: number, n: number): number[] {
+// Generador con DISPERSIÓN real. Antes mezclaba sólo floor y ceil del centro
+// (rango ±1, casi sin variación). Ahora genera valores con distribución
+// gaussiana alrededor del centro, con σ configurable, y al final corrige
+// algunos valores para que la suma cuadre y el promedio quede ~exacto.
+function generarValores(centro: number, n: number, sigma = 1.6): number[] {
   const clamp = (v: number) => Math.max(1, Math.min(10, v))
-  const floor = clamp(Math.floor(centro))
-  const ceil  = clamp(Math.ceil(centro))
-  const fraction = centro - Math.floor(centro)
-  const nCeil = Math.round(fraction * n)
-  const nFloor = n - nCeil
-  const arr = [
-    ...Array(nFloor).fill(floor),
-    ...Array(nCeil).fill(ceil),
-  ]
-  // Shuffle
+  // Box-Muller para gaussiana standard
+  const gauss = () => {
+    let u = 0, v = 0
+    while (u === 0) u = Math.random()
+    while (v === 0) v = Math.random()
+    return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v)
+  }
+  const arr: number[] = []
+  for (let i = 0; i < n; i++) {
+    arr.push(clamp(Math.round(centro + gauss() * sigma)))
+  }
+  // Ajuste fino: si la suma se alejó del objetivo, empuja unos valores
+  // 1 unidad arriba o abajo hasta acercarse (sin salir de 1..10).
+  const objetivo = Math.round(centro * n)
+  let intentos = 0
+  while (intentos < 200) {
+    const sumaActual = arr.reduce((a, b) => a + b, 0)
+    const diff = objetivo - sumaActual
+    if (Math.abs(diff) <= Math.max(1, Math.floor(n / 50))) break
+    const idx = Math.floor(Math.random() * n)
+    const nuevo = clamp(arr[idx] + Math.sign(diff))
+    if (nuevo !== arr[idx]) arr[idx] = nuevo
+    intentos += 1
+  }
+  // Shuffle final
   for (let i = arr.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1))
     ;[arr[i], arr[j]] = [arr[j], arr[i]]
@@ -51,6 +70,17 @@ async function main() {
     process.exit(1)
   }
   const sb = createClient(url, key, { auth: { persistSession: false } })
+
+  // Reset: borra participantes existentes del equipo. ON DELETE CASCADE
+  // limpia respuestas automáticamente.
+  const { count: existentes } = await sb
+    .from('participantes')
+    .select('id', { count: 'exact', head: true })
+    .eq('equipo_id', EQUIPO_ID)
+  if ((existentes ?? 0) > 0) {
+    console.log(`↻ borrando ${existentes} participantes previos (y sus respuestas en cascada)…`)
+    await sb.from('participantes').delete().eq('equipo_id', EQUIPO_ID)
+  }
 
   const { data: preguntas, error: errPreg } = await sb
     .from('preguntas').select('id, dimension_id, rol')
