@@ -74,7 +74,7 @@ export default function IntakeFormMobile({
         </div>
       )}
 
-      <p style={{ fontSize: 12.5, lineHeight: 1.4, color: 'var(--ink)', fontWeight: 500, margin: 0 }}>
+      <p style={{ fontSize: 14.5, lineHeight: 1.5, color: 'var(--ink)', fontWeight: 500, margin: 0 }}>
         Laborativo como tercero independiente revisará las respuestas, la compañía solo verá los resultados consolidados.
       </p>
 

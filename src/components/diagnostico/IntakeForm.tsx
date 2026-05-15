@@ -86,7 +86,7 @@ export default function IntakeForm({ equipoId, nombreCompania, codigo, tipo = 'c
           </div>
           {/* Separador corto entre las dos notas */}
           <div aria-hidden style={{ marginLeft: 100, width: 42, height: 1.5, background: 'var(--ink)', marginTop: 16 }} />
-          <p style={{ fontSize: 13, lineHeight: 1.4, color: 'var(--ink)', fontWeight: 500, margin: '8px 0 0', marginLeft: 100, maxWidth: '54ch' }}>
+          <p style={{ fontSize: 15, lineHeight: 1.55, color: 'var(--ink)', fontWeight: 500, margin: '8px 0 0', marginLeft: 100, maxWidth: '54ch' }}>
             Laborativo como tercero independiente revisará las respuestas, la compañía solo verá los resultados consolidados.
           </p>
           <div style={{ paddingTop: 8, marginLeft: 100 }}>
@@ -127,7 +127,7 @@ export default function IntakeForm({ equipoId, nombreCompania, codigo, tipo = 'c
             </div>
           </div>
 
-          <p style={{ fontSize: 13, lineHeight: 1.4, color: 'var(--ink)', fontWeight: 500, margin: '8px 0 0', marginLeft: 100, maxWidth: '54ch' }}>
+          <p style={{ fontSize: 15, lineHeight: 1.55, color: 'var(--ink)', fontWeight: 500, margin: '8px 0 0', marginLeft: 100, maxWidth: '54ch' }}>
             Laborativo como tercero independiente revisará las respuestas, la compañía solo verá los resultados consolidados.
           </p>
           <div style={{ paddingTop: 8, marginLeft: 100 }}>
