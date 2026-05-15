@@ -230,7 +230,7 @@ export default function ResultadosPulso({
           {dispersionPorDim && (
             <>
               <SectionBar title="Dispersión del equipo" subtitle="Frecuencia de respuestas por dimensión" />
-              <div style={{ padding: '24px 56px 8px', display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', columnGap: 64, rowGap: 32 }}>
+              <div style={{ padding: '24px 56px 40px', display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', columnGap: 64, rowGap: 32 }}>
                 {resultados.map(dim => (
                   <HistogramaDim
                     key={dim.id}
@@ -459,9 +459,6 @@ function HistogramaDim({
   }
   const maxFreq = Math.max(1, ...buckets)
 
-  // Posición del promedio (1..10) → 0..1 normalizado para línea vertical.
-  const promFrac = promedio !== null ? (promedio - 1) / 9 : null
-
   // Altura del cuerpo del histograma. La etiqueta del número y la barra
   // negra viven dentro de este alto; el eje 1..10 va debajo.
   const ALTO = 120
@@ -469,7 +466,7 @@ function HistogramaDim({
   const ALTO_BARRA = ALTO - ROTULO
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 35 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
         <div>
           <div style={{ fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--ink)', fontWeight: 700 }}>
@@ -504,16 +501,6 @@ function HistogramaDim({
       </div>
 
       <div style={{ position: 'relative' }}>
-        {/* Línea vertical del promedio */}
-        {promFrac !== null && (
-          <div style={{
-            position: 'absolute', top: 0, height: ALTO,
-            left: `${promFrac * 100}%`,
-            width: 1.5, background: 'var(--ink)', opacity: .25,
-            zIndex: 0,
-          }} aria-hidden />
-        )}
-
         {/* Cada columna: número arriba + barra creciendo desde abajo.
             `alignItems: end` en el grid ancla cada celda al fondo, así
             la barra queda exactamente sobre la línea base. */}
@@ -570,46 +557,34 @@ function HistogramaDim({
 
 // ─── Leyenda interpretativa de la dispersión ─────────────────────
 const RANGOS_DISPERSION: Array<{ rango: string; lectura: string; color: string }> = [
-  { rango: '± 0.0 – 1.2', lectura: 'Equipo alineado. Diferencias chicas entre personas.',                    color: '#C8E6C9' },
-  { rango: '± 1.3 – 2.0', lectura: 'Dispersión notable. Vale revisar por qué algunos lo ven distinto.',      color: '#FCE99A' },
-  { rango: '± 2.0+',      lectura: 'Equipo dividido. El promedio esconde dos (o más) lecturas distintas.',   color: '#F2C2C2' },
+  { rango: '± 0.0 – 1.2', lectura: 'Equipo alineado',     color: '#C8E6C9' },
+  { rango: '± 1.3 – 2.0', lectura: 'Dispersión notable', color: '#FCE99A' },
+  { rango: '± 2.0+',      lectura: 'Equipo dividido',    color: '#F2C2C2' },
 ]
 
 function LeyendaDispersion() {
   return (
-    <div style={{ padding: '8px 56px 32px', borderBottom: '1.5px solid var(--ink)' }}>
-      <div style={{
-        border: '1.5px solid var(--ink)', background: 'var(--card)',
-      }}>
-        <div style={{ background: 'var(--ink)', padding: '8px 16px' }}>
-          <span style={{ fontSize: 11, fontWeight: 800, color: '#fff', letterSpacing: '.06em', textTransform: 'uppercase' }}>
-            Cómo leer la dispersión
+    <div style={{ padding: '24px 56px 24px', borderBottom: '1.5px solid var(--ink)' }}>
+      <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 24, rowGap: 12 }}>
+        <span style={{
+          fontSize: 11, fontWeight: 800, color: 'var(--ink)',
+          letterSpacing: '.06em', textTransform: 'uppercase',
+        }}>
+          Cómo leer la dispersión
+        </span>
+        {RANGOS_DISPERSION.map(r => (
+          <span key={r.rango} style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+            <span style={{
+              fontSize: 13, fontWeight: 800, color: 'var(--ink)', fontVariantNumeric: 'tabular-nums',
+              background: r.color, padding: '4px 10px',
+            }}>
+              {r.rango}
+            </span>
+            <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--ink)' }}>
+              {r.lectura}
+            </span>
           </span>
-        </div>
-        <div>
-          {RANGOS_DISPERSION.map((r, i) => (
-            <div
-              key={r.rango}
-              style={{
-                display: 'grid', gridTemplateColumns: '160px 1fr',
-                padding: '12px 16px',
-                borderTop: i === 0 ? 'none' : '1px solid var(--line-soft)',
-                alignItems: 'center', gap: 16,
-              }}
-            >
-              <span style={{
-                fontSize: 14, fontWeight: 800, color: 'var(--ink)', fontVariantNumeric: 'tabular-nums',
-                background: r.color, padding: '4px 10px',
-                justifySelf: 'start',
-              }}>
-                {r.rango}
-              </span>
-              <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--ink-2)', lineHeight: 1.4 }}>
-                {r.lectura}
-              </span>
-            </div>
-          ))}
-        </div>
+        ))}
       </div>
     </div>
   )
