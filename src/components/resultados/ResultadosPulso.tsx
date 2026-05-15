@@ -459,7 +459,7 @@ function HistogramaDim({
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-      <div style={{ display: 'flex', alignItems: 'baseline', gap: 14 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
         <div>
           <div style={{ fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--ink)', fontWeight: 700 }}>
             {subtitulo}
@@ -474,7 +474,7 @@ function HistogramaDim({
           <span style={{ fontSize: 22, fontWeight: 900, letterSpacing: '-.02em' }}>
             {promedio !== null ? promedio.toFixed(1) : '—'}
           </span>
-          <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--ink)' }}>/ 10</span>
+          <span style={{ fontSize: 22, fontWeight: 900, letterSpacing: '-.02em', color: 'var(--ink)' }}>/ 10</span>
         </div>
         {/* Separador vertical antes del indicador de dispersión */}
         <span aria-hidden style={{ width: 1.5, alignSelf: 'stretch', background: 'var(--ink)' }} />
