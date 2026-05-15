@@ -49,8 +49,10 @@ export default function LandingMobile({
           <span style={{ background: 'var(--ink)', color: 'var(--bg)', padding: '6px 12px', fontSize: 11, letterSpacing: '.08em', textTransform: 'uppercase', fontWeight: 700, display: 'inline-block' }}>{nombreCompania}</span>
         </div>
 
-        <h1 style={{ fontWeight: 900, fontSize: 'clamp(20px, 5.5vw, 30px)', lineHeight: 1.04, letterSpacing: '-.02em', margin: '20px 0 0', paddingBottom: '.05em' }}>
-          {copy.hero[0]}<br />{copy.hero[1]}<br />{copy.hero[2]}
+        <h1 style={{ fontWeight: 900, fontSize: 'clamp(48px, 13vw, 78px)', lineHeight: .88, letterSpacing: '-.04em', margin: '20px 0 0', paddingBottom: '.05em' }}>
+          {copy.hero.map((linea, i) => (
+            <span key={i}>{i > 0 && <br />}{linea}</span>
+          ))}
         </h1>
 
         <p style={{ fontSize: 14.5, lineHeight: 1.5, color: 'var(--ink)', margin: '24px 0 0', fontWeight: 500 }}>
@@ -168,8 +170,8 @@ export default function LandingMobile({
       <div id="empezar" style={{ padding: '48px 20px 56px', scrollMarginTop: 24 }}>
         <span className="eyebrow">Empieza ahora</span>
         <div className="rule" />
-        <h2 style={{ fontWeight: 900, fontSize: 'clamp(48px, 13vw, 78px)', lineHeight: .88, letterSpacing: '-.04em', margin: '12px 0 28px' }}>
-          de la intuición<br />a la data.
+        <h2 style={{ fontWeight: 900, fontSize: 'clamp(20px, 5.5vw, 30px)', lineHeight: 1.04, letterSpacing: '-.02em', margin: '12px 0 28px' }}>
+          exploremos las visiones,<br />fortalezcamos la cultura.
         </h2>
         <Link href={`/d/${codigo}/intake`} style={{
           width: '100%',

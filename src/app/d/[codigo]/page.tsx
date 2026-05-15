@@ -74,8 +74,10 @@ export default async function LandingPage({ params }: { params: Promise<{ codigo
         </div>
 
         <span style={{ background: 'var(--ink)', color: 'var(--bg)', padding: '6px 12px', fontSize: 11, letterSpacing: '.08em', textTransform: 'uppercase', fontWeight: 700, display: 'inline-block' }}>{diag.nombre_compania}</span>
-        <h1 style={{ fontWeight: 900, fontSize: 80, lineHeight: 1, letterSpacing: '-.020em', maxWidth: '30ch', paddingBottom: '.08em', marginTop: 24 }}>
-          {copy.hero[0]}<br />{copy.hero[1]}<br />{copy.hero[2]}
+        <h1 style={{ fontWeight: 900, fontSize: 'clamp(48px,6.5vw,96px)', lineHeight: .88, letterSpacing: '-.045em', maxWidth: '14ch', paddingBottom: '.08em', marginTop: 24 }}>
+          {copy.hero.map((linea, i) => (
+            <span key={i}>{i > 0 && <br />}{linea}</span>
+          ))}
         </h1>
 
         <div style={{ display: 'flex', gap: 40, marginTop: 42, alignItems: 'flex-end' }}>
@@ -203,8 +205,8 @@ export default async function LandingPage({ params }: { params: Promise<{ codigo
       <div id="empezar" style={{ padding: '80px 56px', scrollMarginTop: 24 }}>
         <span className="eyebrow">Empieza ahora</span>
         <div className="rule" />
-        <h2 style={{ fontWeight: 900, fontSize: 'clamp(48px,6.5vw,96px)', lineHeight: .88, letterSpacing: '-.045em', margin: '12px 0 32px', maxWidth: '14ch' }}>
-          de la intuición<br />a la data.
+        <h2 style={{ fontWeight: 900, fontSize: 80, lineHeight: 1, letterSpacing: '-.020em', margin: '12px 0 32px', maxWidth: '30ch' }}>
+          exploremos las visiones,<br />fortalezcamos la cultura.
         </h2>
         <Link href={`/d/${codigo}/intake`} className="btn primary">Iniciar diagnóstico <ArrowRight size={15} strokeWidth={2.5} /></Link>
         <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 72, fontSize: 10, color: 'var(--mute)', letterSpacing: '.08em', textTransform: 'uppercase', fontWeight: 600 }}>

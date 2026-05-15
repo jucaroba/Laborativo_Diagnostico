@@ -27,7 +27,7 @@ export type ProductoHeader = {
 
 export type LandingCopy = {
   header: ProductoHeader
-  hero: [string, string, string]               // 3 líneas del h1
+  hero: string[]                                 // líneas del h1 (2 o 3)
   introBold: string                              // ej. "4C"
   introTexto: string
   introCierre: string
@@ -45,14 +45,13 @@ export type LandingCopy = {
 
 const CULTURA_360: LandingCopy = {
   header: {
-    producto: 'Diagnóstico de Cultura',
+    producto: 'Cultura y Liderazgo',
     formato: 'Mirada 360°',
     tiempo: '5–10 minutos',
   },
   hero: [
-    'exploremos las visiones,',
-    'entendamos las oportunidades,',
-    'fortalezcamos la cultura.',
+    'de la intuición',
+    'a la data.',
   ],
   introBold: '4C',
   introTexto: 'es un modelo de diagnóstico que integra la percepción del equipo y su líder a través de cuatro dimensiones de cultura, haciendo visibles las brechas y habilitando acciones para transformarla.',
