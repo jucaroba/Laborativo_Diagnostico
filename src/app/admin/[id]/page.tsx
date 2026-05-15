@@ -95,25 +95,29 @@ export default async function DiagnosticoPage({ params }: { params: Promise<{ id
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
         <div>
-          {ronda > 1 && (
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 10, marginBottom: 10, flexWrap: 'wrap' }}>
-              {padreData && (
-                <Link
-                  href={`/admin/${padreData.id}`}
-                  style={{
-                    fontSize: 11, color: 'var(--ink)', fontWeight: 600, letterSpacing: '.04em',
-                    textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 4,
-                  }}
-                >
-                  <ArrowLeft size={12} strokeWidth={2.5} /> Ronda {padreData.ronda ?? 1}
-                </Link>
-              )}
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 10, marginBottom: 10, flexWrap: 'wrap' }}>
+            <span style={{
+              fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase', fontWeight: 700,
+              background: 'var(--ink)', color: '#fff', padding: '3px 8px',
+            }}>{tipoConfig?.etiqueta ?? d.tipo}</span>
+            {ronda > 1 && padreData && (
+              <Link
+                href={`/admin/${padreData.id}`}
+                style={{
+                  fontSize: 11, color: 'var(--ink)', fontWeight: 600, letterSpacing: '.04em',
+                  textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 4,
+                }}
+              >
+                <ArrowLeft size={12} strokeWidth={2.5} /> Ronda {padreData.ronda ?? 1}
+              </Link>
+            )}
+            {ronda > 1 && (
               <span style={{
                 fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase', fontWeight: 700,
-                background: 'var(--ink)', color: '#fff', padding: '3px 8px',
+                background: 'transparent', color: 'var(--ink)', border: '1.5px solid var(--ink)', padding: '2px 8px',
               }}>Ronda {ronda}</span>
-            </div>
-          )}
+            )}
+          </div>
           <h1 className="page-header__title" style={{ fontSize: 32, letterSpacing: '0px' }}>{d.nombre_compania}</h1>
           <p className="page-header__subtitle">{d.contacto_nombre} / {d.contacto_cargo} / {d.contacto_email}</p>
         </div>
