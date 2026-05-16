@@ -43,9 +43,9 @@ function DeltaRonda({ actual, anterior, rondaAnterior }: { actual: number | null
   )
 }
 
-// Paleta Espejo — colores propios para distinguir del 360
-const COLOR_YO     = '#6B5BFF' // morado vibrante
-const COLOR_EQUIPO = '#5BCEB0' // turquesa
+// Paleta Espejo — mismo lenguaje cromático que el 360 (cyan + rosa)
+const COLOR_YO     = '#00E6FF' // cyan
+const COLOR_EQUIPO = '#FF3366' // rosa
 
 const deltaBg = (d: number) => d >= 2.5 ? '#F2C2C2' : d >= 1.5 ? '#FCE99A' : '#C8E6C9'
 
