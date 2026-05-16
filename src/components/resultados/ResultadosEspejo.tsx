@@ -225,20 +225,17 @@ function DimCard({ dim, anterior, rondaAnterior, benchmark, benchmarkN, mobile }
   )
 }
 
-// Radar con 2 polígonos: YO y EQUIPO
+// Radar con 2 polígonos: YO y EQUIPO.
+// Geometría idéntica al radar del dashboard 360° (RadarPerspectivas) —
+// solo cambian los polígonos que pinta (Yo + Equipo en vez de los 4 roles).
 function RadarEspejo({ resultados, maxSize }: { resultados: DimResultado[]; maxSize: number }) {
   const size = 520
   const center = size / 2
-  const radius = size * 0.42
+  const radius = size * 0.48
   const axes = DIMENSIONES.length
-  // viewBox con suficiente espacio fuera del cuadrado para las etiquetas
-  // (Intención / Motivación arriba, Acción / Interacción abajo).
-  const labelOffset = 28  // px hacia afuera del cuadrado
-  const labelSpace = 70   // espacio reservado para el ancho de la etiqueta
-  const left = center - radius - labelSpace
-  const top = center - radius - 28
-  const w = radius * 2 + labelSpace * 2
-  const h = radius * 2 + 28 * 2
+  const padX = 8
+  const viewBoxY = 40
+  const viewBoxH = 440
 
   const axisAngle = (i: number) => -Math.PI * 3 / 4 + (i * 2 * Math.PI) / axes
   const point = (i: number, val: number): [number, number] => {
@@ -246,26 +243,22 @@ function RadarEspejo({ resultados, maxSize }: { resultados: DimResultado[]; maxS
     const a = axisAngle(i)
     return [center + r * Math.cos(a), center + r * Math.sin(a)]
   }
-  // Labels en las 4 esquinas, AFUERA del cuadrado (igual que el 360).
+
   const labelAnchor = (i: number): { textAnchor: 'start' | 'end'; dominantBaseline: 'auto' | 'hanging' } => {
-    // i=0 sup-izq, 1 sup-der, 2 inf-der, 3 inf-izq
+    const a = axisAngle(i)
+    const dx = Math.cos(a)
+    const dy = Math.sin(a)
     return {
-      textAnchor: (i === 1 || i === 2) ? 'end' : 'start',
-      dominantBaseline: (i === 0 || i === 1) ? 'auto' : 'hanging',
+      textAnchor: dx > 0 ? 'start' : 'end',
+      dominantBaseline: dy > 0 ? 'hanging' : 'auto',
     }
   }
   const labelPos = (i: number): [number, number] => {
-    const x1 = center - radius           // borde izquierdo del cuadrado
-    const x2 = center + radius           // borde derecho
-    const y1 = center - radius - labelOffset / 3   // arriba del cuadrado
-    const y2 = center + radius + labelOffset       // debajo del cuadrado
-    switch (i) {
-      case 0: return [x1, y1]   // sup-izq · Intención (afuera arriba-izq)
-      case 1: return [x2, y1]   // sup-der · Motivación (afuera arriba-der)
-      case 2: return [x2, y2]   // inf-der · Interacción (afuera abajo-der)
-      case 3: return [x1, y2]   // inf-izq · Acción (afuera abajo-izq)
-      default: return [center, center]
-    }
+    const r = radius + 14
+    const a = axisAngle(i)
+    const x = center + r * Math.cos(a)
+    const y = i < 2 ? 93 : 425
+    return [x, y]
   }
 
   const valsYo     = DIMENSIONES.map(d => resultados.find(x => x.id === d.id)?.yo.promedio ?? null)
@@ -273,7 +266,8 @@ function RadarEspejo({ resultados, maxSize }: { resultados: DimResultado[]; maxS
   const completa = (vs: (number | null)[]) => vs.every(v => v !== null)
 
   return (
-    <svg viewBox={`${left} ${top} ${w} ${h}`} style={{ width: '100%', maxWidth: maxSize, height: 'auto' }}>
+    <svg viewBox={`${-padX} ${viewBoxY} ${size + padX * 2} ${viewBoxH}`} style={{ width: '100%', maxWidth: maxSize, height: 'auto' }}>
+      {/* Grid rings */}
       {[2, 4, 6, 8, 10].map(level => (
         <polygon
           key={level}
@@ -285,12 +279,19 @@ function RadarEspejo({ resultados, maxSize }: { resultados: DimResultado[]; maxS
         />
       ))}
 
+      {/* Axes */}
       {DIMENSIONES.map((dim, i) => {
         const [x, y] = point(i, 10)
-        return <line key={dim.id} x1={center} y1={center} x2={x} y2={y} stroke="#0A0A0A" strokeOpacity={0.3} strokeWidth={1} />
+        return (
+          <line
+            key={dim.id}
+            x1={center} y1={center} x2={x} y2={y}
+            stroke="#0A0A0A" strokeOpacity={0.3} strokeWidth={1}
+          />
+        )
       })}
 
-      {/* Polígono EQUIPO (más al fondo) */}
+      {/* Polígono EQUIPO (al fondo) */}
       {completa(valsEquipo) && (
         <g>
           <polygon
@@ -300,7 +301,7 @@ function RadarEspejo({ resultados, maxSize }: { resultados: DimResultado[]; maxS
           />
           {valsEquipo.map((v, i) => {
             const [px, py] = point(i, v as number)
-            return <circle key={i} cx={px} cy={py} r={5} fill={COLOR_EQUIPO} stroke="#0A0A0A" strokeWidth={1.5} />
+            return <circle key={i} cx={px} cy={py} r={4} fill={COLOR_EQUIPO} stroke="#0A0A0A" strokeWidth={1.5} />
           })}
         </g>
       )}
@@ -314,28 +315,39 @@ function RadarEspejo({ resultados, maxSize }: { resultados: DimResultado[]; maxS
           />
           {valsYo.map((v, i) => {
             const [px, py] = point(i, v as number)
-            return <circle key={i} cx={px} cy={py} r={5} fill={COLOR_YO} stroke="#0A0A0A" strokeWidth={1.5} />
+            return <circle key={i} cx={px} cy={py} r={4} fill={COLOR_YO} stroke="#0A0A0A" strokeWidth={1.5} />
           })}
         </g>
       )}
 
+      {/* Scale ticks — círculos negros con número blanco */}
       {[0, 2, 4, 6, 8, 10].map(level => {
         const cy = center - (level / 10) * radius * Math.SQRT1_2
         return (
           <g key={`tick-${level}`}>
-            <circle cx={center} cy={cy} r={10} fill="#0A0A0A" />
-            <text x={center} y={cy} fontSize="10" fontWeight="700" fill="#fff" textAnchor="middle" dominantBaseline="central">
+            <circle cx={center} cy={cy} r={9} fill="#0A0A0A" />
+            <text
+              x={center} y={cy}
+              fontSize="10" fontWeight="700" fill="#fff"
+              textAnchor="middle" dominantBaseline="central"
+            >
               {level}
             </text>
           </g>
         )
       })}
 
+      {/* Dimension labels en cada esquina */}
       {DIMENSIONES.map((dim, i) => {
         const [x, y] = labelPos(i)
         const { textAnchor, dominantBaseline } = labelAnchor(i)
         return (
-          <text key={dim.id} x={x} y={y} textAnchor={textAnchor} dominantBaseline={dominantBaseline} fontSize="14" fontWeight="800" fill="#0A0A0A">
+          <text
+            key={dim.id}
+            x={x} y={y}
+            textAnchor={textAnchor} dominantBaseline={dominantBaseline}
+            fontSize="14" fontWeight="800" fill="#0A0A0A"
+          >
             {dim.nombre}
           </text>
         )
