@@ -1,5 +1,5 @@
 import Image from 'next/image'
-import { ChipTipo, HistogramaDim, LeyendaDispersion, promedioBg } from './_dispersion-shared'
+import { ChipTipo, HistogramaDim, LeyendaDispersion, promedioBg, RANGOS_DISPERSION } from './_dispersion-shared'
 
 type DimResultado = {
   id: number
@@ -226,6 +226,21 @@ export default function ResultadosTermometro({
           ))}
         </div>
 
+        {/* Lectura ejecutiva — titular grande con color según temperatura */}
+        <SectionBar title="Lectura ejecutiva" subtitle="Una mirada en una frase" mobile />
+        <div style={{
+          padding: '24px 20px 28px', borderBottom: '1.5px solid var(--ink)',
+          display: 'flex', justifyContent: 'center',
+        }}>
+          <h2 style={{
+            fontSize: 'clamp(22px,6vw,30px)', fontWeight: 900, letterSpacing: '-.03em',
+            lineHeight: 1.05, margin: 0, textAlign: 'center', color: 'var(--ink)',
+            background: lectura.color, padding: '14px 18px',
+          }}>
+            {lectura.titulo}
+          </h2>
+        </div>
+
         <SectionBar title="Lectura por dimensión" subtitle="Escala 1–10" mobile />
         <div style={{ borderBottom: '1.5px solid var(--ink)', display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
           {resultados.map((dim, i) => (
@@ -237,6 +252,29 @@ export default function ResultadosTermometro({
             </div>
           ))}
         </div>
+
+        {/* Promedio global — paralelo a la 5ª card del desktop */}
+        <PromedioCardTermometroMobile resultados={resultados} />
+
+        {/* Dispersión del equipo */}
+        {dispersionPorDim && (
+          <>
+            <SectionBar title="Dispersión del equipo" subtitle="Frecuencia de respuestas" mobile />
+            <div style={{ padding: '28px 20px 32px', display: 'flex', flexDirection: 'column', gap: 40, borderBottom: '1.5px solid var(--ink)' }}>
+              {resultados.map(dim => (
+                <HistogramaDim
+                  key={dim.id}
+                  nombre={dim.nombre}
+                  subtitulo={dim.subtitulo}
+                  promedio={dim.promedio}
+                  desviacion={dim.desviacion}
+                  valores={dispersionPorDim[dim.id] ?? []}
+                />
+              ))}
+            </div>
+            <LeyendaDispersionMobile />
+          </>
+        )}
 
         <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: 6, fontSize: 9.5, color: 'var(--ink)', letterSpacing: '.08em', textTransform: 'uppercase', fontWeight: 600 }}>
           <span>Laborativo / Consultoría Creativa Basada en la Emoción</span>
@@ -333,5 +371,78 @@ export default function ResultadosTermometro({
         </div>
       </div>
     </>
+  )
+}
+
+// ─── Mobile-only adaptaciones ───────────────────────────────────
+// Porta a mobile la card "Promedio global" y la leyenda de
+// dispersión, sin tocar las versiones desktop.
+
+function PromedioCardTermometroMobile({ resultados }: { resultados: DimResultado[] }) {
+  const vals = resultados.map(r => r.promedio).filter((v): v is number => typeof v === 'number')
+  const prom = vals.length ? Math.round((vals.reduce((a, b) => a + b, 0) / vals.length) * 10) / 10 : null
+  const pct = prom !== null ? ((prom - 1) / 9) * 100 : 0
+  const color = prom !== null ? promedioBg(prom) : 'var(--mute)'
+  return (
+    <div style={{
+      padding: '18px 20px 22px',
+      borderBottom: '1.5px solid var(--ink)',
+      display: 'flex', flexDirection: 'column', gap: 12,
+    }}>
+      <div>
+        <div style={{ fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--ink)', fontWeight: 700 }}>Global</div>
+        <h3 style={{ fontSize: 22, fontWeight: 900, letterSpacing: '-.02em', lineHeight: 1, margin: '4px 0 0' }}>Promedio</h3>
+      </div>
+      <div style={{ display: 'flex', alignItems: 'baseline', gap: 10 }}>
+        <span style={{ fontWeight: 900, fontSize: 64, lineHeight: .9, letterSpacing: '-.05em', color: 'var(--ink)' }}>
+          {prom !== null ? prom.toFixed(1) : '—'}
+        </span>
+        {prom !== null && (
+          <span style={{ fontWeight: 700, fontSize: 28, lineHeight: 1, letterSpacing: '-.02em' }}>
+            <span style={{ position: 'relative', top: -5 }}>/</span><span>10</span>
+          </span>
+        )}
+      </div>
+      <div style={{ position: 'relative', height: 10, border: '1.5px solid var(--ink)' }}>
+        {prom !== null && (
+          <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: `${pct}%`, background: color }} />
+        )}
+      </div>
+      <div style={{ fontSize: 12.5, color: 'var(--ink-2)', fontWeight: 500, lineHeight: 1.4 }}>
+        Promedio simple de las 4 dimensiones.
+      </div>
+    </div>
+  )
+}
+
+function LeyendaDispersionMobile() {
+  return (
+    <div style={{ padding: '0 20px 24px', borderBottom: '1.5px solid var(--ink)' }}>
+      <div style={{
+        border: '1.5px solid var(--ink)', background: 'var(--card)',
+        padding: '14px 16px',
+        display: 'flex', flexDirection: 'column', gap: 10,
+      }}>
+        <span style={{
+          fontSize: 10.5, fontWeight: 800, color: 'var(--ink)',
+          letterSpacing: '.06em', textTransform: 'uppercase',
+        }}>
+          Cómo leer la dispersión
+        </span>
+        {RANGOS_DISPERSION.map(r => (
+          <span key={r.rango} style={{ display: 'inline-flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+            <span style={{
+              fontSize: 12, fontWeight: 800, color: 'var(--ink)', fontFeatureSettings: '"tnum" 1, "zero" 0',
+              background: r.color, padding: '3px 8px',
+            }}>
+              {r.rango}
+            </span>
+            <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--ink)' }}>
+              {r.lectura}
+            </span>
+          </span>
+        ))}
+      </div>
+    </div>
   )
 }

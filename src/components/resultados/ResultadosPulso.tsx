@@ -171,6 +171,34 @@ export default function ResultadosPulso({
           ))}
         </div>
 
+        {/* Promedio global — paralelo a la 5ª card del desktop */}
+        <PromedioCardMobile resultados={resultados} />
+
+        {/* Dispersión del equipo — mini-histogramas por dimensión */}
+        {dispersionPorDim && (
+          <>
+            <SectionBar title="Dispersión del equipo" subtitle="Frecuencia de respuestas" mobile />
+            <div style={{ padding: '28px 20px 32px', display: 'flex', flexDirection: 'column', gap: 40, borderBottom: '1.5px solid var(--ink)' }}>
+              {resultados.map(dim => (
+                <HistogramaDim
+                  key={dim.id}
+                  nombre={dim.nombre}
+                  subtitulo={dim.subtitulo}
+                  promedio={dim.promedio}
+                  desviacion={dim.desviacion}
+                  valores={dispersionPorDim[dim.id] ?? []}
+                />
+              ))}
+            </div>
+            <LeyendaDispersionMobile />
+          </>
+        )}
+
+        {/* Ranking de preguntas — top 3 / bottom 3 */}
+        {preguntasRanking && preguntasRanking.length > 0 && (
+          <RankingPreguntasMobile preguntas={preguntasRanking} />
+        )}
+
         <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: 6, fontSize: 9.5, color: 'var(--ink)', letterSpacing: '.08em', textTransform: 'uppercase', fontWeight: 600 }}>
           <span>Laborativo / Consultoría Creativa Basada en la Emoción</span>
           <span>Pulso · V1.0</span>
@@ -731,6 +759,156 @@ function BloquePreguntas({
                 display: 'block', fontSize: 14, fontWeight: 600, color: 'var(--ink)',
                 lineHeight: 1.4, minHeight: '2.8em',
               }}>
+                {p.texto}
+              </span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+// ─── Mobile-only adaptaciones de los bloques nuevos ─────────────
+// Estos componentes existen solo para portar a mobile lo que ya hay
+// en desktop, sin tocar lo demás. Layout en 1 columna, paddings/fuentes
+// pensados para pantalla angosta.
+
+function PromedioCardMobile({ resultados }: { resultados: DimResultado[] }) {
+  const vals = resultados.map(r => r.promedio).filter((v): v is number => typeof v === 'number')
+  const prom = vals.length ? Math.round((vals.reduce((a, b) => a + b, 0) / vals.length) * 10) / 10 : null
+  return (
+    <div style={{
+      padding: '18px 20px 22px',
+      borderBottom: '1.5px solid var(--ink)',
+      display: 'flex', flexDirection: 'column', gap: 12,
+    }}>
+      <div>
+        <div style={{ fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--ink)', fontWeight: 700 }}>Global</div>
+        <h3 style={{ fontSize: 20, fontWeight: 900, letterSpacing: '-.02em', lineHeight: 1, margin: '4px 0 0' }}>Promedio</h3>
+      </div>
+      <div style={{ width: 36, height: 6, background: 'var(--ink)' }} />
+      <div style={{ display: 'flex', alignItems: 'baseline', gap: 10 }}>
+        <span style={{ fontWeight: 900, fontSize: 56, lineHeight: 1, letterSpacing: '-.04em', color: 'var(--ink)' }}>
+          {prom !== null ? prom.toFixed(1) : '—'}
+        </span>
+        {prom !== null && (
+          <span style={{ fontWeight: 700, fontSize: 26, lineHeight: 1, letterSpacing: '-.02em' }}>
+            <span style={{ position: 'relative', top: -4 }}>/</span><span>10</span>
+          </span>
+        )}
+      </div>
+      <BarraPulso valor={prom} />
+    </div>
+  )
+}
+
+function LeyendaDispersionMobile() {
+  return (
+    <div style={{ padding: '0 20px 24px', borderBottom: '1.5px solid var(--ink)' }}>
+      <div style={{
+        border: '1.5px solid var(--ink)', background: 'var(--card)',
+        padding: '14px 16px',
+        display: 'flex', flexDirection: 'column', gap: 10,
+      }}>
+        <span style={{
+          fontSize: 10.5, fontWeight: 800, color: 'var(--ink)',
+          letterSpacing: '.06em', textTransform: 'uppercase',
+        }}>
+          Cómo leer la dispersión
+        </span>
+        {RANGOS_DISPERSION.map(r => (
+          <span key={r.rango} style={{ display: 'inline-flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+            <span style={{
+              fontSize: 12, fontWeight: 800, color: 'var(--ink)', fontFeatureSettings: '"tnum" 1, "zero" 0',
+              background: r.color, padding: '3px 8px',
+            }}>
+              {r.rango}
+            </span>
+            <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--ink)' }}>
+              {r.lectura}
+            </span>
+          </span>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function RankingPreguntasMobile({ preguntas }: { preguntas: PregItem[] }) {
+  const top = preguntas.slice(0, 3)
+  const bottom = [...preguntas].slice(-3).reverse()
+  const dimNombre = (id: number) => DIMENSIONES.find(d => d.id === id)?.nombre ?? ''
+  return (
+    <>
+      <SectionBar title="Lo que más se destaca" subtitle="Pregunta por pregunta" mobile />
+      <div style={{
+        padding: '20px 20px 24px',
+        display: 'flex', flexDirection: 'column', gap: 28,
+        borderBottom: '1.5px solid var(--ink)',
+      }}>
+        <BloquePreguntasMobile
+          titulo="Lo más fuerte del equipo"
+          subtitulo="Las 3 con promedio más alto"
+          color="#C8E6C9"
+          preguntas={top}
+          dimNombre={dimNombre}
+        />
+        <BloquePreguntasMobile
+          titulo="Lo que más duele"
+          subtitulo="Las 3 con promedio más bajo"
+          color="#F2C2C2"
+          preguntas={bottom}
+          dimNombre={dimNombre}
+        />
+      </div>
+    </>
+  )
+}
+
+function BloquePreguntasMobile({
+  titulo, subtitulo, color, preguntas, dimNombre,
+}: {
+  titulo: string
+  subtitulo: string
+  color: string
+  preguntas: PregItem[]
+  dimNombre: (id: number) => string
+}) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+      <div>
+        <div style={{ fontSize: 9.5, letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--ink)', fontWeight: 700 }}>
+          {subtitulo}
+        </div>
+        <h3 style={{ fontSize: 18, fontWeight: 900, letterSpacing: '-.02em', margin: '4px 0 0', lineHeight: 1 }}>
+          {titulo}
+        </h3>
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column' }}>
+        {preguntas.map((p, i) => (
+          <div
+            key={p.id}
+            style={{
+              display: 'grid', gridTemplateColumns: '62px 1fr',
+              padding: '12px 0', gap: 12,
+              borderTop: i === 0 ? '1.5px solid var(--ink)' : '1px solid var(--line-soft)',
+              alignItems: 'center',
+            }}
+          >
+            <span style={{
+              fontSize: 22, fontWeight: 900, letterSpacing: '-.03em', color: 'var(--ink)',
+              fontFeatureSettings: '"tnum" 1, "zero" 0', lineHeight: 1,
+              background: color, padding: '4px 8px',
+              display: 'inline-block', justifySelf: 'start',
+            }}>
+              {p.promedio.toFixed(1)}
+            </span>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+              <span style={{ fontSize: 9.5, letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--ink)', fontWeight: 700 }}>
+                {dimNombre(p.dimension_id)}
+              </span>
+              <span style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--ink)', lineHeight: 1.4 }}>
                 {p.texto}
               </span>
             </div>

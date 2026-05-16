@@ -416,6 +416,38 @@ export default function ResultadosEspejo({
           <RadarEspejo resultados={resultados} maxSize={420} />
         </div>
 
+        {/* Más alineado / Menos alineado — las dos cards apiladas */}
+        <SectionBar title="Más alineado y menos alineado" subtitle="Dimensiones extremas" mobile />
+        <div style={{ padding: '24px 20px 28px', borderBottom: '1.5px solid var(--ink)' }}>
+          <AlineadoDistanteApilado resultados={resultados} />
+        </div>
+
+        {/* Dispersión por perspectiva: mini-histograma con YO y EQUIPO */}
+        {dispersionPorDimEspejo && (
+          <>
+            <SectionBar title="Dispersión del equipo" subtitle="Frecuencia por dimensión" mobile />
+            <div style={{ padding: '28px 20px 32px', display: 'flex', flexDirection: 'column', gap: 40, borderBottom: '1.5px solid var(--ink)' }}>
+              {resultados.map(dim => (
+                <HistogramaEspejo
+                  key={dim.id}
+                  nombre={dim.nombre}
+                  subtitulo={dim.subtitulo}
+                  yo={dim.yo}
+                  equipo={dim.equipo}
+                  valoresYo={dispersionPorDimEspejo[dim.id]?.YO ?? []}
+                  valoresEquipo={dispersionPorDimEspejo[dim.id]?.EQUIPO ?? []}
+                />
+              ))}
+            </div>
+            <LeyendaDispersionEspejoMobile />
+          </>
+        )}
+
+        {/* Preguntas con mayor brecha Yo–Equipo */}
+        {preguntasBrechaEspejo && preguntasBrechaEspejo.length > 0 && (
+          <PreguntasBrechaEspejoMobile preguntas={preguntasBrechaEspejo} />
+        )}
+
         <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: 6, fontSize: 9.5, color: 'var(--ink)', letterSpacing: '.08em', textTransform: 'uppercase', fontWeight: 600 }}>
           <span>Laborativo / Consultoría Creativa Basada en la Emoción</span>
           <span>Espejo · V1.0</span>
@@ -787,3 +819,91 @@ function PreguntasBrechaEspejo({ preguntas }: { preguntas: PreguntaBrecha[] }) {
 // Reservado: helpers de dispersión simples por valor también disponibles si se necesita.
 void dispersionBg
 void promedioBg
+
+// ─── Mobile-only adaptaciones ───────────────────────────────────
+// Porta a mobile la leyenda de dispersión y el listado de preguntas
+// con mayor brecha. La sección "Más alineado / Menos alineado" reusa
+// `AlineadoDistanteApilado` directamente porque ya está en columna.
+
+function LeyendaDispersionEspejoMobile() {
+  return (
+    <div style={{ padding: '0 20px 24px', borderBottom: '1.5px solid var(--ink)' }}>
+      <div style={{
+        border: '1.5px solid var(--ink)', background: 'var(--card)',
+        padding: '14px 16px',
+        display: 'flex', flexDirection: 'column', gap: 10,
+      }}>
+        <span style={{
+          fontSize: 10.5, fontWeight: 800, color: 'var(--ink)',
+          letterSpacing: '.06em', textTransform: 'uppercase',
+        }}>
+          Cómo leer la dispersión
+        </span>
+        {RANGOS_DISPERSION.map(r => (
+          <span key={r.rango} style={{ display: 'inline-flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+            <span style={{
+              fontSize: 12, fontWeight: 800, color: 'var(--ink)', fontFeatureSettings: '"tnum" 1, "zero" 0',
+              background: r.color, padding: '3px 8px',
+            }}>
+              {r.rango}
+            </span>
+            <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--ink)' }}>
+              {r.lectura}
+            </span>
+          </span>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function PreguntasBrechaEspejoMobile({ preguntas }: { preguntas: PreguntaBrecha[] }) {
+  const top = preguntas.slice(0, 5)
+  const dimNombre = (id: number) => DIMENSIONES.find(d => d.id === id)?.nombre ?? ''
+  const brechaBg = (b: number) => b >= 2.5 ? '#F2C2C2' : b >= 1.5 ? '#FCE99A' : '#C8E6C9'
+  return (
+    <>
+      <SectionBar title="Preguntas con mayor brecha" subtitle="Dónde más se separan Yo y Equipo" mobile />
+      <div style={{ padding: '8px 20px 24px', borderBottom: '1.5px solid var(--ink)', display: 'flex', flexDirection: 'column' }}>
+        {top.map((p, i) => (
+          <div
+            key={p.idYo}
+            style={{
+              padding: '16px 0', display: 'flex', flexDirection: 'column', gap: 10,
+              borderTop: i === 0 ? 'none' : '1px solid var(--line-soft)',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <span style={{
+                fontSize: 20, fontWeight: 900, letterSpacing: '-.03em', color: 'var(--ink)',
+                fontFeatureSettings: '"tnum" 1, "zero" 0', lineHeight: 1,
+                background: brechaBg(p.brecha), padding: '5px 10px',
+                display: 'inline-block',
+              }}>
+                Δ {p.brecha.toFixed(1)}
+              </span>
+              <span style={{ fontSize: 9.5, letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--ink)', fontWeight: 700 }}>
+                {dimNombre(p.dimension_id)}
+              </span>
+            </div>
+            <span style={{ fontSize: 13.5, fontWeight: 600, color: 'var(--ink)', lineHeight: 1.4 }}>
+              {p.texto}
+            </span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 18, fontFeatureSettings: '"tnum" 1, "zero" 0', flexWrap: 'wrap' }}>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+                <span style={{ width: 10, height: 10, borderRadius: '50%', background: COLOR_YO }} />
+                <span style={{ fontSize: 10.5, fontWeight: 700, color: 'var(--ink)', letterSpacing: '.04em', textTransform: 'uppercase' }}>Yo</span>
+                <b style={{ fontSize: 15, fontWeight: 800, color: 'var(--ink)' }}>{p.promYo.toFixed(1)}</b>
+              </span>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+                <span style={{ width: 10, height: 10, borderRadius: '50%', background: COLOR_EQUIPO }} />
+                <span style={{ fontSize: 10.5, fontWeight: 700, color: 'var(--ink)', letterSpacing: '.04em', textTransform: 'uppercase' }}>Equipo</span>
+                <b style={{ fontSize: 15, fontWeight: 800, color: 'var(--ink)' }}>{p.promEquipo.toFixed(1)}</b>
+              </span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </>
+  )
+}
