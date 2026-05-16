@@ -396,20 +396,21 @@ export default function ResultadosEspejo({
           </div>
 
           {/* Forma del espejo + Más alineado/Más distante agrupados:
-              radar a la derecha, cards apiladas a la izquierda,
-              leyenda debajo del radar. */}
+              cards apiladas + leyenda a la izquierda, radar a la derecha. */}
           <SectionBar title="Forma del espejo" subtitle="Yo y Equipo · más alineado y más distante" />
           <div style={{
-            padding: '16px 56px 24px', borderBottom: '1.5px solid var(--ink)',
+            padding: '8px 56px 8px', borderBottom: '1.5px solid var(--ink)',
             display: 'grid', gridTemplateColumns: '1fr 1.4fr', gap: 48, alignItems: 'center',
           }}>
-            {/* Izquierda: Más alineado / Más distante apilados */}
-            <AlineadoDistanteApilado resultados={resultados} />
-
-            {/* Derecha: radar + leyenda debajo */}
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
-              <RadarEspejo resultados={resultados} maxSize={624} />
+            {/* Izquierda: Más alineado, Más distante y leyenda apilados */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 48 }}>
+              <AlineadoDistanteApilado resultados={resultados} />
               <Leyenda />
+            </div>
+
+            {/* Derecha: radar (sin leyenda, pegado al alto del bloque izquierdo) */}
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <RadarEspejo resultados={resultados} maxSize={624} />
             </div>
           </div>
 
@@ -457,7 +458,7 @@ function AlineadoDistanteApilado({ resultados }: { resultados: DimResultado[] })
   const masDistante = sorted[sorted.length - 1]
   if (!masAlineada || !masDistante) return null
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 56 }}>
       <CardAlineado dim={masAlineada} variante="alineado" />
       <CardAlineado dim={masDistante} variante="distante" />
     </div>
@@ -491,11 +492,11 @@ function CardAlineado({ dim, variante }: { dim: DimResultado; variante: 'alinead
         }}>
           Δ {dim.delta.toFixed(1)}
         </span>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 4, fontVariantNumeric: 'tabular-nums' }}>
-          <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--ink-2)' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, fontVariantNumeric: 'tabular-nums' }}>
+          <span style={{ fontSize: 16, fontWeight: 600, color: 'var(--ink-2)' }}>
             Yo <b style={{ color: 'var(--ink)', fontWeight: 800 }}>{dim.yo.promedio !== null ? dim.yo.promedio.toFixed(1) : '—'}</b>
           </span>
-          <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--ink-2)' }}>
+          <span style={{ fontSize: 16, fontWeight: 600, color: 'var(--ink-2)' }}>
             Equipo <b style={{ color: 'var(--ink)', fontWeight: 800 }}>{dim.equipo.promedio !== null ? dim.equipo.promedio.toFixed(1) : '—'}</b>
           </span>
         </div>
