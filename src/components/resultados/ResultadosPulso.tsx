@@ -120,8 +120,18 @@ export default function ResultadosPulso({
         </header>
 
         <div style={{ padding: '24px 20px 20px', borderBottom: '1.5px solid var(--ink)' }}>
-          <span className="page-header__eyebrow">Pulso colectivo{rondaActual && rondaActual > 1 ? ` · Ronda ${rondaActual}` : ''}</span>
-          <div className="page-header__rule" />
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, marginBottom: 10, flexWrap: 'wrap' }}>
+            <span style={{
+              fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase', fontWeight: 700,
+              background: 'var(--ink)', color: '#fff', padding: '3px 8px',
+            }}>Pulso</span>
+            {rondaActual && rondaActual > 1 && (
+              <span style={{
+                fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase', fontWeight: 700,
+                background: 'transparent', color: 'var(--ink)', border: '1.5px solid var(--ink)', padding: '2px 8px',
+              }}>Ronda {rondaActual}</span>
+            )}
+          </div>
           <h1 style={{ fontSize: 'clamp(28px, 8vw, 36px)', fontWeight: 900, letterSpacing: '-.02em', lineHeight: 1, margin: 0 }}>
             {nombreCompania}
           </h1>
@@ -179,8 +189,18 @@ export default function ResultadosPulso({
 
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
           <div style={{ padding: '40px 56px 32px', borderBottom: '1.5px solid var(--ink)' }}>
-            <span className="page-header__eyebrow">Pulso colectivo{rondaActual && rondaActual > 1 ? ` · Ronda ${rondaActual}` : ''}</span>
-            <div className="page-header__rule" />
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 10, marginBottom: 12, flexWrap: 'wrap' }}>
+              <span style={{
+                fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase', fontWeight: 700,
+                background: 'var(--ink)', color: '#fff', padding: '3px 8px',
+              }}>Pulso</span>
+              {rondaActual && rondaActual > 1 && (
+                <span style={{
+                  fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase', fontWeight: 700,
+                  background: 'transparent', color: 'var(--ink)', border: '1.5px solid var(--ink)', padding: '2px 8px',
+                }}>Ronda {rondaActual}</span>
+              )}
+            </div>
             <h1 className="page-header__title" style={{ fontSize: 'clamp(32px,4vw,48px)' }}>
               {nombreCompania}
             </h1>
