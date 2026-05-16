@@ -131,7 +131,6 @@ function BarrasYoEquipo({
       {/* Barra única: mitad superior Yo, línea negra, mitad inferior Equipo */}
       <div style={{
         position: 'relative', height: altoBarra,
-        border: '1.5px solid var(--ink)',
       }}>
         {yo !== null && (
           <div style={{
