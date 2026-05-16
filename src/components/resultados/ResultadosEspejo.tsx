@@ -290,7 +290,7 @@ export default function ResultadosEspejo({
         </header>
 
         <div style={{ padding: '24px 20px 20px', borderBottom: '1.5px solid var(--ink)' }}>
-          <ChipTipo etiqueta="Espejo" rondaActual={rondaActual} />
+          <ChipTipo etiqueta="Equipo en Espejo" rondaActual={rondaActual} />
           <h1 style={{ fontSize: 'clamp(28px, 8vw, 36px)', fontWeight: 900, letterSpacing: '-.02em', lineHeight: 1, margin: 0 }}>
             {nombreCompania}
           </h1>
@@ -349,7 +349,7 @@ export default function ResultadosEspejo({
 
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
           <div style={{ padding: '40px 56px 32px', borderBottom: '1.5px solid var(--ink)' }}>
-            <ChipTipo etiqueta="Espejo" rondaActual={rondaActual} />
+            <ChipTipo etiqueta="Equipo en Espejo" rondaActual={rondaActual} />
             <h1 className="page-header__title" style={{ fontSize: 'clamp(32px,4vw,48px)' }}>
               {nombreCompania}
             </h1>
