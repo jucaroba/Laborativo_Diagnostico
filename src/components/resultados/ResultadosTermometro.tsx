@@ -135,6 +135,52 @@ function MedidorBase({ dim, sizeNumber, padding, anterior, rondaAnterior, benchm
   )
 }
 
+// Card "Promedio" — quinta columna del grid de "Lectura por dimensión".
+// Promedio simple de los 4 promedios de dimensión. Separada visualmente
+// con una línea vertical corta a su izquierda (no toca el top ni el
+// bottom de la card, mismo patrón de Pulso y 360°).
+function PromedioCardTermometro({ resultados }: { resultados: DimResultado[] }) {
+  const vals = resultados.map(r => r.promedio).filter((v): v is number => typeof v === 'number')
+  const prom = vals.length ? Math.round((vals.reduce((a, b) => a + b, 0) / vals.length) * 10) / 10 : null
+  const pct = prom !== null ? ((prom - 1) / 9) * 100 : 0
+  const color = prom !== null ? promedioBg(prom) : 'var(--mute)'
+  return (
+    <div style={{
+      padding: '32px 24px 30px',
+      display: 'flex', flexDirection: 'column', gap: 14,
+      position: 'relative',
+    }}>
+      {/* Separador vertical corto a la izquierda (no llega ni al top ni al bottom) */}
+      <span aria-hidden style={{
+        position: 'absolute', left: 0, top: 32, bottom: 30,
+        width: 1.5, background: 'var(--ink)',
+      }} />
+      <div>
+        <div style={{ fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--ink)', fontWeight: 700 }}>Global</div>
+        <h3 style={{ fontSize: 30.72, fontWeight: 900, letterSpacing: '-.02em', lineHeight: 1, margin: '4px 0 0' }}>Promedio</h3>
+      </div>
+      <div style={{ display: 'flex', alignItems: 'baseline', gap: 10 }}>
+        <span style={{ fontWeight: 900, fontSize: 96, lineHeight: .9, letterSpacing: '-.05em', color: 'var(--ink)' }}>
+          {prom !== null ? prom.toFixed(1) : '—'}
+        </span>
+        {prom !== null && (
+          <span style={{ fontWeight: 700, fontSize: 38.4, lineHeight: 1, letterSpacing: '-.02em' }}>
+            <span style={{ position: 'relative', top: -6.7 }}>/</span><span>10</span>
+          </span>
+        )}
+      </div>
+      <div style={{ position: 'relative', height: 10, border: '1.5px solid var(--ink)' }}>
+        {prom !== null && (
+          <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: `${pct}%`, background: color }} />
+        )}
+      </div>
+      <div style={{ fontSize: 12.5, color: 'var(--ink-2)', fontWeight: 500, lineHeight: 1.4 }}>
+        Promedio simple de las 4 dimensiones.
+      </div>
+    </div>
+  )
+}
+
 export default function ResultadosTermometro({
   nombreCompania, estado, totalParticipantes, totalFormularios, resultados,
   comparacion, rondaActual, rondaAnterior, benchmark, benchmarkN, dispersionPorDim,
@@ -251,14 +297,13 @@ export default function ResultadosTermometro({
           </div>
 
           <SectionBar title="Lectura por dimensión" subtitle="Una pregunta por dimensión · Escala 1–10" />
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', borderBottom: '1.5px solid var(--ink)' }}>
-            {resultados.map((dim, i, arr) => (
-              <div key={dim.id} style={{
-                borderRight: i < arr.length - 1 ? '1.5px solid var(--ink)' : 'none',
-              }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', borderBottom: '1.5px solid var(--ink)' }}>
+            {resultados.map(dim => (
+              <div key={dim.id}>
                 <MedidorBase dim={dim} sizeNumber={96} padding="32px 24px 30px" anterior={hayComparacion ? getAnterior(dim.id) : null} rondaAnterior={rondaAnterior} benchmark={hayBenchmark ? getBenchmark(dim.id) : null} benchmarkN={benchmarkN} />
               </div>
             ))}
+            <PromedioCardTermometro resultados={resultados} />
           </div>
 
           {/* Dispersión: mini-histogramas + leyenda */}
