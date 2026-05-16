@@ -231,13 +231,14 @@ function RadarEspejo({ resultados, maxSize }: { resultados: DimResultado[]; maxS
   const center = size / 2
   const radius = size * 0.42
   const axes = DIMENSIONES.length
-  // viewBox ajustado al cuadrado del polígono — sin aire extra arriba/abajo.
-  // El cuadrado va de (center-radius) a (center+radius) en ambos ejes.
-  const margin = 6
-  const left = center - radius - margin
-  const top = center - radius - margin
-  const w = radius * 2 + margin * 2
-  const h = radius * 2 + margin * 2
+  // viewBox con suficiente espacio fuera del cuadrado para las etiquetas
+  // (Intención / Motivación arriba, Acción / Interacción abajo).
+  const labelOffset = 28  // px hacia afuera del cuadrado
+  const labelSpace = 70   // espacio reservado para el ancho de la etiqueta
+  const left = center - radius - labelSpace
+  const top = center - radius - 28
+  const w = radius * 2 + labelSpace * 2
+  const h = radius * 2 + 28 * 2
 
   const axisAngle = (i: number) => -Math.PI * 3 / 4 + (i * 2 * Math.PI) / axes
   const point = (i: number, val: number): [number, number] => {
@@ -245,25 +246,24 @@ function RadarEspejo({ resultados, maxSize }: { resultados: DimResultado[]; maxS
     const a = axisAngle(i)
     return [center + r * Math.cos(a), center + r * Math.sin(a)]
   }
-  // Labels en las 4 esquinas internas del cuadrado del radar.
+  // Labels en las 4 esquinas, AFUERA del cuadrado (igual que el 360).
   const labelAnchor = (i: number): { textAnchor: 'start' | 'end'; dominantBaseline: 'auto' | 'hanging' } => {
     // i=0 sup-izq, 1 sup-der, 2 inf-der, 3 inf-izq
     return {
       textAnchor: (i === 1 || i === 2) ? 'end' : 'start',
-      dominantBaseline: (i === 0 || i === 1) ? 'hanging' : 'auto',
+      dominantBaseline: (i === 0 || i === 1) ? 'auto' : 'hanging',
     }
   }
   const labelPos = (i: number): [number, number] => {
-    const inset = 12
-    const x1 = center - radius + inset
-    const x2 = center + radius - inset
-    const y1 = center - radius + inset
-    const y2 = center + radius - inset
+    const x1 = center - radius           // borde izquierdo del cuadrado
+    const x2 = center + radius           // borde derecho
+    const y1 = center - radius - labelOffset / 3   // arriba del cuadrado
+    const y2 = center + radius + labelOffset       // debajo del cuadrado
     switch (i) {
-      case 0: return [x1, y1]   // sup-izq · Intención
-      case 1: return [x2, y1]   // sup-der · Motivación
-      case 2: return [x2, y2]   // inf-der · Interacción
-      case 3: return [x1, y2]   // inf-izq · Acción
+      case 0: return [x1, y1]   // sup-izq · Intención (afuera arriba-izq)
+      case 1: return [x2, y1]   // sup-der · Motivación (afuera arriba-der)
+      case 2: return [x2, y2]   // inf-der · Interacción (afuera abajo-der)
+      case 3: return [x1, y2]   // inf-izq · Acción (afuera abajo-izq)
       default: return [center, center]
     }
   }
