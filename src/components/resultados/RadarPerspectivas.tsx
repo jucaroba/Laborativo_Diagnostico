@@ -122,7 +122,7 @@ export default function RadarPerspectivas({ promediosPorRol, promedioGlobalPorRo
                 lineHeight: 1,
                 letterSpacing: '-.04em',
                 color: 'var(--ink)',
-                fontVariantNumeric: 'tabular-nums',
+                fontFeatureSettings: '"tnum" 1, "zero" 0',
               }}>
                 {promedio !== null ? promedio.toFixed(1) : '—'}
               </span>

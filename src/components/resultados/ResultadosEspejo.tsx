@@ -50,7 +50,7 @@ function DeltaRonda({ actual, anterior, rondaAnterior }: { actual: number | null
     <span style={{
       display: 'inline-flex', alignItems: 'center', gap: 4,
       fontSize: 10.5, fontWeight: 700, color,
-      fontVariantNumeric: 'tabular-nums',
+      fontFeatureSettings: '"tnum" 1, "zero" 0',
     }}>
       {flecha} {signo}{diff.toFixed(1)}
       {rondaAnterior ? <span style={{ fontWeight: 500, color: 'var(--mute)', letterSpacing: '.04em', textTransform: 'uppercase', fontSize: 8.5 }}> vs r{rondaAnterior}</span> : null}
@@ -152,7 +152,7 @@ function BarrasYoEquipo({
       </div>
 
       {/* Valores apilados a la derecha */}
-      <div style={{ display: 'flex', flexDirection: 'column', textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', textAlign: 'right', fontFeatureSettings: '"tnum" 1, "zero" 0' }}>
         <b style={{
           flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end',
           fontSize: mobile ? 14 : 16, fontWeight: 900,
@@ -188,7 +188,7 @@ function DimCard({ dim, anterior, rondaAnterior, benchmark, benchmarkN, mobile }
         <span style={{
           padding: mobile ? '8px 12px' : '12px 14px', background: deltaBg(dim.delta),
           fontSize: mobile ? 16 : 20, fontWeight: 900, letterSpacing: '-.02em',
-          fontVariantNumeric: 'tabular-nums', flexShrink: 0,
+          fontFeatureSettings: '"tnum" 1, "zero" 0', flexShrink: 0,
           color: 'var(--ink)', lineHeight: 1,
           alignSelf: 'stretch', display: 'inline-flex', alignItems: 'center',
         }}>
@@ -216,8 +216,8 @@ function DimCard({ dim, anterior, rondaAnterior, benchmark, benchmarkN, mobile }
             {benchmarkN && benchmarkN > 0 ? <span style={{ color: 'var(--mute)', fontWeight: 500 }}>· {benchmarkN} {benchmarkN === 1 ? 'equipo' : 'equipos'}</span> : null}
           </div>
           <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap', fontSize: 11, fontWeight: 600, color: 'var(--ink-2)' }}>
-            <span><span style={{ color: 'var(--mute)' }}>Yo</span> <b style={{ fontWeight: 800, color: 'var(--ink)', fontVariantNumeric: 'tabular-nums' }}>{benchmark.yo.promedio !== null ? benchmark.yo.promedio.toFixed(1) : '—'}</b></span>
-            <span><span style={{ color: 'var(--mute)' }}>Equipo</span> <b style={{ fontWeight: 800, color: 'var(--ink)', fontVariantNumeric: 'tabular-nums' }}>{benchmark.equipo.promedio !== null ? benchmark.equipo.promedio.toFixed(1) : '—'}</b></span>
+            <span><span style={{ color: 'var(--mute)' }}>Yo</span> <b style={{ fontWeight: 800, color: 'var(--ink)', fontFeatureSettings: '"tnum" 1, "zero" 0' }}>{benchmark.yo.promedio !== null ? benchmark.yo.promedio.toFixed(1) : '—'}</b></span>
+            <span><span style={{ color: 'var(--mute)' }}>Equipo</span> <b style={{ fontWeight: 800, color: 'var(--ink)', fontFeatureSettings: '"tnum" 1, "zero" 0' }}>{benchmark.equipo.promedio !== null ? benchmark.equipo.promedio.toFixed(1) : '—'}</b></span>
           </div>
         </div>
       )}
@@ -570,12 +570,12 @@ function CardAlineado({ dim, variante }: { dim: DimResultado; variante: 'alinead
         {/* Caja del Δ 20% más grande */}
         <span style={{
           fontSize: 34, fontWeight: 900, letterSpacing: '-.03em', color: 'var(--ink)',
-          fontVariantNumeric: 'tabular-nums', lineHeight: 1,
+          fontFeatureSettings: '"tnum" 1, "zero" 0', lineHeight: 1,
           background: color, padding: '10px 16px', display: 'inline-block',
         }}>
           Δ {dim.delta.toFixed(1)}
         </span>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 2, fontVariantNumeric: 'tabular-nums' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 2, fontFeatureSettings: '"tnum" 1, "zero" 0' }}>
           <span style={{ fontSize: 16, fontWeight: 600, color: 'var(--ink-2)' }}>
             Yo <b style={{ color: 'var(--ink)', fontWeight: 800 }}>{dim.yo.promedio !== null ? dim.yo.promedio.toFixed(1) : '—'}</b>
           </span>
@@ -646,7 +646,7 @@ function HistogramaEspejo({
               }}>
                 <span style={{
                   fontSize: 10, fontWeight: 800, color: 'var(--ink)',
-                  fontVariantNumeric: 'tabular-nums', lineHeight: 1,
+                  fontFeatureSettings: '"tnum" 1, "zero" 0', lineHeight: 1,
                   visibility: (nYo > 0 || nEq > 0) ? 'visible' : 'hidden',
                 }}>
                   {nYo + nEq}
@@ -674,7 +674,7 @@ function HistogramaEspejo({
           {Array.from({ length: 10 }, (_, i) => (
             <span key={i} style={{
               fontSize: 10, color: 'var(--mute)', fontWeight: 600,
-              textAlign: 'center', fontVariantNumeric: 'tabular-nums',
+              textAlign: 'center', fontFeatureSettings: '"tnum" 1, "zero" 0',
             }}>{i + 1}</span>
           ))}
         </div>
@@ -690,7 +690,7 @@ function PromedioCompacto({ label, valor, dispersion, color }: { label: string; 
         <span style={{ width: 10, height: 10, borderRadius: '50%', background: color }} />
         {label}
       </span>
-      <span style={{ fontSize: 18, fontWeight: 900, letterSpacing: '-.02em', color: 'var(--ink)', fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>
+      <span style={{ fontSize: 18, fontWeight: 900, letterSpacing: '-.02em', color: 'var(--ink)', fontFeatureSettings: '"tnum" 1, "zero" 0', lineHeight: 1 }}>
         {valor !== null ? valor.toFixed(1) : '—'} <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--ink-2)' }}>± {dispersion.toFixed(1)}</span>
       </span>
     </div>
@@ -715,7 +715,7 @@ function LeyendaDispersionEspejo() {
         {RANGOS_DISPERSION.map(r => (
           <span key={r.rango} style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
             <span style={{
-              fontSize: 13, fontWeight: 800, color: 'var(--ink)', fontVariantNumeric: 'tabular-nums',
+              fontSize: 13, fontWeight: 800, color: 'var(--ink)', fontFeatureSettings: '"tnum" 1, "zero" 0',
               background: r.color, padding: '4px 10px',
             }}>
               {r.rango}
@@ -754,7 +754,7 @@ function PreguntasBrechaEspejo({ preguntas }: { preguntas: PreguntaBrecha[] }) {
           >
             <span style={{
               fontSize: 22, fontWeight: 900, letterSpacing: '-.03em', color: 'var(--ink)',
-              fontVariantNumeric: 'tabular-nums', lineHeight: 1,
+              fontFeatureSettings: '"tnum" 1, "zero" 0', lineHeight: 1,
               background: brechaBg(p.brecha), padding: '6px 10px',
               display: 'inline-block', justifySelf: 'start',
             }}>
@@ -768,12 +768,12 @@ function PreguntasBrechaEspejo({ preguntas }: { preguntas: PreguntaBrecha[] }) {
                 {p.texto}
               </span>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontVariantNumeric: 'tabular-nums' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontFeatureSettings: '"tnum" 1, "zero" 0' }}>
               <span style={{ width: 10, height: 10, borderRadius: '50%', background: COLOR_YO }} />
               <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--ink)', letterSpacing: '.04em', textTransform: 'uppercase' }}>Yo</span>
               <b style={{ fontSize: 16, fontWeight: 800, color: 'var(--ink)' }}>{p.promYo.toFixed(1)}</b>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontVariantNumeric: 'tabular-nums' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontFeatureSettings: '"tnum" 1, "zero" 0' }}>
               <span style={{ width: 10, height: 10, borderRadius: '50%', background: COLOR_EQUIPO }} />
               <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--ink)', letterSpacing: '.04em', textTransform: 'uppercase' }}>Equipo</span>
               <b style={{ fontSize: 16, fontWeight: 800, color: 'var(--ink)' }}>{p.promEquipo.toFixed(1)}</b>

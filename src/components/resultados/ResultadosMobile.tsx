@@ -151,7 +151,7 @@ export default function ResultadosMobile({
                   }}>
                     <span style={{ width: 10, height: 10, borderRadius: '50%', background: ROL_NEON[rol] }} />
                     <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--ink-2)' }}>{ROL_INFO[rol].label}</span>
-                    <b style={{ fontSize: 13, fontWeight: 900, fontVariantNumeric: 'tabular-nums', color: val !== undefined ? 'var(--ink)' : 'var(--mute)' }}>
+                    <b style={{ fontSize: 13, fontWeight: 900, fontFeatureSettings: '"tnum" 1, "zero" 0', color: val !== undefined ? 'var(--ink)' : 'var(--mute)' }}>
                       {val !== undefined ? val.toFixed(1) : '—'}
                     </b>
                   </div>
@@ -191,7 +191,7 @@ export default function ResultadosMobile({
                   display: 'inline-block', padding: '5px 10px',
                   background: deltaBg(dim.delta),
                   fontSize: 12, fontWeight: 900, letterSpacing: '-.01em',
-                  fontVariantNumeric: 'tabular-nums', flexShrink: 0,
+                  fontFeatureSettings: '"tnum" 1, "zero" 0', flexShrink: 0,
                 }}>
                   Δ {dim.delta.toFixed(1)}
                 </span>
@@ -237,7 +237,7 @@ export default function ResultadosMobile({
                       position: 'absolute', top: 0,
                       left: `${((n - 1) / 9) * 100}%`,
                       transform: 'translateX(-50%)',
-                      fontSize: 9, color: 'var(--mute)', fontWeight: 600, fontVariantNumeric: 'tabular-nums',
+                      fontSize: 9, color: 'var(--mute)', fontWeight: 600, fontFeatureSettings: '"tnum" 1, "zero" 0',
                     }}>{n}</span>
                   ))}
                 </div>

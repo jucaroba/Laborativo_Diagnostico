@@ -189,7 +189,7 @@ export default async function ComparativoCompaniaPage({ params }: { params: Prom
               display: 'grid',
               gridTemplateColumns: '240px repeat(5, 1fr)',
               border: '1.5px solid var(--ink)',
-              fontVariantNumeric: 'tabular-nums',
+              fontFeatureSettings: '"tnum" 1, "zero" 0',
             }}>
               {/* Header row */}
               <div style={{

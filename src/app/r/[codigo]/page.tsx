@@ -479,7 +479,7 @@ export default async function ResultadosPage({ params }: { params: Promise<{ cod
                     }}>
                       <span style={{ width: 10, height: 10, borderRadius: '50%', background: ROL_NEON[rol] }} />
                       <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--ink-2)' }}>{ROL_INFO[rol].label}</span>
-                      <b style={{ fontSize: 14, fontWeight: 900, fontVariantNumeric: 'tabular-nums', color: val !== undefined ? 'var(--ink)' : 'var(--mute)' }}>
+                      <b style={{ fontSize: 14, fontWeight: 900, fontFeatureSettings: '"tnum" 1, "zero" 0', color: val !== undefined ? 'var(--ink)' : 'var(--mute)' }}>
                         {val !== undefined ? val.toFixed(1) : '—'}
                       </b>
                     </div>
@@ -543,7 +543,7 @@ export default async function ResultadosPage({ params }: { params: Promise<{ cod
                       }}>
                         <span style={{ width: 10, height: 10, borderRadius: '50%', background: ROL_NEON[rol] }} />
                         <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--ink-2)' }}>{ROL_INFO[rol].label}</span>
-                        <b style={{ fontSize: 14, fontWeight: 900, fontVariantNumeric: 'tabular-nums', color: val !== null ? 'var(--ink)' : 'var(--mute)' }}>
+                        <b style={{ fontSize: 14, fontWeight: 900, fontFeatureSettings: '"tnum" 1, "zero" 0', color: val !== null ? 'var(--ink)' : 'var(--mute)' }}>
                           {val !== null ? val.toFixed(1) : '—'}
                         </b>
                       </div>
@@ -594,7 +594,7 @@ export default async function ResultadosPage({ params }: { params: Promise<{ cod
                   display: 'inline-block', padding: '6px 12px',
                   background: deltaBg(dim.delta),
                   fontSize: 13, fontWeight: 900, letterSpacing: '-.01em',
-                  fontVariantNumeric: 'tabular-nums',
+                  fontFeatureSettings: '"tnum" 1, "zero" 0',
                 }}>
                   Δ {dim.delta.toFixed(1)}
                 </span>
@@ -643,7 +643,7 @@ export default async function ResultadosPage({ params }: { params: Promise<{ cod
                       position: 'absolute', top: 0,
                       left: `${((n - 1) / 9) * 100}%`,
                       transform: 'translateX(-50%)',
-                      fontSize: 10, color: 'var(--mute)', fontWeight: 600, fontVariantNumeric: 'tabular-nums',
+                      fontSize: 10, color: 'var(--mute)', fontWeight: 600, fontFeatureSettings: '"tnum" 1, "zero" 0',
                     }}>{n}</span>
                   ))}
                 </div>

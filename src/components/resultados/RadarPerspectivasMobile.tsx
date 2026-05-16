@@ -84,7 +84,7 @@ export default function RadarPerspectivasMobile({ promediosPorRol, promedioGloba
                   {ROL_INFO[rol].label}
                 </span>
               </span>
-              <span style={{ fontWeight: 900, fontSize: 22, lineHeight: 1, letterSpacing: '-.04em', color: 'var(--ink)', fontVariantNumeric: 'tabular-nums' }}>
+              <span style={{ fontWeight: 900, fontSize: 22, lineHeight: 1, letterSpacing: '-.04em', color: 'var(--ink)', fontFeatureSettings: '"tnum" 1, "zero" 0' }}>
                 {promedio !== null ? promedio.toFixed(1) : '—'}
               </span>
             </button>

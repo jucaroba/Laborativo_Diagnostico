@@ -55,7 +55,7 @@ function DeltaRonda({ actual, anterior, rondaAnterior }: { actual: number | null
     <span style={{
       display: 'inline-flex', alignItems: 'center', gap: 4,
       fontSize: 11, fontWeight: 700, color,
-      fontVariantNumeric: 'tabular-nums',
+      fontFeatureSettings: '"tnum" 1, "zero" 0',
     }}>
       {flecha} {signo}{diff.toFixed(1)}
       {rondaAnterior ? <span style={{ fontWeight: 500, color: 'var(--mute)', letterSpacing: '.04em', textTransform: 'uppercase', fontSize: 9 }}> vs ronda {rondaAnterior}</span> : null}
@@ -127,7 +127,7 @@ function MedidorBase({ dim, sizeNumber, padding, anterior, rondaAnterior, benchm
       {benchmark !== null && benchmark !== undefined && (
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, fontWeight: 600, color: 'var(--ink-2)' }}>
           <span style={{ width: 8, height: 8, background: 'var(--ink)', display: 'inline-block', borderRadius: '50%' }} />
-          Benchmark Laborativo · <b style={{ fontWeight: 800, fontVariantNumeric: 'tabular-nums', color: 'var(--ink)' }}>{benchmark.toFixed(1)}</b>
+          Benchmark Laborativo · <b style={{ fontWeight: 800, fontFeatureSettings: '"tnum" 1, "zero" 0', color: 'var(--ink)' }}>{benchmark.toFixed(1)}</b>
           {benchmarkN && benchmarkN > 0 ? <span style={{ color: 'var(--mute)', fontWeight: 500 }}>· {benchmarkN} {benchmarkN === 1 ? 'equipo' : 'equipos'}</span> : null}
         </div>
       )}

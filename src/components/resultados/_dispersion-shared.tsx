@@ -59,7 +59,7 @@ export function HistogramaDim({
         <span aria-hidden style={{ width: 1.5, alignSelf: 'stretch', background: 'var(--ink)' }} />
         <span style={{
           fontSize: 22, fontWeight: 900, letterSpacing: '-.02em', color: 'var(--ink)',
-          fontVariantNumeric: 'tabular-nums', lineHeight: 1,
+          fontFeatureSettings: '"tnum" 1, "zero" 0', lineHeight: 1,
           background: promedioBg(promedio), padding: '6px 10px', display: 'inline-block',
         }}>
           {promedio !== null ? promedio.toFixed(1) : '—'} / 10
@@ -67,7 +67,7 @@ export function HistogramaDim({
         <span aria-hidden style={{ width: 1.5, alignSelf: 'stretch', background: 'var(--ink)' }} />
         <span style={{
           fontSize: 22, fontWeight: 900, letterSpacing: '-.02em', color: 'var(--ink)',
-          fontVariantNumeric: 'tabular-nums', lineHeight: 1,
+          fontFeatureSettings: '"tnum" 1, "zero" 0', lineHeight: 1,
           background: dispersionBg(desviacion), padding: '6px 10px', display: 'inline-block',
         }}>
           ± {desviacion.toFixed(1)}
@@ -89,7 +89,7 @@ export function HistogramaDim({
               }}>
                 <span style={{
                   fontSize: 11, fontWeight: 800, color: 'var(--ink)',
-                  fontVariantNumeric: 'tabular-nums',
+                  fontFeatureSettings: '"tnum" 1, "zero" 0',
                   visibility: n > 0 ? 'visible' : 'hidden',
                   lineHeight: 1,
                 }}>{n}</span>
@@ -110,7 +110,7 @@ export function HistogramaDim({
           {Array.from({ length: 10 }, (_, i) => (
             <span key={i} style={{
               fontSize: 10, color: 'var(--mute)', fontWeight: 600,
-              textAlign: 'center', fontVariantNumeric: 'tabular-nums',
+              textAlign: 'center', fontFeatureSettings: '"tnum" 1, "zero" 0',
             }}>{i + 1}</span>
           ))}
         </div>
@@ -138,7 +138,7 @@ export function LeyendaDispersion() {
         {RANGOS_DISPERSION.map(r => (
           <span key={r.rango} style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
             <span style={{
-              fontSize: 13, fontWeight: 800, color: 'var(--ink)', fontVariantNumeric: 'tabular-nums',
+              fontSize: 13, fontWeight: 800, color: 'var(--ink)', fontFeatureSettings: '"tnum" 1, "zero" 0',
               background: r.color, padding: '4px 10px',
             }}>
               {r.rango}
