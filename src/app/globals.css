@@ -62,6 +62,10 @@ html, body {
   font-family: 'Red Hat Display', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  /* Red Hat Display tiene la feature "zero" (slashed-zero) que se activa
+     automáticamente con tabular-nums. La desactivamos globalmente para
+     que el "0" siempre use el glifo proporcional sin barra diagonal. */
+  font-feature-settings: "zero" 0;
 }
 
 @media (max-width: 768px) {
