@@ -97,7 +97,7 @@ function FilaPerspectiva({
   return (
     <div style={{ display: 'grid', gridTemplateColumns: '64px 1fr 42px', gap: mobile ? 8 : 12, alignItems: 'center' }}>
       <span style={{ fontSize: mobile ? 10 : 11, letterSpacing: '.08em', textTransform: 'uppercase', fontWeight: 700, color: 'var(--ink)' }}>{label}</span>
-      <div style={{ position: 'relative', height: mobile ? 8 : 10, background: 'var(--bg-2)', border: '1.5px solid var(--ink)' }}>
+      <div style={{ position: 'relative', height: mobile ? 11 : 14, border: '1.5px solid var(--ink)' }}>
         {valor !== null && (
           <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: `${pct}%`, background: color }} />
         )}
@@ -123,10 +123,11 @@ function DimCard({ dim, anterior, rondaAnterior, benchmark, benchmarkN, mobile }
         </div>
         <span aria-hidden style={{ width: 1.5, alignSelf: 'stretch', background: 'var(--ink)' }} />
         <span style={{
-          padding: '6px 10px', background: deltaBg(dim.delta),
-          fontSize: 14, fontWeight: 900, letterSpacing: '-.02em',
+          padding: mobile ? '8px 12px' : '12px 14px', background: deltaBg(dim.delta),
+          fontSize: mobile ? 16 : 20, fontWeight: 900, letterSpacing: '-.02em',
           fontVariantNumeric: 'tabular-nums', flexShrink: 0,
-          color: 'var(--ink)',
+          color: 'var(--ink)', lineHeight: 1,
+          alignSelf: 'stretch', display: 'inline-flex', alignItems: 'center',
         }}>
           Δ {dim.delta.toFixed(1)}
         </span>
@@ -379,8 +380,8 @@ export default function ResultadosEspejo({
 
           <SectionBar title="Brecha Yo ↔ Equipo" subtitle="Por dimensión, ordenadas por mayor brecha" />
           <div style={{
-            padding: '32px 56px 40px', borderBottom: '1.5px solid var(--ink)',
-            display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', columnGap: 56, rowGap: 32,
+            padding: '40px 56px 48px', borderBottom: '1.5px solid var(--ink)',
+            display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', columnGap: 56, rowGap: 64,
           }}>
             {[...resultados].sort((a, b) => b.delta - a.delta).map(dim => (
               <DimCard
