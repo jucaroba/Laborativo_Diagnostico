@@ -1,4 +1,5 @@
 import Image from 'next/image'
+import { ChipTipo, HistogramaDim, LeyendaDispersion, promedioBg } from './_dispersion-shared'
 
 type DimResultado = {
   id: number
@@ -20,6 +21,27 @@ type Props = {
   rondaAnterior?: number
   benchmark?: DimResultado[] | null
   benchmarkN?: number
+  /** Promedios por persona por dimensión (calculado en el server). */
+  dispersionPorDim?: Record<number, number[]>
+}
+
+// Lectura ejecutiva del termómetro: un titular que resume el estado general.
+function lecturaEjecutiva(resultados: DimResultado[]): { titulo: string; color: string } {
+  const vals = resultados.map(r => r.promedio).filter((v): v is number => typeof v === 'number')
+  const bajas = vals.filter(v => v < 5).length
+  if (vals.length === 0) return { titulo: 'Sin datos suficientes.', color: 'var(--mute)' }
+  if (bajas >= 3) return { titulo: 'Pulso bajo en varias dimensiones.', color: '#F2C2C2' }
+  if (bajas >= 1) return { titulo: 'Algunas zonas frías.', color: '#FCE99A' }
+  return { titulo: 'Buena temperatura general.', color: '#C8E6C9' }
+}
+
+// Frase interpretativa por dimensión según el rango del promedio.
+function fraseDim(nombre: string, valor: number | null): string {
+  if (valor === null) return ''
+  if (valor >= 7.5) return `El equipo siente fortaleza en ${nombre.toLowerCase()}.`
+  if (valor >= 6.0) return `Buen pulso en ${nombre.toLowerCase()}, con margen para crecer.`
+  if (valor >= 4.5) return `Lectura tibia en ${nombre.toLowerCase()}. Vale revisar.`
+  return `${nombre} está bajo. Punto de atención prioritario.`
 }
 
 
@@ -41,13 +63,11 @@ function DeltaRonda({ actual, anterior, rondaAnterior }: { actual: number | null
   )
 }
 
-// Color "termómetro" según valor: rojo–ámbar–verde
+// Color del relleno de la barra del termómetro: ahora unificado con el
+// semáforo del resto del dashboard (verde/amarillo/rojo del promedioBg).
 const tempColor = (v: number | null) => {
   if (v === null) return 'var(--mute)'
-  if (v >= 8) return '#1A9850'
-  if (v >= 6) return '#A2C859'
-  if (v >= 4) return '#FEE08B'
-  return '#D73027'
+  return promedioBg(v)
 }
 
 function SectionBar({ title, subtitle, mobile }: { title: string; subtitle?: string; mobile?: boolean }) {
@@ -76,7 +96,7 @@ function MedidorBase({ dim, sizeNumber, padding, anterior, rondaAnterior, benchm
         {anterior !== null && anterior !== undefined && <DeltaRonda actual={dim.promedio} anterior={anterior} rondaAnterior={rondaAnterior} />}
       </div>
       <div style={{ display: 'flex', alignItems: 'baseline', gap: 10 }}>
-        <span style={{ fontWeight: 900, fontSize: sizeNumber, lineHeight: .9, letterSpacing: '-.05em', color }}>
+        <span style={{ fontWeight: 900, fontSize: sizeNumber, lineHeight: .9, letterSpacing: '-.05em', color: 'var(--ink)' }}>
           {dim.promedio !== null ? dim.promedio.toFixed(1) : '—'}
         </span>
         {dim.promedio !== null && (
@@ -86,19 +106,10 @@ function MedidorBase({ dim, sizeNumber, padding, anterior, rondaAnterior, benchm
         )}
       </div>
       {/* Barra termómetro */}
-      <div style={{ position: 'relative', height: 10, background: 'var(--bg-2)', border: '1.5px solid var(--ink)' }}>
+      <div style={{ position: 'relative', height: 10, border: '1.5px solid var(--ink)' }}>
         {dim.promedio !== null && (
           <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: `${pct}%`, background: color }} />
         )}
-        {/* marcas en 5 y 8 */}
-        {[5, 8].map(n => (
-          <div key={n} style={{
-            position: 'absolute',
-            left: `${((n - 1) / 9) * 100}%`,
-            top: -3, bottom: -3, width: 1.5,
-            background: 'var(--ink)', opacity: .4,
-          }} />
-        ))}
         {/* marca benchmark */}
         {benchmark !== null && benchmark !== undefined && (
           <div title={`Benchmark: ${benchmark.toFixed(1)}`} style={{
@@ -109,8 +120,9 @@ function MedidorBase({ dim, sizeNumber, padding, anterior, rondaAnterior, benchm
           }} />
         )}
       </div>
-      <div style={{ fontSize: 11, color: 'var(--ink-2)', fontWeight: 500 }}>
-        ± {dim.desviacion.toFixed(1)} de dispersión · {dim.n} respuestas
+      {/* Frase interpretativa por dimensión */}
+      <div style={{ fontSize: 12.5, color: 'var(--ink-2)', fontWeight: 500, lineHeight: 1.4 }}>
+        {fraseDim(dim.nombre, dim.promedio)}
       </div>
       {benchmark !== null && benchmark !== undefined && (
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, fontWeight: 600, color: 'var(--ink-2)' }}>
@@ -125,12 +137,13 @@ function MedidorBase({ dim, sizeNumber, padding, anterior, rondaAnterior, benchm
 
 export default function ResultadosTermometro({
   nombreCompania, estado, totalParticipantes, totalFormularios, resultados,
-  comparacion, rondaActual, rondaAnterior, benchmark, benchmarkN,
+  comparacion, rondaActual, rondaAnterior, benchmark, benchmarkN, dispersionPorDim,
 }: Props) {
   const hayComparacion = comparacion && comparacion.length > 0
   const getAnterior = (id: number) => comparacion?.find(c => c.id === id)?.promedio ?? null
   const hayBenchmark = !!benchmark && benchmark.length > 0
   const getBenchmark = (id: number) => benchmark?.find(b => b.id === id)?.promedio ?? null
+  const lectura = lecturaEjecutiva(resultados)
   return (
     <>
       {/* MOBILE */}
@@ -144,8 +157,7 @@ export default function ResultadosTermometro({
         </header>
 
         <div style={{ padding: '24px 20px 20px', borderBottom: '1.5px solid var(--ink)' }}>
-          <span className="page-header__eyebrow">Termómetro de 4{rondaActual && rondaActual > 1 ? ` · Ronda ${rondaActual}` : ''}</span>
-          <div className="page-header__rule" />
+          <ChipTipo etiqueta="Termómetro" rondaActual={rondaActual} />
           <h1 style={{ fontSize: 'clamp(28px, 8vw, 36px)', fontWeight: 900, letterSpacing: '-.02em', lineHeight: 1, margin: 0 }}>
             {nombreCompania}
           </h1>
@@ -198,8 +210,7 @@ export default function ResultadosTermometro({
 
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
           <div style={{ padding: '40px 56px 32px', borderBottom: '1.5px solid var(--ink)' }}>
-            <span className="page-header__eyebrow">Termómetro de 4{rondaActual && rondaActual > 1 ? ` · Ronda ${rondaActual}` : ''}</span>
-            <div className="page-header__rule" />
+            <ChipTipo etiqueta="Termómetro" rondaActual={rondaActual} />
             <h1 className="page-header__title" style={{ fontSize: 'clamp(32px,4vw,48px)' }}>
               {nombreCompania}
             </h1>
@@ -224,6 +235,21 @@ export default function ResultadosTermometro({
             </div>
           </div>
 
+          {/* Lectura ejecutiva: un titular grande que resume el termómetro */}
+          <SectionBar title="Lectura ejecutiva" subtitle="Una mirada en una frase" />
+          <div style={{
+            padding: '40px 56px 40px', borderBottom: '1.5px solid var(--ink)',
+            display: 'flex', justifyContent: 'center',
+          }}>
+            <h2 style={{
+              fontSize: 'clamp(36px,5vw,64px)', fontWeight: 900, letterSpacing: '-.035em',
+              lineHeight: 1, margin: 0, textAlign: 'center', color: 'var(--ink)',
+              background: lectura.color, padding: '20px 32px',
+            }}>
+              {lectura.titulo}
+            </h2>
+          </div>
+
           <SectionBar title="Lectura por dimensión" subtitle="Una pregunta por dimensión · Escala 1–10" />
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', borderBottom: '1.5px solid var(--ink)' }}>
             {resultados.map((dim, i, arr) => (
@@ -234,6 +260,26 @@ export default function ResultadosTermometro({
               </div>
             ))}
           </div>
+
+          {/* Dispersión: mini-histogramas + leyenda */}
+          {dispersionPorDim && (
+            <>
+              <SectionBar title="Dispersión del equipo" subtitle="Frecuencia de respuestas por dimensión" />
+              <div style={{ padding: '48px 56px 56px', display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', columnGap: 64, rowGap: 64 }}>
+                {resultados.map(dim => (
+                  <HistogramaDim
+                    key={dim.id}
+                    nombre={dim.nombre}
+                    subtitulo={dim.subtitulo}
+                    promedio={dim.promedio}
+                    desviacion={dim.desviacion}
+                    valores={dispersionPorDim[dim.id] ?? []}
+                  />
+                ))}
+              </div>
+              <LeyendaDispersion />
+            </>
+          )}
         </div>
 
         <div style={{ maxWidth: 1100, margin: '0 auto', padding: '24px', display: 'flex', justifyContent: 'space-between', fontSize: 10, color: 'var(--ink)', letterSpacing: '.08em', textTransform: 'uppercase', fontWeight: 600 }}>

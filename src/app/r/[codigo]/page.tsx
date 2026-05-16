@@ -170,6 +170,78 @@ export default async function ResultadosPage({ params }: { params: Promise<{ cod
       ? await fetchBenchmarkEspejo('equipo_en_espejo', diag.id)
       : null
     const totalFormulariosEspejo = new Set((respuestas ?? []).map(r => r.participante_id)).size
+
+    // Dispersión por dimensión × perspectiva: promedios por persona en
+    // cada combinación (dim, YO/EQUIPO). Para el histograma del Espejo.
+    const preguntaToDimPersp = new Map<string, { dim: number; persp: 'YO' | 'EQUIPO' }>()
+    for (const p of preguntas ?? []) {
+      const persp = p.rol === 'YO' ? 'YO' : p.rol === 'EQUIPO' ? 'EQUIPO' : null
+      if (!persp) continue
+      preguntaToDimPersp.set(p.id, { dim: p.dimension_id, persp })
+    }
+    type Cell = { suma: number; n: number }
+    const acumPart: Record<string, Record<number, { YO: Cell; EQUIPO: Cell }>> = {}
+    for (const r of respuestas ?? []) {
+      const meta = preguntaToDimPersp.get(r.pregunta_id)
+      if (!meta) continue
+      if (!acumPart[r.participante_id]) acumPart[r.participante_id] = {}
+      if (!acumPart[r.participante_id][meta.dim]) acumPart[r.participante_id][meta.dim] = { YO: { suma: 0, n: 0 }, EQUIPO: { suma: 0, n: 0 } }
+      acumPart[r.participante_id][meta.dim][meta.persp].suma += r.valor
+      acumPart[r.participante_id][meta.dim][meta.persp].n += 1
+    }
+    const dispersionPorDimEspejo: Record<number, { YO: number[]; EQUIPO: number[] }> = {
+      1: { YO: [], EQUIPO: [] }, 2: { YO: [], EQUIPO: [] },
+      3: { YO: [], EQUIPO: [] }, 4: { YO: [], EQUIPO: [] },
+    }
+    for (const partId of Object.keys(acumPart)) {
+      for (const dimStr of Object.keys(acumPart[partId])) {
+        const dim = Number(dimStr)
+        const cell = acumPart[partId][dim]
+        if (cell.YO.n > 0)     dispersionPorDimEspejo[dim].YO.push(cell.YO.suma / cell.YO.n)
+        if (cell.EQUIPO.n > 0) dispersionPorDimEspejo[dim].EQUIPO.push(cell.EQUIPO.suma / cell.EQUIPO.n)
+      }
+    }
+
+    // Ranking de "preguntas con mayor brecha Yo–Equipo". Las preguntas
+    // del Espejo vienen en pares conceptuales (mismo texto, una con rol
+    // YO y otra con EQUIPO), pero no hay un FK que los una explícito.
+    // Heurística: las parejamos por (dimension_id, orden) — el orden de
+    // cada pregunta dentro de su rol coincide.
+    const respPorPreg: Record<string, { suma: number; n: number }> = {}
+    for (const r of respuestas ?? []) {
+      if (!respPorPreg[r.pregunta_id]) respPorPreg[r.pregunta_id] = { suma: 0, n: 0 }
+      respPorPreg[r.pregunta_id].suma += r.valor
+      respPorPreg[r.pregunta_id].n += 1
+    }
+    type PregEspejo = { idYo: string; idEquipo: string; texto: string; dimension_id: number; promYo: number; promEquipo: number; brecha: number }
+    const pregsYo = (preguntas ?? []).filter(p => p.rol === 'YO').sort((a, b) => {
+      const ord = (x: typeof a) => (x as { orden?: number }).orden ?? 0
+      return a.dimension_id - b.dimension_id || ord(a) - ord(b)
+    })
+    const pregsEquipo = (preguntas ?? []).filter(p => p.rol === 'EQUIPO').sort((a, b) => {
+      const ord = (x: typeof a) => (x as { orden?: number }).orden ?? 0
+      return a.dimension_id - b.dimension_id || ord(a) - ord(b)
+    })
+    const preguntasBrechaEspejo: PregEspejo[] = []
+    for (let i = 0; i < Math.min(pregsYo.length, pregsEquipo.length); i++) {
+      const py = pregsYo[i]
+      const pe = pregsEquipo[i]
+      if (py.dimension_id !== pe.dimension_id) continue
+      const cy = respPorPreg[py.id]
+      const ce = respPorPreg[pe.id]
+      if (!cy || !ce || cy.n === 0 || ce.n === 0) continue
+      const promYo = Math.round((cy.suma / cy.n) * 10) / 10
+      const promEquipo = Math.round((ce.suma / ce.n) * 10) / 10
+      preguntasBrechaEspejo.push({
+        idYo: py.id, idEquipo: pe.id,
+        texto: (py as { texto: string }).texto,
+        dimension_id: py.dimension_id,
+        promYo, promEquipo,
+        brecha: Math.round(Math.abs(promYo - promEquipo) * 10) / 10,
+      })
+    }
+    preguntasBrechaEspejo.sort((a, b) => b.brecha - a.brecha)
+
     return (
       <ResultadosEspejo
         nombreCompania={diag.nombre_compania}
@@ -182,6 +254,8 @@ export default async function ResultadosPage({ params }: { params: Promise<{ cod
         rondaAnterior={rondaAnterior}
         benchmark={benchmark?.resultados ?? null}
         benchmarkN={benchmark?.nDiagnosticos ?? 0}
+        dispersionPorDimEspejo={dispersionPorDimEspejo}
+        preguntasBrechaEspejo={preguntasBrechaEspejo}
       />
     )
   }

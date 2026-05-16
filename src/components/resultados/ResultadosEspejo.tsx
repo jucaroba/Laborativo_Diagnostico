@@ -1,5 +1,6 @@
 import Image from 'next/image'
 import { DIMENSIONES } from '@/types'
+import { ChipTipo, dispersionBg, promedioBg, RANGOS_DISPERSION } from './_dispersion-shared'
 
 type Perspectiva = 'YO' | 'EQUIPO'
 
@@ -10,6 +11,16 @@ type DimResultado = {
   yo: { promedio: number | null; desviacion: number; n: number }
   equipo: { promedio: number | null; desviacion: number; n: number }
   delta: number
+}
+
+type PreguntaBrecha = {
+  idYo: string
+  idEquipo: string
+  texto: string
+  dimension_id: number
+  promYo: number
+  promEquipo: number
+  brecha: number
 }
 
 type Props = {
@@ -23,6 +34,10 @@ type Props = {
   rondaAnterior?: number
   benchmark?: DimResultado[] | null
   benchmarkN?: number
+  /** Para cada dimensión, lista de promedios por persona por perspectiva. */
+  dispersionPorDimEspejo?: Record<number, { YO: number[]; EQUIPO: number[] }>
+  /** Preguntas ordenadas por brecha Yo-Equipo (descendente). */
+  preguntasBrechaEspejo?: PreguntaBrecha[]
 }
 
 function DeltaRonda({ actual, anterior, rondaAnterior }: { actual: number | null; anterior: number | null; rondaAnterior?: number }) {
@@ -258,6 +273,7 @@ function RadarEspejo({ resultados, maxSize }: { resultados: DimResultado[]; maxS
 export default function ResultadosEspejo({
   nombreCompania, estado, totalParticipantes, totalFormularios, resultados,
   comparacion, rondaActual, rondaAnterior, benchmark, benchmarkN,
+  dispersionPorDimEspejo, preguntasBrechaEspejo,
 }: Props) {
   const getAnterior = (id: number) => comparacion?.find(c => c.id === id) ?? null
   const getBenchmark = (id: number) => benchmark?.find(b => b.id === id) ?? null
@@ -274,8 +290,7 @@ export default function ResultadosEspejo({
         </header>
 
         <div style={{ padding: '24px 20px 20px', borderBottom: '1.5px solid var(--ink)' }}>
-          <span className="page-header__eyebrow">Equipo en Espejo{rondaActual && rondaActual > 1 ? ` · Ronda ${rondaActual}` : ''}</span>
-          <div className="page-header__rule" />
+          <ChipTipo etiqueta="Espejo" rondaActual={rondaActual} />
           <h1 style={{ fontSize: 'clamp(28px, 8vw, 36px)', fontWeight: 900, letterSpacing: '-.02em', lineHeight: 1, margin: 0 }}>
             {nombreCompania}
           </h1>
@@ -334,8 +349,7 @@ export default function ResultadosEspejo({
 
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
           <div style={{ padding: '40px 56px 32px', borderBottom: '1.5px solid var(--ink)' }}>
-            <span className="page-header__eyebrow">Equipo en Espejo{rondaActual && rondaActual > 1 ? ` · Ronda ${rondaActual}` : ''}</span>
-            <div className="page-header__rule" />
+            <ChipTipo etiqueta="Espejo" rondaActual={rondaActual} />
             <h1 className="page-header__title" style={{ fontSize: 'clamp(32px,4vw,48px)' }}>
               {nombreCompania}
             </h1>
@@ -380,6 +394,35 @@ export default function ResultadosEspejo({
             <Leyenda />
             <RadarEspejo resultados={resultados} maxSize={520} />
           </div>
+
+          {/* Más alineado / Más distante: ranking de dimensiones por Δ */}
+          <AlineadoDistanteEspejo resultados={resultados} />
+
+          {/* Dispersión por perspectiva: mini-histograma con YO y EQUIPO superpuestos */}
+          {dispersionPorDimEspejo && (
+            <>
+              <SectionBar title="Dispersión del equipo" subtitle="Frecuencia de respuestas por dimensión y perspectiva" />
+              <div style={{ padding: '48px 56px 56px', display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', columnGap: 64, rowGap: 64 }}>
+                {resultados.map(dim => (
+                  <HistogramaEspejo
+                    key={dim.id}
+                    nombre={dim.nombre}
+                    subtitulo={dim.subtitulo}
+                    yo={dim.yo}
+                    equipo={dim.equipo}
+                    valoresYo={dispersionPorDimEspejo[dim.id]?.YO ?? []}
+                    valoresEquipo={dispersionPorDimEspejo[dim.id]?.EQUIPO ?? []}
+                  />
+                ))}
+              </div>
+              <LeyendaDispersionEspejo />
+            </>
+          )}
+
+          {/* Preguntas con mayor brecha Yo–Equipo */}
+          {preguntasBrechaEspejo && preguntasBrechaEspejo.length > 0 && (
+            <PreguntasBrechaEspejo preguntas={preguntasBrechaEspejo} />
+          )}
         </div>
 
         <div style={{ maxWidth: 1100, margin: '0 auto', padding: '24px', display: 'flex', justifyContent: 'space-between', fontSize: 10, color: 'var(--ink)', letterSpacing: '.08em', textTransform: 'uppercase', fontWeight: 600 }}>
@@ -390,3 +433,267 @@ export default function ResultadosEspejo({
     </>
   )
 }
+
+// ─── "El espejo más alineado / más distante" ─────────────────────
+// Ranking de dimensiones por Δ Yo-Equipo (las dos más alineadas y las
+// dos más distantes). Una lectura rápida de cohesión perspectival.
+function AlineadoDistanteEspejo({ resultados }: { resultados: DimResultado[] }) {
+  const sorted = [...resultados].sort((a, b) => a.delta - b.delta)
+  const masAlineada = sorted[0]
+  const masDistante = sorted[sorted.length - 1]
+  if (!masAlineada || !masDistante) return null
+  return (
+    <>
+      <SectionBar title="Más alineado · Más distante" subtitle="Dimensión con menor y mayor brecha Yo-Equipo" />
+      <div style={{
+        padding: '40px 56px 48px', borderBottom: '1.5px solid var(--ink)',
+        display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', columnGap: 56,
+      }}>
+        <CardAlineado dim={masAlineada} variante="alineado" />
+        <CardAlineado dim={masDistante} variante="distante" />
+      </div>
+    </>
+  )
+}
+
+function CardAlineado({ dim, variante }: { dim: DimResultado; variante: 'alineado' | 'distante' }) {
+  const color = variante === 'alineado' ? '#C8E6C9' : '#F2C2C2'
+  const titulo = variante === 'alineado' ? 'Más alineado' : 'Más distante'
+  const subtitulo = variante === 'alineado'
+    ? 'La mirada individual y la del equipo se parecen.'
+    : 'La mirada individual y la del equipo se separan.'
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+      <div>
+        <div style={{ fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--ink)', fontWeight: 700 }}>
+          {titulo}
+        </div>
+        <h3 style={{ fontSize: 24, fontWeight: 900, letterSpacing: '-.02em', margin: '4px 0 0', lineHeight: 1 }}>
+          {dim.nombre}
+        </h3>
+        <p style={{ fontSize: 13, color: 'var(--ink-2)', fontWeight: 500, margin: '6px 0 0', lineHeight: 1.4 }}>
+          {subtitulo}
+        </p>
+      </div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+        <span style={{
+          fontSize: 28, fontWeight: 900, letterSpacing: '-.03em', color: 'var(--ink)',
+          fontVariantNumeric: 'tabular-nums', lineHeight: 1,
+          background: color, padding: '6px 12px', display: 'inline-block',
+        }}>
+          Δ {dim.delta.toFixed(1)}
+        </span>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 4, fontVariantNumeric: 'tabular-nums' }}>
+          <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--ink-2)' }}>
+            Yo <b style={{ color: 'var(--ink)', fontWeight: 800 }}>{dim.yo.promedio !== null ? dim.yo.promedio.toFixed(1) : '—'}</b>
+          </span>
+          <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--ink-2)' }}>
+            Equipo <b style={{ color: 'var(--ink)', fontWeight: 800 }}>{dim.equipo.promedio !== null ? dim.equipo.promedio.toFixed(1) : '—'}</b>
+          </span>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ─── Histograma de Espejo: dos series superpuestas (YO + EQUIPO) ─
+function HistogramaEspejo({
+  nombre, subtitulo, yo, equipo, valoresYo, valoresEquipo,
+}: {
+  nombre: string
+  subtitulo: string
+  yo: { promedio: number | null; desviacion: number }
+  equipo: { promedio: number | null; desviacion: number }
+  valoresYo: number[]
+  valoresEquipo: number[]
+}) {
+  const bucketize = (valores: number[]) => {
+    const b = Array(10).fill(0) as number[]
+    for (const v of valores) {
+      const i = Math.max(1, Math.min(10, Math.round(v))) - 1
+      b[i] += 1
+    }
+    return b
+  }
+  const bucketsYo = bucketize(valoresYo)
+  const bucketsEquipo = bucketize(valoresEquipo)
+  const maxFreq = Math.max(1, ...bucketsYo, ...bucketsEquipo)
+  const ALTO = 130
+  const ROTULO = 16
+  const ALTO_BARRA = ALTO - ROTULO
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
+        <div>
+          <div style={{ fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--ink)', fontWeight: 700 }}>
+            {subtitulo}
+          </div>
+          <div style={{ fontSize: 18, fontWeight: 900, letterSpacing: '-.02em', lineHeight: 1, marginTop: 2 }}>
+            {nombre}
+          </div>
+        </div>
+        <span aria-hidden style={{ width: 1.5, alignSelf: 'stretch', background: 'var(--ink)' }} />
+        <PromedioCompacto label="Yo" valor={yo.promedio} dispersion={yo.desviacion} color={COLOR_YO} />
+        <PromedioCompacto label="Equipo" valor={equipo.promedio} dispersion={equipo.desviacion} color={COLOR_EQUIPO} />
+      </div>
+
+      <div style={{ position: 'relative' }}>
+        <div style={{
+          display: 'grid', gridTemplateColumns: 'repeat(10, 1fr)', gap: 6,
+          height: ALTO, borderBottom: '1px solid var(--ink)', alignItems: 'end',
+        }}>
+          {bucketsYo.map((_, i) => {
+            const nYo = bucketsYo[i]
+            const nEq = bucketsEquipo[i]
+            const hYo = (nYo / maxFreq) * ALTO_BARRA
+            const hEq = (nEq / maxFreq) * ALTO_BARRA
+            return (
+              <div key={i} style={{
+                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
+              }}>
+                <span style={{
+                  fontSize: 10, fontWeight: 800, color: 'var(--ink)',
+                  fontVariantNumeric: 'tabular-nums', lineHeight: 1,
+                  visibility: (nYo > 0 || nEq > 0) ? 'visible' : 'hidden',
+                }}>
+                  {nYo + nEq}
+                </span>
+                {/* Dos barras lado a lado dentro del slot */}
+                <div style={{
+                  width: '100%', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2,
+                  alignItems: 'end', justifyContent: 'center',
+                  flex: 1,
+                }}>
+                  <div title={`Yo · ${i + 1}: ${nYo}`} style={{
+                    height: `${hYo}px`, minHeight: nYo > 0 ? 4 : 0,
+                    background: COLOR_YO,
+                  }} />
+                  <div title={`Equipo · ${i + 1}: ${nEq}`} style={{
+                    height: `${hEq}px`, minHeight: nEq > 0 ? 4 : 0,
+                    background: COLOR_EQUIPO,
+                  }} />
+                </div>
+              </div>
+            )
+          })}
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(10, 1fr)', gap: 6, marginTop: 6 }}>
+          {Array.from({ length: 10 }, (_, i) => (
+            <span key={i} style={{
+              fontSize: 10, color: 'var(--mute)', fontWeight: 600,
+              textAlign: 'center', fontVariantNumeric: 'tabular-nums',
+            }}>{i + 1}</span>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function PromedioCompacto({ label, valor, dispersion, color }: { label: string; valor: number | null; dispersion: number; color: string }) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+      <span style={{ fontSize: 9, letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--ink)', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+        <span style={{ width: 10, height: 10, borderRadius: '50%', background: color }} />
+        {label}
+      </span>
+      <span style={{ fontSize: 18, fontWeight: 900, letterSpacing: '-.02em', color: 'var(--ink)', fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>
+        {valor !== null ? valor.toFixed(1) : '—'} <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--ink-2)' }}>± {dispersion.toFixed(1)}</span>
+      </span>
+    </div>
+  )
+}
+
+function LeyendaDispersionEspejo() {
+  return (
+    <div style={{ padding: '32px 56px 32px', borderBottom: '1.5px solid var(--ink)' }}>
+      <div style={{
+        border: '1.5px solid var(--ink)', background: 'var(--card)',
+        padding: '16px 20px',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        flexWrap: 'wrap', gap: 28, rowGap: 12,
+      }}>
+        <span style={{
+          fontSize: 11, fontWeight: 800, color: 'var(--ink)',
+          letterSpacing: '.06em', textTransform: 'uppercase',
+        }}>
+          Cómo leer la dispersión
+        </span>
+        {RANGOS_DISPERSION.map(r => (
+          <span key={r.rango} style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+            <span style={{
+              fontSize: 13, fontWeight: 800, color: 'var(--ink)', fontVariantNumeric: 'tabular-nums',
+              background: r.color, padding: '4px 10px',
+            }}>
+              {r.rango}
+            </span>
+            <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--ink)' }}>
+              {r.lectura}
+            </span>
+          </span>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+// ─── Preguntas con mayor brecha Yo–Equipo ────────────────────────
+function PreguntasBrechaEspejo({ preguntas }: { preguntas: PreguntaBrecha[] }) {
+  const top = preguntas.slice(0, 5)
+  const dimNombre = (id: number) => DIMENSIONES.find(d => d.id === id)?.nombre ?? ''
+
+  // Color del badge de brecha según tamaño
+  const brechaBg = (b: number) => b >= 2.5 ? '#F2C2C2' : b >= 1.5 ? '#FCE99A' : '#C8E6C9'
+
+  return (
+    <>
+      <SectionBar title="Preguntas con mayor brecha" subtitle="Dónde más se separan Yo y Equipo" />
+      <div style={{ padding: '40px 56px 48px', borderBottom: '1.5px solid var(--ink)', display: 'flex', flexDirection: 'column' }}>
+        {top.map((p, i) => (
+          <div
+            key={p.idYo}
+            style={{
+              display: 'grid', gridTemplateColumns: '90px 1fr 110px 110px',
+              padding: '16px 0', gap: 20,
+              borderTop: i === 0 ? '1.5px solid var(--ink)' : '1px solid var(--line-soft)',
+              borderBottom: i === top.length - 1 ? '1.5px solid var(--ink)' : 'none',
+              alignItems: 'center',
+            }}
+          >
+            <span style={{
+              fontSize: 22, fontWeight: 900, letterSpacing: '-.03em', color: 'var(--ink)',
+              fontVariantNumeric: 'tabular-nums', lineHeight: 1,
+              background: brechaBg(p.brecha), padding: '6px 10px',
+              display: 'inline-block', justifySelf: 'start',
+            }}>
+              Δ {p.brecha.toFixed(1)}
+            </span>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+              <span style={{ fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--ink)', fontWeight: 700 }}>
+                {dimNombre(p.dimension_id)}
+              </span>
+              <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--ink)', lineHeight: 1.4 }}>
+                {p.texto}
+              </span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontVariantNumeric: 'tabular-nums' }}>
+              <span style={{ width: 10, height: 10, borderRadius: '50%', background: COLOR_YO }} />
+              <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--ink)', letterSpacing: '.04em', textTransform: 'uppercase' }}>Yo</span>
+              <b style={{ fontSize: 16, fontWeight: 800, color: 'var(--ink)', marginLeft: 'auto' }}>{p.promYo.toFixed(1)}</b>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontVariantNumeric: 'tabular-nums' }}>
+              <span style={{ width: 10, height: 10, borderRadius: '50%', background: COLOR_EQUIPO }} />
+              <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--ink)', letterSpacing: '.04em', textTransform: 'uppercase' }}>Equipo</span>
+              <b style={{ fontSize: 16, fontWeight: 800, color: 'var(--ink)', marginLeft: 'auto' }}>{p.promEquipo.toFixed(1)}</b>
+            </div>
+          </div>
+        ))}
+      </div>
+    </>
+  )
+}
+
+// Reservado: helpers de dispersión simples por valor también disponibles si se necesita.
+void dispersionBg
+void promedioBg
