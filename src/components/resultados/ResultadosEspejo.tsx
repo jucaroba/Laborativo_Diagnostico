@@ -90,21 +90,84 @@ function Leyenda({ mobile }: { mobile?: boolean }) {
   )
 }
 
-function FilaPerspectiva({
-  label, valor, color, mobile,
-}: { label: string; valor: number | null; color: string; mobile?: boolean }) {
-  const pct = valor !== null ? ((valor - 1) / 9) * 100 : 0
+// Leyenda apilada vertical para acompañar el radar a su derecha.
+function LeyendaVertical() {
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: '64px 1fr 42px', gap: mobile ? 8 : 12, alignItems: 'center' }}>
-      <span style={{ fontSize: mobile ? 10 : 11, letterSpacing: '.08em', textTransform: 'uppercase', fontWeight: 700, color: 'var(--ink)' }}>{label}</span>
-      <div style={{ position: 'relative', height: mobile ? 11 : 14, border: '1.5px solid var(--ink)' }}>
-        {valor !== null && (
-          <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: `${pct}%`, background: color }} />
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 10, fontSize: 13, fontWeight: 600, color: 'var(--ink)' }}>
+      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+        <span style={{ width: 12, height: 12, borderRadius: '50%', background: COLOR_YO }} /> Yo
+      </span>
+      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+        <span style={{ width: 12, height: 12, borderRadius: '50%', background: COLOR_EQUIPO }} /> Equipo
+      </span>
+    </div>
+  )
+}
+
+// Barra única dividida horizontalmente: Yo arriba, Equipo abajo,
+// línea negra en el medio. Etiquetas a la izquierda, valores a la derecha.
+function BarrasYoEquipo({
+  yo, equipo, mobile,
+}: { yo: number | null; equipo: number | null; mobile?: boolean }) {
+  const pctYo = yo !== null ? ((yo - 1) / 9) * 100 : 0
+  const pctEq = equipo !== null ? ((equipo - 1) / 9) * 100 : 0
+  const altoBarra = mobile ? 36 : 44
+  return (
+    <div style={{ display: 'grid', gridTemplateColumns: '72px 1fr 48px', gap: mobile ? 8 : 12, alignItems: 'stretch' }}>
+      {/* Labels apilados a la izquierda */}
+      <div style={{ display: 'flex', flexDirection: 'column' }}>
+        <span style={{
+          flex: 1, display: 'flex', alignItems: 'center',
+          fontSize: mobile ? 10 : 11, letterSpacing: '.08em',
+          textTransform: 'uppercase', fontWeight: 700, color: 'var(--ink)',
+        }}>YO</span>
+        <span style={{
+          flex: 1, display: 'flex', alignItems: 'center',
+          fontSize: mobile ? 10 : 11, letterSpacing: '.08em',
+          textTransform: 'uppercase', fontWeight: 700, color: 'var(--ink)',
+        }}>EQUIPO</span>
+      </div>
+
+      {/* Barra única: mitad superior Yo, línea negra, mitad inferior Equipo */}
+      <div style={{
+        position: 'relative', height: altoBarra,
+        border: '1.5px solid var(--ink)',
+      }}>
+        {yo !== null && (
+          <div style={{
+            position: 'absolute', left: 0, top: 0, height: '50%',
+            width: `${pctYo}%`, background: COLOR_YO,
+          }} />
+        )}
+        <div aria-hidden style={{
+          position: 'absolute', left: 0, right: 0, top: '50%',
+          height: 1.5, background: 'var(--ink)', transform: 'translateY(-50%)',
+        }} />
+        {equipo !== null && (
+          <div style={{
+            position: 'absolute', left: 0, bottom: 0, height: '50%',
+            width: `${pctEq}%`, background: COLOR_EQUIPO,
+          }} />
         )}
       </div>
-      <b style={{ fontSize: mobile ? 14 : 16, fontWeight: 900, fontVariantNumeric: 'tabular-nums', textAlign: 'right', color: valor !== null ? 'var(--ink)' : 'var(--mute)' }}>
-        {valor !== null ? valor.toFixed(1) : '—'}
-      </b>
+
+      {/* Valores apilados a la derecha */}
+      <div style={{ display: 'flex', flexDirection: 'column', textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>
+        <b style={{
+          flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end',
+          fontSize: mobile ? 14 : 16, fontWeight: 900,
+          color: yo !== null ? 'var(--ink)' : 'var(--mute)',
+        }}>
+          {yo !== null ? yo.toFixed(1) : '—'}
+        </b>
+        <b style={{
+          flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end',
+          fontSize: mobile ? 14 : 16, fontWeight: 900,
+          color: equipo !== null ? 'var(--ink)' : 'var(--mute)',
+        }}>
+          {equipo !== null ? equipo.toFixed(1) : '—'}
+        </b>
+      </div>
     </div>
   )
 }
@@ -132,10 +195,7 @@ function DimCard({ dim, anterior, rondaAnterior, benchmark, benchmarkN, mobile }
           Δ {dim.delta.toFixed(1)}
         </span>
       </div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-        <FilaPerspectiva label="Yo" valor={dim.yo.promedio} color={COLOR_YO} mobile={mobile} />
-        <FilaPerspectiva label="Equipo" valor={dim.equipo.promedio} color={COLOR_EQUIPO} mobile={mobile} />
-      </div>
+      <BarrasYoEquipo yo={dim.yo.promedio} equipo={dim.equipo.promedio} mobile={mobile} />
       {anterior && (
         <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap', borderTop: '1px solid var(--line-soft)', paddingTop: 8 }}>
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
@@ -171,9 +231,13 @@ function RadarEspejo({ resultados, maxSize }: { resultados: DimResultado[]; maxS
   const center = size / 2
   const radius = size * 0.42
   const axes = DIMENSIONES.length
-  const padX = 8
-  const viewBoxY = 40
-  const viewBoxH = 440
+  // viewBox ajustado al cuadrado del polígono — sin aire extra arriba/abajo.
+  // El cuadrado va de (center-radius) a (center+radius) en ambos ejes.
+  const margin = 6
+  const left = center - radius - margin
+  const top = center - radius - margin
+  const w = radius * 2 + margin * 2
+  const h = radius * 2 + margin * 2
 
   const axisAngle = (i: number) => -Math.PI * 3 / 4 + (i * 2 * Math.PI) / axes
   const point = (i: number, val: number): [number, number] => {
@@ -181,21 +245,27 @@ function RadarEspejo({ resultados, maxSize }: { resultados: DimResultado[]; maxS
     const a = axisAngle(i)
     return [center + r * Math.cos(a), center + r * Math.sin(a)]
   }
+  // Labels en las 4 esquinas internas del cuadrado del radar.
   const labelAnchor = (i: number): { textAnchor: 'start' | 'end'; dominantBaseline: 'auto' | 'hanging' } => {
-    const a = axisAngle(i)
-    const dx = Math.cos(a)
-    const dy = Math.sin(a)
+    // i=0 sup-izq, 1 sup-der, 2 inf-der, 3 inf-izq
     return {
-      textAnchor: dx > 0 ? 'start' : 'end',
-      dominantBaseline: dy > 0 ? 'hanging' : 'auto',
+      textAnchor: (i === 1 || i === 2) ? 'end' : 'start',
+      dominantBaseline: (i === 0 || i === 1) ? 'hanging' : 'auto',
     }
   }
   const labelPos = (i: number): [number, number] => {
-    const r = radius + 14
-    const a = axisAngle(i)
-    const x = center + r * Math.cos(a)
-    const y = i < 2 ? 100 : 420
-    return [x, y]
+    const inset = 12
+    const x1 = center - radius + inset
+    const x2 = center + radius - inset
+    const y1 = center - radius + inset
+    const y2 = center + radius - inset
+    switch (i) {
+      case 0: return [x1, y1]   // sup-izq · Intención
+      case 1: return [x2, y1]   // sup-der · Motivación
+      case 2: return [x2, y2]   // inf-der · Interacción
+      case 3: return [x1, y2]   // inf-izq · Acción
+      default: return [center, center]
+    }
   }
 
   const valsYo     = DIMENSIONES.map(d => resultados.find(x => x.id === d.id)?.yo.promedio ?? null)
@@ -203,7 +273,7 @@ function RadarEspejo({ resultados, maxSize }: { resultados: DimResultado[]; maxS
   const completa = (vs: (number | null)[]) => vs.every(v => v !== null)
 
   return (
-    <svg viewBox={`${-padX} ${viewBoxY} ${size + padX * 2} ${viewBoxH}`} style={{ width: '100%', maxWidth: maxSize, height: 'auto' }}>
+    <svg viewBox={`${left} ${top} ${w} ${h}`} style={{ width: '100%', maxWidth: maxSize, height: 'auto' }}>
       {[2, 4, 6, 8, 10].map(level => (
         <polygon
           key={level}
@@ -395,22 +465,20 @@ export default function ResultadosEspejo({
             ))}
           </div>
 
-          {/* Forma del espejo + Más alineado/Más distante agrupados:
-              cards apiladas + leyenda a la izquierda, radar a la derecha. */}
-          <SectionBar title="Forma del espejo" subtitle="Yo y Equipo · más alineado y más distante" />
+          {/* Forma del espejo + Más alineado/Menos alineado agrupados:
+              cards apiladas a la izquierda, radar + leyenda lateral a la derecha. */}
+          <SectionBar title="Forma del espejo" subtitle="Yo y Equipo · más alineado y menos alineado" />
           <div style={{
-            padding: '8px 56px 8px', borderBottom: '1.5px solid var(--ink)',
+            padding: '16px 56px 16px', borderBottom: '1.5px solid var(--ink)',
             display: 'grid', gridTemplateColumns: '1fr 1.4fr', gap: 48, alignItems: 'center',
           }}>
-            {/* Izquierda: Más alineado, Más distante y leyenda apilados */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 48 }}>
-              <AlineadoDistanteApilado resultados={resultados} />
-              <Leyenda />
-            </div>
+            {/* Izquierda: Más alineado / Menos alineado apilados */}
+            <AlineadoDistanteApilado resultados={resultados} />
 
-            {/* Derecha: radar (sin leyenda, pegado al alto del bloque izquierdo) */}
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-              <RadarEspejo resultados={resultados} maxSize={624} />
+            {/* Derecha: radar + leyenda apilada vertical a su derecha */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16 }}>
+              <RadarEspejo resultados={resultados} maxSize={580} />
+              <LeyendaVertical />
             </div>
           </div>
 
@@ -467,32 +535,35 @@ function AlineadoDistanteApilado({ resultados }: { resultados: DimResultado[] })
 
 function CardAlineado({ dim, variante }: { dim: DimResultado; variante: 'alineado' | 'distante' }) {
   const color = variante === 'alineado' ? '#C8E6C9' : '#F2C2C2'
-  const titulo = variante === 'alineado' ? 'Más alineado' : 'Más distante'
+  const etiqueta = variante === 'alineado' ? 'Más alineado' : 'Menos alineado'
   const subtitulo = variante === 'alineado'
     ? 'La mirada individual y la del equipo se parecen.'
     : 'La mirada individual y la del equipo se separan.'
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-      <div>
-        <div style={{ fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--ink)', fontWeight: 700 }}>
-          {titulo}
-        </div>
-        <h3 style={{ fontSize: 24, fontWeight: 900, letterSpacing: '-.02em', margin: '4px 0 0', lineHeight: 1 }}>
+      {/* Label negro + nombre de la dimensión al lado derecho */}
+      <div style={{ display: 'inline-flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+        <span style={{
+          fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase', fontWeight: 700,
+          background: 'var(--ink)', color: '#fff', padding: '3px 10px',
+        }}>{etiqueta}</span>
+        <h3 style={{ fontSize: 24, fontWeight: 900, letterSpacing: '-.02em', margin: 0, lineHeight: 1 }}>
           {dim.nombre}
         </h3>
-        <p style={{ fontSize: 13, color: 'var(--ink-2)', fontWeight: 500, margin: '6px 0 0', lineHeight: 1.4 }}>
-          {subtitulo}
-        </p>
       </div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+      <p style={{ fontSize: 13, color: 'var(--ink-2)', fontWeight: 500, margin: 0, lineHeight: 1.4 }}>
+        {subtitulo}
+      </p>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+        {/* Caja del Δ 20% más grande */}
         <span style={{
-          fontSize: 28, fontWeight: 900, letterSpacing: '-.03em', color: 'var(--ink)',
+          fontSize: 34, fontWeight: 900, letterSpacing: '-.03em', color: 'var(--ink)',
           fontVariantNumeric: 'tabular-nums', lineHeight: 1,
-          background: color, padding: '6px 12px', display: 'inline-block',
+          background: color, padding: '10px 16px', display: 'inline-block',
         }}>
           Δ {dim.delta.toFixed(1)}
         </span>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, fontVariantNumeric: 'tabular-nums' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 2, fontVariantNumeric: 'tabular-nums' }}>
           <span style={{ fontSize: 16, fontWeight: 600, color: 'var(--ink-2)' }}>
             Yo <b style={{ color: 'var(--ink)', fontWeight: 800 }}>{dim.yo.promedio !== null ? dim.yo.promedio.toFixed(1) : '—'}</b>
           </span>
