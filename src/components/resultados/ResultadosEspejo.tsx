@@ -112,18 +112,21 @@ function FilaPerspectiva({
 function DimCard({ dim, anterior, rondaAnterior, benchmark, benchmarkN, mobile }: { dim: DimResultado; anterior?: DimResultado | null; rondaAnterior?: number; benchmark?: DimResultado | null; benchmarkN?: number; mobile?: boolean }) {
   return (
     <div style={{
-      padding: mobile ? '18px 20px 22px' : '28px 24px 28px',
+      padding: mobile ? '0' : '0',
       display: 'flex', flexDirection: 'column', gap: mobile ? 12 : 16,
     }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
+      {/* Header: dimensión + separador vertical + Δ, todo en la misma fila a la izquierda */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
         <div>
           <div style={{ fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--ink)', fontWeight: 700 }}>{dim.subtitulo}</div>
           <h3 style={{ fontSize: mobile ? 20 : 22, fontWeight: 900, letterSpacing: '-.02em', lineHeight: 1, margin: '4px 0 0' }}>{dim.nombre}</h3>
         </div>
+        <span aria-hidden style={{ width: 1.5, alignSelf: 'stretch', background: 'var(--ink)' }} />
         <span style={{
-          padding: '5px 10px', background: deltaBg(dim.delta),
-          fontSize: 12, fontWeight: 900, letterSpacing: '-.01em',
+          padding: '6px 10px', background: deltaBg(dim.delta),
+          fontSize: 14, fontWeight: 900, letterSpacing: '-.02em',
           fontVariantNumeric: 'tabular-nums', flexShrink: 0,
+          color: 'var(--ink)',
         }}>
           Δ {dim.delta.toFixed(1)}
         </span>
@@ -375,28 +378,39 @@ export default function ResultadosEspejo({
           </div>
 
           <SectionBar title="Brecha Yo ↔ Equipo" subtitle="Por dimensión, ordenadas por mayor brecha" />
-          <div style={{ padding: '20px 56px 12px', borderBottom: '1.5px solid var(--line-soft)' }}>
-            <Leyenda />
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', borderBottom: '1.5px solid var(--ink)' }}>
-            {[...resultados].sort((a, b) => b.delta - a.delta).map((dim, i, arr) => (
-              <div key={dim.id} style={{
-                borderRight: i % 2 === 0 ? '1.5px solid var(--ink)' : 'none',
-                borderBottom: i < arr.length - 2 ? '1.5px solid var(--ink)' : 'none',
-              }}>
-                <DimCard dim={dim} anterior={getAnterior(dim.id)} rondaAnterior={rondaAnterior} benchmark={getBenchmark(dim.id)} benchmarkN={benchmarkN} />
-              </div>
+          <div style={{
+            padding: '32px 56px 40px', borderBottom: '1.5px solid var(--ink)',
+            display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', columnGap: 56, rowGap: 32,
+          }}>
+            {[...resultados].sort((a, b) => b.delta - a.delta).map(dim => (
+              <DimCard
+                key={dim.id}
+                dim={dim}
+                anterior={getAnterior(dim.id)}
+                rondaAnterior={rondaAnterior}
+                benchmark={getBenchmark(dim.id)}
+                benchmarkN={benchmarkN}
+              />
             ))}
           </div>
 
-          <SectionBar title="Forma del espejo" subtitle="Yo y Equipo en una sola vista" />
-          <div style={{ padding: '32px 56px 48px', borderBottom: '1.5px solid var(--ink)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20 }}>
-            <Leyenda />
-            <RadarEspejo resultados={resultados} maxSize={520} />
-          </div>
+          {/* Forma del espejo + Más alineado/Más distante agrupados:
+              radar a la derecha, cards apiladas a la izquierda,
+              leyenda debajo del radar. */}
+          <SectionBar title="Forma del espejo" subtitle="Yo y Equipo · más alineado y más distante" />
+          <div style={{
+            padding: '16px 56px 24px', borderBottom: '1.5px solid var(--ink)',
+            display: 'grid', gridTemplateColumns: '1fr 1.4fr', gap: 48, alignItems: 'center',
+          }}>
+            {/* Izquierda: Más alineado / Más distante apilados */}
+            <AlineadoDistanteApilado resultados={resultados} />
 
-          {/* Más alineado / Más distante: ranking de dimensiones por Δ */}
-          <AlineadoDistanteEspejo resultados={resultados} />
+            {/* Derecha: radar + leyenda debajo */}
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
+              <RadarEspejo resultados={resultados} maxSize={624} />
+              <Leyenda />
+            </div>
+          </div>
 
           {/* Dispersión por perspectiva: mini-histograma con YO y EQUIPO superpuestos */}
           {dispersionPorDimEspejo && (
@@ -434,25 +448,18 @@ export default function ResultadosEspejo({
   )
 }
 
-// ─── "El espejo más alineado / más distante" ─────────────────────
-// Ranking de dimensiones por Δ Yo-Equipo (las dos más alineadas y las
-// dos más distantes). Una lectura rápida de cohesión perspectival.
-function AlineadoDistanteEspejo({ resultados }: { resultados: DimResultado[] }) {
+// ─── "El espejo más alineado / más distante" — versión apilada ───
+// Las dos cards una encima de la otra (para mostrar al lado del radar).
+function AlineadoDistanteApilado({ resultados }: { resultados: DimResultado[] }) {
   const sorted = [...resultados].sort((a, b) => a.delta - b.delta)
   const masAlineada = sorted[0]
   const masDistante = sorted[sorted.length - 1]
   if (!masAlineada || !masDistante) return null
   return (
-    <>
-      <SectionBar title="Más alineado · Más distante" subtitle="Dimensión con menor y mayor brecha Yo-Equipo" />
-      <div style={{
-        padding: '40px 56px 48px', borderBottom: '1.5px solid var(--ink)',
-        display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', columnGap: 56,
-      }}>
-        <CardAlineado dim={masAlineada} variante="alineado" />
-        <CardAlineado dim={masDistante} variante="distante" />
-      </div>
-    </>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
+      <CardAlineado dim={masAlineada} variante="alineado" />
+      <CardAlineado dim={masDistante} variante="distante" />
+    </div>
   )
 }
 
@@ -654,10 +661,9 @@ function PreguntasBrechaEspejo({ preguntas }: { preguntas: PreguntaBrecha[] }) {
           <div
             key={p.idYo}
             style={{
-              display: 'grid', gridTemplateColumns: '90px 1fr 110px 110px',
-              padding: '16px 0', gap: 20,
-              borderTop: i === 0 ? '1.5px solid var(--ink)' : '1px solid var(--line-soft)',
-              borderBottom: i === top.length - 1 ? '1.5px solid var(--ink)' : 'none',
+              display: 'grid', gridTemplateColumns: '90px 1fr auto auto',
+              padding: '16px 0', gap: 32,
+              borderTop: i === 0 ? 'none' : '1px solid var(--line-soft)',
               alignItems: 'center',
             }}
           >
@@ -680,12 +686,12 @@ function PreguntasBrechaEspejo({ preguntas }: { preguntas: PreguntaBrecha[] }) {
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontVariantNumeric: 'tabular-nums' }}>
               <span style={{ width: 10, height: 10, borderRadius: '50%', background: COLOR_YO }} />
               <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--ink)', letterSpacing: '.04em', textTransform: 'uppercase' }}>Yo</span>
-              <b style={{ fontSize: 16, fontWeight: 800, color: 'var(--ink)', marginLeft: 'auto' }}>{p.promYo.toFixed(1)}</b>
+              <b style={{ fontSize: 16, fontWeight: 800, color: 'var(--ink)' }}>{p.promYo.toFixed(1)}</b>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontVariantNumeric: 'tabular-nums' }}>
               <span style={{ width: 10, height: 10, borderRadius: '50%', background: COLOR_EQUIPO }} />
               <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--ink)', letterSpacing: '.04em', textTransform: 'uppercase' }}>Equipo</span>
-              <b style={{ fontSize: 16, fontWeight: 800, color: 'var(--ink)', marginLeft: 'auto' }}>{p.promEquipo.toFixed(1)}</b>
+              <b style={{ fontSize: 16, fontWeight: 800, color: 'var(--ink)' }}>{p.promEquipo.toFixed(1)}</b>
             </div>
           </div>
         ))}
