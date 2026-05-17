@@ -135,7 +135,7 @@ export default async function ComparativoCompaniaPage({ params }: { params: Prom
       <div style={{ maxWidth: 1200, margin: '0 auto' }}>
 
         {/* Título */}
-        <div style={{ padding: '40px 40px 32px', borderBottom: '1.5px solid var(--ink)' }}>
+        <div style={{ padding: '40px 24px 32px', borderBottom: '1.5px solid var(--ink)' }}>
           <span style={{
             display: 'inline-block', padding: '2px 8px', marginBottom: 8,
             fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase',

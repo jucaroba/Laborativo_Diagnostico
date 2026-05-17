@@ -216,7 +216,7 @@ export default function ResultadosPulso({
         </header>
 
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-          <div style={{ padding: '40px 56px 32px', borderBottom: '1.5px solid var(--ink)' }}>
+          <div style={{ padding: '40px 24px 32px', borderBottom: '1.5px solid var(--ink)' }}>
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: 10, marginBottom: 12, flexWrap: 'wrap' }}>
               <span style={{
                 fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase', fontWeight: 700,

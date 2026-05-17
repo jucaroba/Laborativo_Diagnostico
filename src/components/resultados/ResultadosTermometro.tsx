@@ -293,7 +293,7 @@ export default function ResultadosTermometro({
         </header>
 
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-          <div style={{ padding: '40px 56px 32px', borderBottom: '1.5px solid var(--ink)' }}>
+          <div style={{ padding: '40px 24px 32px', borderBottom: '1.5px solid var(--ink)' }}>
             <ChipTipo etiqueta="Termómetro" rondaActual={rondaActual} />
             <h1 className="page-header__title" style={{ fontSize: 'clamp(32px,4vw,48px)' }}>
               {nombreCompania}
