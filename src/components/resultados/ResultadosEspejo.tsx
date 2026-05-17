@@ -134,7 +134,7 @@ function BarrasYoEquipo({
       }}>
         {yo !== null && (
           <div style={{
-            position: 'absolute', left: 0, top: 0, height: '50%',
+            position: 'absolute', left: 0, top: 0, height: 'calc(50% - 1px)',
             width: `${pctYo}%`, background: COLOR_YO,
           }} />
         )}
@@ -144,7 +144,7 @@ function BarrasYoEquipo({
         }} />
         {equipo !== null && (
           <div style={{
-            position: 'absolute', left: 0, bottom: 0, height: '50%',
+            position: 'absolute', left: 0, bottom: 0, height: 'calc(50% - 1px)',
             width: `${pctEq}%`, background: COLOR_EQUIPO,
           }} />
         )}
