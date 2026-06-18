@@ -33,19 +33,19 @@ const EJES: Record<number, { A: string; C: string; D: string; B: string }[]> = {
   // ── Dimensión 1 · Intención (Sentido — ¿A dónde vamos?) ──
   1: [
     {
-      A: 'Tengo claridad sobre hacia dónde se dirige la organización',
+      A: 'Me interesa tener claridad sobre hacia dónde se dirige la organización',
       C: 'Mi líder transmite con claridad hacia dónde se dirige la organización',
       D: 'Transmito con claridad a mi equipo hacia dónde se dirige la organización',
       B: 'Mi equipo tiene claridad sobre hacia dónde se dirige la organización',
     },
     {
-      A: 'Entiendo cómo mi trabajo diario contribuye al propósito de la organización',
+      A: 'Me esfuerzo por contribuir con mi trabajo diario al propósito de la organización',
       C: 'Mi líder ayuda a conectar nuestro trabajo diario con el propósito de la organización',
       D: 'Ayudo a mi equipo a conectar su trabajo diario con el propósito de la organización',
       B: 'Mi equipo conecta su trabajo diario con el propósito de la organización',
     },
     {
-      A: 'Me entusiasma la visión de futuro que tenemos como organización',
+      A: 'Me involucro con la visión de futuro de la organización',
       C: 'Mi líder transmite una visión de futuro que me entusiasma',
       D: 'Transmito a mi equipo una visión de futuro que los entusiasma',
       B: 'A mi equipo lo entusiasma la visión de futuro que tenemos como organización',
@@ -54,19 +54,19 @@ const EJES: Record<number, { A: string; C: string; D: string; B: string }[]> = {
   // ── Dimensión 2 · Motivación (Energía — ¿Por qué?) ──
   2: [
     {
-      A: 'Trabajo con energía y entusiasmo en mi día a día',
+      A: 'Pongo energía y entusiasmo en mi trabajo diario',
       C: 'Mi líder transmite energía y entusiasmo al equipo',
       D: 'Transmito energía y entusiasmo a mi equipo',
       B: 'Mi equipo trabaja con energía y entusiasmo en su día a día',
     },
     {
-      A: 'Siento que mi esfuerzo y mis logros son reconocidos',
+      A: 'Reconozco y valoro el esfuerzo y los logros de mis compañeros',
       C: 'Mi líder reconoce oportunamente el esfuerzo y los logros del equipo',
       D: 'Reconozco oportunamente el esfuerzo y los logros de mi equipo',
       B: 'Mi equipo se siente reconocido por su esfuerzo y sus logros',
     },
     {
-      A: 'Estoy dispuesto a dar más de lo estrictamente requerido',
+      A: 'Doy más de lo estrictamente requerido cuando se necesita',
       C: 'Mi líder genera las condiciones para que el equipo dé lo mejor de sí',
       D: 'Genero las condiciones para que mi equipo dé lo mejor de sí',
       B: 'Mi equipo da más de lo estrictamente requerido',
@@ -75,19 +75,19 @@ const EJES: Record<number, { A: string; C: string; D: string; B: string }[]> = {
   // ── Dimensión 3 · Interacción (Vínculos — ¿Con quién?) ──
   3: [
     {
-      A: 'En el equipo nos comunicamos de forma abierta y honesta',
+      A: 'Me comunico de forma abierta y honesta con mi equipo',
       C: 'Mi líder mantiene una comunicación abierta y honesta con el equipo',
       D: 'Mantengo una comunicación abierta y honesta con mi equipo',
       B: 'Mi equipo se comunica de forma abierta y honesta',
     },
     {
-      A: 'Existe confianza entre las personas del equipo',
+      A: 'Contribuyo a generar confianza dentro del equipo',
       C: 'Mi líder genera confianza en su relación con el equipo',
       D: 'Genero confianza en mi relación con el equipo',
       B: 'En mi equipo las personas se tienen confianza entre sí',
     },
     {
-      A: 'Los desacuerdos en el equipo se abordan de forma constructiva',
+      A: 'Abordo los desacuerdos del equipo de forma constructiva',
       C: 'Mi líder escucha y aborda los desacuerdos de forma constructiva',
       D: 'Escucho y abordo los desacuerdos del equipo de forma constructiva',
       B: 'Mi equipo aborda los desacuerdos de forma constructiva',
@@ -96,19 +96,19 @@ const EJES: Record<number, { A: string; C: string; D: string; B: string }[]> = {
   // ── Dimensión 4 · Acción (Comportamiento — ¿Qué?) ──
   4: [
     {
-      A: 'Cumplimos consistentemente con los compromisos que adquirimos',
+      A: 'Cumplo consistentemente con los compromisos que adquiero',
       C: 'Mi líder cumple consistentemente con los compromisos que adquiere',
       D: 'Cumplo consistentemente con los compromisos que adquiero',
       B: 'Mi equipo cumple consistentemente con los compromisos que adquiere',
     },
     {
-      A: 'Tengo autonomía para actuar y tomar decisiones en mi trabajo',
+      A: 'Tomo la iniciativa para actuar y decidir en mi trabajo',
       C: 'Mi líder nos da autonomía para actuar y tomar decisiones',
       D: 'Doy a mi equipo autonomía para actuar y tomar decisiones',
       B: 'Mi equipo actúa con autonomía y toma decisiones por su cuenta',
     },
     {
-      A: 'Nos adaptamos con rapidez a los cambios y aprendemos de los errores',
+      A: 'Me adapto con rapidez a los cambios y aprendo de mis errores',
       C: 'Mi líder ayuda al equipo a adaptarse a los cambios y aprender de los errores',
       D: 'Ayudo a mi equipo a adaptarse a los cambios y aprender de los errores',
       B: 'Mi equipo se adapta con rapidez a los cambios y aprende de los errores',
