@@ -1,8 +1,9 @@
 'use client'
 
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import { LayoutGrid, FileText, Users, type LucideIcon } from 'lucide-react'
+import { usePathname, useRouter } from 'next/navigation'
+import { LayoutGrid, FileText, Users, LogOut, type LucideIcon } from 'lucide-react'
+import { createSupabaseBrowser } from '@/lib/supabase-browser'
 
 type Item = {
   label: string
@@ -51,6 +52,13 @@ export const SIDEBAR_WIDTH = 232
 
 export default function Sidebar() {
   const pathname = usePathname()
+  const router = useRouter()
+
+  async function salir() {
+    await createSupabaseBrowser().auth.signOut()
+    router.replace('/admin/login')
+    router.refresh()
+  }
 
   return (
     <aside className="admin-sidebar">
@@ -76,6 +84,13 @@ export default function Sidebar() {
           </ul>
         </div>
       ))}
+      <div className="admin-sidebar__section" style={{ marginTop: 'auto' }}>
+        <div className="admin-sidebar__divider" />
+        <button onClick={salir} className="admin-sidebar__link" style={{ background: 'none', border: 'none', cursor: 'pointer', width: '100%', textAlign: 'left', font: 'inherit' }}>
+          <LogOut size={16} strokeWidth={2} />
+          Cerrar sesión
+        </button>
+      </div>
     </aside>
   )
 }

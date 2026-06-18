@@ -1,9 +1,15 @@
 'use client'
 import Image from 'next/image'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import Sidebar from '@/components/admin/Sidebar'
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname()
+
+  // El login se muestra sin el chrome del admin (ni sidebar ni header).
+  if (pathname === '/admin/login') return <>{children}</>
+
   return (
     <div style={{ minHeight: '100vh', background: '#F5F5F5', fontFamily: "'Red Hat Display', sans-serif" }}>
       <header className="admin-header">
