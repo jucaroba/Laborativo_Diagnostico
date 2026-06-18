@@ -111,6 +111,7 @@ export default function EquiposSection({ diagnosticoId, tipo, codigoResultadosCo
             <EquipoCard
               key={e.id}
               equipo={e}
+              diagnosticoId={diagnosticoId}
               tipoConfig={tipoConfig}
               completados={completadosPorEquipo[e.id] ?? 0}
               onEliminar={() => abrirEliminar(e)}
@@ -166,8 +167,8 @@ type TipoConfig = (typeof TIPOS_DIAGNOSTICO)[TipoDiagnostico]
 
 // ─── Card de cada equipo ─────────────────────────────────────────────
 function EquipoCard({
-  equipo, tipoConfig, completados, onEliminar,
-}: { equipo: Equipo; tipoConfig: TipoConfig | undefined; completados: number; onEliminar: () => void }) {
+  equipo, diagnosticoId, tipoConfig, completados, onEliminar,
+}: { equipo: Equipo; diagnosticoId: string; tipoConfig: TipoConfig | undefined; completados: number; onEliminar: () => void }) {
   const linkParticipacion = `${BASE_URL}/d/${equipo.codigo_participacion}`
   const linkFormulario   = `${BASE_URL}/d/${equipo.codigo_participacion}/intake`
   const linkDashboard    = `${BASE_URL}/r/${equipo.codigo_resultados}`
@@ -196,6 +197,17 @@ function EquipoCard({
             <span title="Cuestionarios completados">{completados}</span>
           </span>
         )}
+        <Link
+          href={`/admin/${diagnosticoId}/respuestas/${equipo.id}`}
+          title="Ver respuestas por persona (uso interno)"
+          style={{
+            fontSize: 11, fontWeight: 700, letterSpacing: '.04em', textTransform: 'uppercase',
+            color: 'var(--ink)', textDecoration: 'none', border: '1.5px solid var(--ink)',
+            padding: '3px 8px', display: 'inline-flex', alignItems: 'center', gap: 4,
+          }}
+        >
+          Respuestas <ArrowUpRight size={12} strokeWidth={2.5} />
+        </Link>
         <button
           onClick={onEliminar}
           title="Eliminar equipo"

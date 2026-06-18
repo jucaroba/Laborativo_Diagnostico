@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { enviarInvitacionParticipante } from '@/lib/resend'
 
-type Entrada = { nombre: string; email: string }
+type Entrada = { nombre: string; email: string; area?: string }
 
 export async function POST(req: NextRequest) {
   try {
@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
     }
 
     const limpia = lista
-      .map(e => ({ nombre: (e.nombre || '').trim(), email: (e.email || '').trim().toLowerCase() }))
+      .map(e => ({ nombre: (e.nombre || '').trim(), email: (e.email || '').trim().toLowerCase(), area: (e.area || '').trim() || null }))
       .filter(e => e.nombre && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e.email))
 
     if (limpia.length === 0) {
@@ -53,10 +53,12 @@ export async function POST(req: NextRequest) {
           equipo_id: equipoId,
           nombre: e.nombre,
           email: e.email,
+          area: e.area,
         })),
         { onConflict: 'equipo_id,email' }
       )
-      .select('id, nombre, email')
+      // token: lo genera la BD por default al insertar; lo recuperamos para el link personalizado.
+      .select('id, nombre, email, token')
 
     if (upsertError || !filas) {
       return NextResponse.json({ error: upsertError?.message || 'Error al guardar' }, { status: 500 })
@@ -69,6 +71,7 @@ export async function POST(req: NextRequest) {
           participanteNombre: f.nombre,
           nombreCompania: diag.nombre_compania,
           codigoParticipacion: equipo.codigo_participacion,
+          token: f.token,
         }).then(() => f.id)
       )
     )

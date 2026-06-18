@@ -11,6 +11,7 @@ const PERFILES = [
 
 export default function IntakeFormMobile({
   nombreCompania,
+  invitadoNombre = null,
   tipo = 'cultura_360',
   preguntasEquipo,
   preguntasLider,
@@ -21,6 +22,7 @@ export default function IntakeFormMobile({
   onComenzar,
 }: {
   nombreCompania: string
+  invitadoNombre?: string | null
   tipo?: TipoDiagnostico
   preguntasEquipo: number
   preguntasLider: number
@@ -38,6 +40,11 @@ export default function IntakeFormMobile({
       <span className="eyebrow">{esSimple ? 'Registro' : 'Paso 01 / 02 — Registro'}</span>
       <div className="rule" />
       <div style={{ fontSize: 12, color: 'var(--ink)', fontWeight: 700, marginTop: 8, textTransform: 'uppercase', letterSpacing: '.08em' }}>{nombreCompania}</div>
+      {invitadoNombre && (
+        <div style={{ fontSize: 14, color: 'var(--ink-2)', fontWeight: 600 }}>
+          Hola, {invitadoNombre}. Respondes con tu link personal.
+        </div>
+      )}
       <h2 style={{ fontWeight: 900, fontSize: 'clamp(32px, 9vw, 44px)', lineHeight: .95, letterSpacing: -.5, margin: 0 }}>
         {esSimple ? <>Antes de empezar,<br />unas notas rápidas.</> : <>Antes de empezar,<br />elige tu rol.</>}
       </h2>

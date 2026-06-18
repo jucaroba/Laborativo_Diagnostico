@@ -11,20 +11,21 @@ import CopiarLink from './CopiarLink'
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
-type Fila = { nombre: string; email: string; valido: boolean; duplicado: boolean }
+type Fila = { nombre: string; email: string; area: string; valido: boolean; duplicado: boolean }
 
 function parsear(texto: string): Fila[] {
   const lineas = texto.split(/\r?\n/).map(l => l.trim()).filter(Boolean)
   const vistos = new Set<string>()
   return lineas.map(linea => {
     const partes = linea.split(/\t|,|;/).map(p => p.trim()).filter(Boolean)
-    const [nombre = '', email = ''] = partes
+    const [nombre = '', email = '', area = ''] = partes
     const emailLower = email.toLowerCase()
     const duplicado = !!emailLower && vistos.has(emailLower)
     if (emailLower) vistos.add(emailLower)
     return {
       nombre,
       email: emailLower,
+      area,
       valido: !!nombre && EMAIL_RE.test(emailLower),
       duplicado,
     }
@@ -50,7 +51,7 @@ export default function InvitarEquipoDialog({ equipoId, variant = 'button', copy
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           equipoId,
-          lista: validos.map(f => ({ nombre: f.nombre, email: f.email })),
+          lista: validos.map(f => ({ nombre: f.nombre, email: f.email, area: f.area })),
         }),
       })
       const data = await r.json()
@@ -154,7 +155,7 @@ export default function InvitarEquipoDialog({ equipoId, variant = 'button', copy
               <textarea
                 value={texto}
                 onChange={(e) => setTexto(e.target.value)}
-                placeholder={'María Pérez\tmaria@empresa.com\nJuan López\tjuan@empresa.com'}
+                placeholder={'María Pérez\tmaria@empresa.com\tVentas\nJuan López\tjuan@empresa.com\tOperaciones'}
                 style={{
                   width: '100%',
                   minHeight: 140,
@@ -175,6 +176,7 @@ export default function InvitarEquipoDialog({ equipoId, variant = 'button', copy
                       <tr style={{ background: 'var(--ink)', color: 'var(--bg)' }}>
                         <th style={{ textAlign: 'left', padding: '6px 10px', fontWeight: 700, letterSpacing: '.04em', textTransform: 'uppercase' }}>Nombre</th>
                         <th style={{ textAlign: 'left', padding: '6px 10px', fontWeight: 700, letterSpacing: '.04em', textTransform: 'uppercase' }}>Email</th>
+                        <th style={{ textAlign: 'left', padding: '6px 10px', fontWeight: 700, letterSpacing: '.04em', textTransform: 'uppercase' }}>Área</th>
                         <th style={{ textAlign: 'left', padding: '6px 10px', fontWeight: 700, letterSpacing: '.04em', textTransform: 'uppercase', width: 110 }}>Estado</th>
                       </tr>
                     </thead>
@@ -186,6 +188,7 @@ export default function InvitarEquipoDialog({ equipoId, variant = 'button', copy
                           <tr key={i} style={{ borderTop: '1px solid var(--line-soft)' }}>
                             <td style={{ padding: '6px 10px' }}>{f.nombre || <em style={{ color: '#FF3366' }}>(faltante)</em>}</td>
                             <td style={{ padding: '6px 10px' }}>{f.email || <em style={{ color: '#FF3366' }}>(faltante)</em>}</td>
+                            <td style={{ padding: '6px 10px', color: f.area ? 'inherit' : 'var(--mute)' }}>{f.area || '—'}</td>
                             <td style={{ padding: '6px 10px', color, fontWeight: 700 }}>{estado}</td>
                           </tr>
                         )

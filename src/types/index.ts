@@ -86,6 +86,22 @@ export interface Participante {
   id: string
   equipo_id: string
   rol: Rol
+  /** Invitación de la persona (link personalizado). null = respondió anónimo. */
+  invitacion_id?: string | null
+  created_at: string
+}
+
+export interface Invitacion {
+  id: string
+  diagnostico_id: string
+  equipo_id: string
+  nombre: string
+  email: string
+  area: string | null
+  /** Token del link personalizado (uso interno). */
+  token?: string
+  enviado_at: string | null
+  respondido_at?: string | null
   created_at: string
 }
 

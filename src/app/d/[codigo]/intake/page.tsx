@@ -4,8 +4,9 @@ import IntakeForm from '@/components/diagnostico/IntakeForm'
 import EstadoNoDisponible from '@/components/diagnostico/EstadoNoDisponible'
 import type { TipoDiagnostico } from '@/types'
 
-export default async function IntakePage({ params }: { params: Promise<{ codigo: string }> }) {
+export default async function IntakePage({ params, searchParams }: { params: Promise<{ codigo: string }>; searchParams: Promise<{ t?: string }> }) {
   const { codigo } = await params
+  const { t: token } = await searchParams
 
   // Resolución por equipo: el código identifica a UN equipo dentro de una compañía.
   const { data: equipo } = await supabase
@@ -15,6 +16,18 @@ export default async function IntakePage({ params }: { params: Promise<{ codigo:
     .single()
 
   if (!equipo) notFound()
+
+  // Link personalizado: el token resuelve la invitación de la persona (debe ser
+  // de este equipo). Si no hay token o no coincide, se responde de forma anónima.
+  let invitacion: { id: string; nombre: string } | null = null
+  if (token) {
+    const { data } = await supabase
+      .from('invitaciones')
+      .select('id, nombre, equipo_id')
+      .eq('token', token)
+      .single()
+    if (data && data.equipo_id === equipo.id) invitacion = { id: data.id, nombre: data.nombre }
+  }
 
   const { data: diag } = await supabase
     .from('diagnosticos')
@@ -52,6 +65,8 @@ export default async function IntakePage({ params }: { params: Promise<{ codigo:
       preguntasEquipo={conteo.A + conteo.C}
       preguntasLider={conteo.D + conteo.B}
       preguntasColectivo={preguntasColectivo}
+      invitacionId={invitacion?.id ?? null}
+      invitadoNombre={invitacion?.nombre ?? null}
     />
   )
 }

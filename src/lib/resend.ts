@@ -36,9 +36,12 @@ export async function enviarInvitacionParticipante(params: {
   participanteNombre: string
   nombreCompania: string
   codigoParticipacion: string
+  /** Token de la invitación: hace el link personalizado y enlaza las respuestas con la persona. */
+  token?: string
 }) {
-  const { participanteEmail, participanteNombre, nombreCompania, codigoParticipacion } = params
-  const link = `${BASE_URL}/d/${codigoParticipacion}/intake`
+  const { participanteEmail, participanteNombre, nombreCompania, codigoParticipacion, token } = params
+  // Link personalizado: el token identifica a la persona al iniciar el cuestionario.
+  const link = `${BASE_URL}/d/${codigoParticipacion}/intake${token ? `?t=${token}` : ''}`
 
   return getResend().emails.send({
     from: 'Laborativo <diagnostico@laborativo.com>',
@@ -47,7 +50,8 @@ export async function enviarInvitacionParticipante(params: {
     html: `
       <p>Hola ${participanteNombre},</p>
       <p>Estás invitado/a a participar en el diagnóstico organizacional de <strong>${nombreCompania}</strong>.</p>
-      <p>Toma entre 12 y 18 minutos. Tus respuestas son anónimas y se usan para mapear las brechas de cultura del equipo.</p>
+      <p>Toma entre 12 y 18 minutos. Este es tu link personal, no lo compartas.</p>
+      <p>Tus respuestas son confidenciales: tu empresa solo verá los resultados consolidados del equipo. Laborativo, como tercero independiente, conserva el detalle de forma reservada para análisis.</p>
       <p><a href="${link}">Comenzar diagnóstico →</a></p>
       <p style="font-size: 13px; color: #666;">O copia este link: ${link}</p>
       <br/>

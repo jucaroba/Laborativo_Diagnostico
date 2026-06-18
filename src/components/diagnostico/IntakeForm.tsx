@@ -14,7 +14,7 @@ const PERFILES = [
   { id: 'lider' as Perfil, h: 'Líder del equipo', p: 'Responderás desde tu rol de liderazgo.\nIncluye tu auto-evaluación y tu mirada sobre el equipo que lideras.' },
 ]
 
-export default function IntakeForm({ equipoId, nombreCompania, codigo, tipo = 'cultura_360', preguntasEquipo, preguntasLider, preguntasColectivo = 0 }: {
+export default function IntakeForm({ equipoId, nombreCompania, codigo, tipo = 'cultura_360', preguntasEquipo, preguntasLider, preguntasColectivo = 0, invitacionId = null, invitadoNombre = null }: {
   equipoId: string
   nombreCompania: string
   codigo: string
@@ -22,6 +22,9 @@ export default function IntakeForm({ equipoId, nombreCompania, codigo, tipo = 'c
   preguntasEquipo: number
   preguntasLider: number
   preguntasColectivo?: number
+  /** Invitación resuelta desde el token del link personalizado (null = anónimo). */
+  invitacionId?: string | null
+  invitadoNombre?: string | null
 }) {
   const router = useRouter()
   const [perfil, setPerfil] = useState<Perfil | null>(null)
@@ -38,11 +41,31 @@ export default function IntakeForm({ equipoId, nombreCompania, codigo, tipo = 'c
 
     const rol = esSimple ? rolUnico : perfil === 'equipo' ? 'A' : 'D'
 
-    const { data: participante } = await supabase
-      .from('participantes')
-      .insert({ equipo_id: equipoId, rol })
-      .select()
-      .single()
+    // Si la persona llegó por su link personalizado y ya había empezado con este
+    // mismo rol, reusamos su participante para no duplicar respuestas.
+    let participante: { id: string } | null = null
+    if (invitacionId) {
+      const { data: existente } = await supabase
+        .from('participantes')
+        .select('id')
+        .eq('invitacion_id', invitacionId)
+        .eq('rol', rol)
+        .maybeSingle()
+      if (existente) participante = existente
+    }
+
+    if (!participante) {
+      // invitacion_id solo se incluye cuando hay invitación, para no depender de
+      // la columna en el flujo anónimo (compatibilidad pre-migración).
+      const payload: { equipo_id: string; rol: string; invitacion_id?: string } = { equipo_id: equipoId, rol }
+      if (invitacionId) payload.invitacion_id = invitacionId
+      const { data } = await supabase
+        .from('participantes')
+        .insert(payload)
+        .select('id')
+        .single()
+      participante = data
+    }
 
     if (participante) {
       sessionStorage.setItem('pid', participante.id)
@@ -57,6 +80,7 @@ export default function IntakeForm({ equipoId, nombreCompania, codigo, tipo = 'c
     <div className="only-mobile">
       <IntakeFormMobile
         nombreCompania={nombreCompania}
+        invitadoNombre={invitadoNombre}
         tipo={tipo}
         preguntasEquipo={preguntasEquipo}
         preguntasLider={preguntasLider}
@@ -71,6 +95,11 @@ export default function IntakeForm({ equipoId, nombreCompania, codigo, tipo = 'c
       <span className="eyebrow">{esSimple ? 'Registro' : 'Paso 01 / 02 — Registro'}</span>
       <div className="rule" />
       <div style={{ fontSize: 13, color: 'var(--ink)', fontWeight: 700, marginTop: 24, marginLeft: 100, textTransform: 'uppercase', letterSpacing: '.08em' }}>{nombreCompania}</div>
+      {invitadoNombre && (
+        <div style={{ fontSize: 15, color: 'var(--ink-2)', fontWeight: 600, marginTop: -12, marginLeft: 100 }}>
+          Hola, {invitadoNombre}. Respondes con tu link personal.
+        </div>
+      )}
       <h2 style={{ fontWeight: 900, fontSize: 64, lineHeight: .92, letterSpacing: -1, marginLeft: 100 }}>
         {esSimple ? <>Antes de empezar,<br />unas notas rápidas.</> : <>Antes de empezar,<br />elige tu rol.</>}
       </h2>
