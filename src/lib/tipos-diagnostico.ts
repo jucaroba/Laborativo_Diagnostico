@@ -31,7 +31,10 @@ export const TIPOS_DIAGNOSTICO: Record<TipoDiagnostico, TipoConfig> = {
     nombre: 'Cultura 360°',
     bullet: 'Cuatro perspectivas cruzadas',
     descripcion: 'El equipo se autoevalúa, el líder se autoevalúa, el líder evalúa al equipo y el equipo evalúa al líder. Cuatro miradas sobre las mismas dimensiones — donde no coinciden, hay una brecha.',
-    rolesPregunta: ['A', 'B', 'C', 'D'],
+    // Orden de presentación: primero las dos miradas del equipo (A: equipo auto,
+    // C: equipo→líder), luego las dos del líder (D: líder auto, B: líder→equipo).
+    // Coincide con el ROL_ORDEN del dashboard de resultados.
+    rolesPregunta: ['A', 'C', 'D', 'B'],
     rolesParticipante: ['A', 'D'],
     disponible: true,
     etiqueta: '360°',
