@@ -14,7 +14,7 @@ const PERFILES = [
   { id: 'lider' as Perfil, h: 'Líder del equipo', p: 'Responderás desde tu rol de liderazgo.\nIncluye tu auto-evaluación y tu mirada sobre el equipo que lideras.' },
 ]
 
-export default function IntakeForm({ equipoId, nombreCompania, codigo, tipo = 'cultura_360', preguntasEquipo, preguntasLider, preguntasColectivo = 0, invitacionId = null, invitadoNombre = null }: {
+export default function IntakeForm({ equipoId, nombreCompania, codigo, tipo = 'cultura_360', preguntasEquipo, preguntasLider, preguntasColectivo = 0, invitacionId = null, invitadoNombre = null, invitadoPerfil = null }: {
   equipoId: string
   nombreCompania: string
   codigo: string
@@ -25,9 +25,13 @@ export default function IntakeForm({ equipoId, nombreCompania, codigo, tipo = 'c
   /** Invitación resuelta desde el token del link personalizado (null = anónimo). */
   invitacionId?: string | null
   invitadoNombre?: string | null
+  /** Si la invitación trae el rol definido (cargue por área), no se pregunta. */
+  invitadoPerfil?: 'lider' | 'miembro' | null
 }) {
   const router = useRouter()
-  const [perfil, setPerfil] = useState<Perfil | null>(null)
+  // Si la invitación ya define el rol, se pre-selecciona y no se muestra el selector.
+  const perfilFijado: Perfil | null = invitadoPerfil === 'lider' ? 'lider' : invitadoPerfil === 'miembro' ? 'equipo' : null
+  const [perfil, setPerfil] = useState<Perfil | null>(perfilFijado)
   const [loading, setLoading] = useState(false)
 
   // En 360 el participante elige rol (equipo o líder). En el resto de tipos
@@ -81,6 +85,7 @@ export default function IntakeForm({ equipoId, nombreCompania, codigo, tipo = 'c
       <IntakeFormMobile
         nombreCompania={nombreCompania}
         invitadoNombre={invitadoNombre}
+        perfilFijado={perfilFijado}
         tipo={tipo}
         preguntasEquipo={preguntasEquipo}
         preguntasLider={preguntasLider}
@@ -133,7 +138,13 @@ export default function IntakeForm({ equipoId, nombreCompania, codigo, tipo = 'c
         </>
       ) : (
         <>
-          {/* Rol */}
+          {/* Rol — si la invitación ya lo define (cargue por área), no se pregunta */}
+          {perfilFijado ? (
+            <div style={{ marginTop: 16, marginLeft: 100, border: '2px solid var(--ink)', padding: '16px 18px', maxWidth: 420 }}>
+              <h5 style={{ margin: 0, fontSize: 16, fontWeight: 800, letterSpacing: '-.01em' }}>{perfilFijado === 'lider' ? 'Líder del equipo' : 'Miembro del equipo'}</h5>
+              <p style={{ margin: '4px 0 0', fontSize: 13, fontWeight: 500, lineHeight: 1.4, color: 'var(--ink-2)' }}>Respondes desde esta perspectiva, definida en tu invitación.</p>
+            </div>
+          ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 16, marginLeft: 100 }}>
             <div style={{ background: 'var(--ink)', padding: '10px 16px' }}>
               <h2 style={{ fontSize: 20, fontWeight: 900, letterSpacing: 0, margin: 0, color: '#fff', fontFamily: 'Red Hat Display, sans-serif' }}>Selecciona una de las dos opciones</h2>
@@ -155,6 +166,7 @@ export default function IntakeForm({ equipoId, nombreCompania, codigo, tipo = 'c
               ))}
             </div>
           </div>
+          )}
 
           <p style={{ fontSize: 15, lineHeight: 1.55, color: 'var(--ink)', fontWeight: 500, margin: '8px 0 0', marginLeft: 100, maxWidth: '54ch' }}>
             Laborativo como tercero independiente revisará las respuestas, la compañía solo verá los resultados consolidados.

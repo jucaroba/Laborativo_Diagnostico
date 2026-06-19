@@ -19,14 +19,17 @@ export default async function IntakePage({ params, searchParams }: { params: Pro
 
   // Link personalizado: el token resuelve la invitación de la persona (debe ser
   // de este equipo). Si no hay token o no coincide, se responde de forma anónima.
-  let invitacion: { id: string; nombre: string } | null = null
+  let invitacion: { id: string; nombre: string; perfil: 'lider' | 'miembro' | null } | null = null
   if (token) {
+    // select('*') para resistir si la columna `perfil` aún no existe en la BD.
     const { data } = await supabase
       .from('invitaciones')
-      .select('id, nombre, equipo_id')
+      .select('*')
       .eq('token', token)
       .single()
-    if (data && data.equipo_id === equipo.id) invitacion = { id: data.id, nombre: data.nombre }
+    if (data && data.equipo_id === equipo.id) {
+      invitacion = { id: data.id, nombre: data.nombre, perfil: (data.perfil as 'lider' | 'miembro' | null) ?? null }
+    }
   }
 
   const { data: diag } = await supabase
@@ -67,6 +70,7 @@ export default async function IntakePage({ params, searchParams }: { params: Pro
       preguntasColectivo={preguntasColectivo}
       invitacionId={invitacion?.id ?? null}
       invitadoNombre={invitacion?.nombre ?? null}
+      invitadoPerfil={invitacion?.perfil ?? null}
     />
   )
 }

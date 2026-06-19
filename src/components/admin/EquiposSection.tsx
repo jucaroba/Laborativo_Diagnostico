@@ -11,6 +11,7 @@ import {
   DialogDescription, DialogFooter,
 } from '@/components/ui/dialog'
 import InvitarEquipoDialog from './InvitarEquipoDialog'
+import CargarParticipantesDialog from './CargarParticipantesDialog'
 import EnviarDescripcionDialog from './EnviarDescripcionDialog'
 import CopiarLink from './CopiarLink'
 import { Plus, Trash2, ArrowUpRight, Users } from 'lucide-react'
@@ -81,9 +82,10 @@ export default function EquiposSection({ diagnosticoId, tipo, codigoResultadosCo
               Comparativo <ArrowUpRight size={13} strokeWidth={2.5} />
             </Link>
           )}
+          <CargarParticipantesDialog diagnosticoId={diagnosticoId} />
           <Button
             onClick={() => setCrearOpen(true)}
-            style={{ background: '#fff', color: 'var(--ink)', border: '1.5px solid #fff' }}
+            style={{ background: 'transparent', color: '#fff', border: '1.5px solid #fff' }}
           >
             <Plus size={14} strokeWidth={2.5} /> Crear equipo
           </Button>
@@ -97,13 +99,16 @@ export default function EquiposSection({ diagnosticoId, tipo, codigoResultadosCo
         }}>
           <Users size={28} strokeWidth={1.5} />
           <p style={{ fontSize: 14, fontWeight: 700, margin: 0 }}>Aún no hay equipos en esta compañía.</p>
-          <p className="text-mute" style={{ fontSize: 12, margin: 0, maxWidth: '40ch' }}>
-            Crea uno para empezar a enviar invitaciones. Todos los equipos comparten
-            el mismo set de preguntas; cada uno tiene su propio link y dashboard.
+          <p className="text-mute" style={{ fontSize: 12, margin: 0, maxWidth: '46ch' }}>
+            Carga la lista de participantes con su área y se crea un equipo por cada
+            área automáticamente. Cada equipo tiene su propio link y dashboard.
           </p>
-          <Button onClick={() => setCrearOpen(true)} style={{ marginTop: 4 }}>
-            <Plus size={14} strokeWidth={2.5} /> Crear primer equipo
-          </Button>
+          <div style={{ display: 'flex', gap: 8, marginTop: 4, flexWrap: 'wrap', justifyContent: 'center' }}>
+            <CargarParticipantesDialog diagnosticoId={diagnosticoId} variant="primary" />
+            <Button variant="outline" onClick={() => setCrearOpen(true)}>
+              <Plus size={14} strokeWidth={2.5} /> Crear equipo manual
+            </Button>
+          </div>
         </div>
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 12 }}>

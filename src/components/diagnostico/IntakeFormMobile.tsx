@@ -12,6 +12,7 @@ const PERFILES = [
 export default function IntakeFormMobile({
   nombreCompania,
   invitadoNombre = null,
+  perfilFijado = null,
   tipo = 'cultura_360',
   preguntasEquipo,
   preguntasLider,
@@ -23,6 +24,7 @@ export default function IntakeFormMobile({
 }: {
   nombreCompania: string
   invitadoNombre?: string | null
+  perfilFijado?: Perfil | null
   tipo?: TipoDiagnostico
   preguntasEquipo: number
   preguntasLider: number
@@ -57,6 +59,11 @@ export default function IntakeFormMobile({
             ? <>Vas a responder {preguntasColectivo} preguntas — una por cada dimensión de cultura. Toma menos de un minuto. Tus respuestas son anónimas y se promedian con las del resto del equipo.</>
             : <>Vas a responder {preguntasColectivo} preguntas sobre cómo se siente el equipo en las cuatro dimensiones de cultura. No hay respuestas correctas o incorrectas. Tus respuestas son anónimas y se promedian con las del resto del equipo.</>}
         </p>
+      ) : perfilFijado ? (
+        <div style={{ marginTop: 8, border: '2px solid var(--ink)', padding: '14px 16px' }}>
+          <h5 style={{ margin: 0, fontSize: 15, fontWeight: 800, letterSpacing: '-.01em' }}>{perfilFijado === 'lider' ? 'Líder del equipo' : 'Miembro del equipo'}</h5>
+          <p style={{ margin: '4px 0 0', fontSize: 12.5, fontWeight: 500, lineHeight: 1.4, color: 'var(--ink-2)' }}>Respondes desde esta perspectiva, definida en tu invitación.</p>
+        </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 8 }}>
           <div style={{ background: 'var(--ink)', padding: '10px 14px' }}>
