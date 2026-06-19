@@ -105,7 +105,7 @@ export default function GrupoPreguntas({ grupo, rol, diagnosticoId, temaId, dime
                     <button onClick={() => setEditandoId(null)} style={iconBtn}><X size={13} strokeWidth={2.5} color="#7A7A7A" /></button>
                   </div>
                 ) : (
-                  <div style={{ display: 'flex', gap: 6, justifyContent: 'flex-end', opacity: 0 }} className="row-actions">
+                  <div style={{ display: 'flex', gap: 6, justifyContent: 'flex-end', opacity: 0.5 }} className="row-actions">
                     <button onClick={() => { setEditandoId(p.id); setTextoEdit(p.texto) }} style={iconBtn}><Pencil size={13} strokeWidth={2} color="#7A7A7A" /></button>
                     <button onClick={() => eliminar(p.id)} style={iconBtn}><Trash2 size={13} strokeWidth={2} color="#FF3366" /></button>
                   </div>
