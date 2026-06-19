@@ -5,7 +5,6 @@ import { supabase } from '@/lib/supabase'
 import { Equipo, TipoDiagnostico } from '@/types'
 import { TIPOS_DIAGNOSTICO } from '@/lib/tipos-diagnostico'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle,
   DialogDescription, DialogFooter,
@@ -14,7 +13,7 @@ import InvitarEquipoDialog from './InvitarEquipoDialog'
 import CargarParticipantesDialog from './CargarParticipantesDialog'
 import EnviarDescripcionDialog from './EnviarDescripcionDialog'
 import CopiarLink from './CopiarLink'
-import { Plus, Trash2, ArrowUpRight, Users } from 'lucide-react'
+import { Trash2, ArrowUpRight, Users } from 'lucide-react'
 import Link from 'next/link'
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://diagnostico.laborativo.com'
@@ -30,7 +29,6 @@ interface Props {
 export default function EquiposSection({ diagnosticoId, tipo, codigoResultadosComparativo, equiposIniciales, completadosPorEquipo }: Props) {
   const router = useRouter()
   const [equipos, setEquipos] = useState<Equipo[]>(equiposIniciales)
-  const [crearOpen, setCrearOpen] = useState(false)
   const [eliminar, setEliminar] = useState<Equipo | null>(null)
   const [eliminarConRespuestas, setEliminarConRespuestas] = useState(false)
 
@@ -83,12 +81,6 @@ export default function EquiposSection({ diagnosticoId, tipo, codigoResultadosCo
             </Link>
           )}
           <CargarParticipantesDialog diagnosticoId={diagnosticoId} />
-          <Button
-            onClick={() => setCrearOpen(true)}
-            style={{ background: 'transparent', color: '#fff', border: '1.5px solid #fff' }}
-          >
-            <Plus size={14} strokeWidth={2.5} /> Crear equipo
-          </Button>
         </div>
       </div>
 
@@ -103,11 +95,8 @@ export default function EquiposSection({ diagnosticoId, tipo, codigoResultadosCo
             Carga la lista de participantes con su área y se crea un equipo por cada
             área automáticamente. Cada equipo tiene su propio link y dashboard.
           </p>
-          <div style={{ display: 'flex', gap: 8, marginTop: 4, flexWrap: 'wrap', justifyContent: 'center' }}>
+          <div style={{ marginTop: 4 }}>
             <CargarParticipantesDialog diagnosticoId={diagnosticoId} variant="primary" />
-            <Button variant="outline" onClick={() => setCrearOpen(true)}>
-              <Plus size={14} strokeWidth={2.5} /> Crear equipo manual
-            </Button>
           </div>
         </div>
       ) : (
@@ -124,18 +113,6 @@ export default function EquiposSection({ diagnosticoId, tipo, codigoResultadosCo
           ))}
         </div>
       )}
-
-      <DialogCrearEquipo
-        open={crearOpen}
-        onOpenChange={setCrearOpen}
-        diagnosticoId={diagnosticoId}
-        existentes={equipos.length}
-        onCreado={(equipo) => {
-          setEquipos(prev => [...prev, equipo])
-          setCrearOpen(false)
-          router.refresh()
-        }}
-      />
 
       <Dialog open={!!eliminar} onOpenChange={(v) => { if (!v) { setEliminar(null); setEliminarConRespuestas(false) } }}>
         <DialogContent style={{ maxWidth: 480 }}>
@@ -279,84 +256,5 @@ function LinkCard({ label, url }: { label: string; url: string }) {
         </a>
       </span>
     </div>
-  )
-}
-
-// ─── Diálogo de crear equipo ─────────────────────────────────────────
-function DialogCrearEquipo({
-  open, onOpenChange, diagnosticoId, existentes, onCreado,
-}: {
-  open: boolean
-  onOpenChange: (v: boolean) => void
-  diagnosticoId: string
-  existentes: number
-  onCreado: (equipo: Equipo) => void
-}) {
-  const [nombre, setNombre] = useState('')
-  const [numero, setNumero] = useState('')
-  const [error, setError] = useState('')
-  const [guardando, setGuardando] = useState(false)
-
-  function reset() { setNombre(''); setNumero(''); setError('') }
-
-  async function guardar() {
-    const limpio = nombre.trim()
-    if (!limpio) { setError('El nombre del equipo es obligatorio.'); return }
-    setGuardando(true); setError('')
-    const { data, error: err } = await supabase
-      .from('equipos')
-      .insert({
-        diagnostico_id: diagnosticoId,
-        nombre: limpio,
-        numero_participantes: numero ? parseInt(numero, 10) : null,
-        estado: 'activo',
-      })
-      .select()
-      .single()
-    setGuardando(false)
-    if (err || !data) { setError(err?.message || 'Error al crear el equipo'); return }
-    onCreado(data as Equipo)
-    reset()
-  }
-
-  return (
-    <Dialog open={open} onOpenChange={(v) => { onOpenChange(v); if (!v) reset() }}>
-      <DialogContent style={{ maxWidth: 480 }}>
-        <DialogHeader>
-          <DialogTitle style={{ fontWeight: 800 }}>
-            {existentes === 0 ? 'Primer equipo de la compañía' : 'Nuevo equipo'}
-          </DialogTitle>
-          <DialogDescription style={{ color: 'var(--ink)' }}>
-            Nombre con el que reconocerás a este equipo. El número de participantes es opcional.
-          </DialogDescription>
-        </DialogHeader>
-
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12, padding: '8px 0 4px' }}>
-          <Input
-            autoFocus
-            value={nombre}
-            onChange={e => setNombre(e.target.value)}
-            placeholder="Nombre del equipo (ej. Marketing)"
-            onKeyDown={e => { if (e.key === 'Enter') guardar() }}
-          />
-          <Input
-            type="number"
-            min={1}
-            value={numero}
-            onChange={e => setNumero(e.target.value)}
-            placeholder="Número de participantes"
-          />
-        </div>
-
-        {error && <p style={{ fontSize: 12, fontWeight: 700, color: '#FF3366', margin: '0 0 4px' }}>{error}</p>}
-
-        <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={guardando}>Cancelar</Button>
-          <Button onClick={guardar} disabled={guardando || !nombre.trim()}>
-            {guardando ? 'Creando…' : 'Crear equipo'}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
   )
 }
