@@ -70,8 +70,8 @@ function RevisionRow({ num, texto, onChange, onDelete }: { num: number; texto: s
               <button onClick={confirmar} style={iconBtn}><Check size={13} strokeWidth={2.5} color="#3D6B4F" /></button>
               <button onClick={() => setEditando(false)} style={iconBtn}><X size={13} strokeWidth={2} color="#7A7A7A" /></button>
             </span>
-          : <span className="row-actions" style={{ display: 'flex', gap: 6, justifyContent: 'flex-end', opacity: 0.5 }}>
-              <button onClick={() => { setDraft(texto); setEditando(true) }} style={iconBtn}><Pencil size={13} strokeWidth={2} color="#7A7A7A" /></button>
+          : <span className="row-actions" style={{ display: 'flex', gap: 6, justifyContent: 'flex-end' }}>
+              <button onClick={() => { setDraft(texto); setEditando(true) }} style={iconBtn}><Pencil size={15} strokeWidth={2.25} color="var(--ink)" /></button>
               <button onClick={onDelete} style={iconBtn}><Trash2 size={13} strokeWidth={2} color="#FF3366" /></button>
             </span>}
       </td>
