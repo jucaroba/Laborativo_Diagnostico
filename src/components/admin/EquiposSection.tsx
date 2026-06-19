@@ -13,7 +13,7 @@ import InvitarEquipoDialog from './InvitarEquipoDialog'
 import CargarParticipantesDialog from './CargarParticipantesDialog'
 import EnviarDescripcionDialog from './EnviarDescripcionDialog'
 import CopiarLink from './CopiarLink'
-import { Trash2, ArrowUpRight, Users } from 'lucide-react'
+import { Trash2, ArrowUpRight } from 'lucide-react'
 import Link from 'next/link'
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://diagnostico.laborativo.com'
@@ -84,22 +84,7 @@ export default function EquiposSection({ diagnosticoId, tipo, codigoResultadosCo
         </div>
       </div>
 
-      {equipos.length === 0 ? (
-        <div style={{
-          border: '1.5px dashed var(--ink)', padding: 32, textAlign: 'center',
-          display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12,
-        }}>
-          <Users size={28} strokeWidth={1.5} />
-          <p style={{ fontSize: 14, fontWeight: 700, margin: 0 }}>Aún no hay equipos en esta compañía.</p>
-          <p className="text-mute" style={{ fontSize: 12, margin: 0, maxWidth: '46ch' }}>
-            Carga la lista de participantes con su área y se crea un equipo por cada
-            área automáticamente. Cada equipo tiene su propio link y dashboard.
-          </p>
-          <div style={{ marginTop: 4 }}>
-            <CargarParticipantesDialog diagnosticoId={diagnosticoId} variant="primary" />
-          </div>
-        </div>
-      ) : (
+      {equipos.length > 0 && (
         <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 12 }}>
           {equipos.map(e => (
             <EquipoCard
