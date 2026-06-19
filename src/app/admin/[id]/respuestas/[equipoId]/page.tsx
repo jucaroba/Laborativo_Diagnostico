@@ -95,17 +95,20 @@ export default async function RespuestasPorPersonaPage({ params }: { params: Pro
       return pa.dimension_id - pb.dimension_id || pa.orden - pb.orden
     })
     return (
-      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12, marginTop: 8 }}>
+      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12, marginTop: 8, color: 'var(--ink)' }}>
         <tbody>
-          {rs.map(r => {
+          {rs.map((r, i) => {
             const pq = preguntaById.get(r.pregunta_id)
             if (!pq) return null
+            // Línea gruesa negra solo al cambiar de dimensión (no antes de la primera).
+            const prev = i > 0 ? preguntaById.get(rs[i - 1].pregunta_id) : null
+            const cambioDim = prev && prev.dimension_id !== pq.dimension_id
             return (
-              <tr key={r.pregunta_id} style={{ borderTop: '1px solid var(--line-soft)' }}>
-                <td style={{ padding: '5px 10px', width: 90, color: 'var(--mute)', fontWeight: 700, whiteSpace: 'nowrap' }}>{dimNombre.get(pq.dimension_id)}</td>
-                <td style={{ padding: '5px 10px', width: 110, color: 'var(--mute)' }}>{ROL_INFO[pq.rol]?.label ?? pq.rol}</td>
-                <td style={{ padding: '5px 10px' }}>{pq.texto}</td>
-                <td style={{ padding: '5px 10px', width: 44, textAlign: 'right', fontWeight: 800 }}>{r.valor}</td>
+              <tr key={r.pregunta_id} style={cambioDim ? { borderTop: '3px solid var(--ink)' } : undefined}>
+                <td style={{ padding: '5px 10px', width: 90, color: 'var(--ink)', fontWeight: 700, whiteSpace: 'nowrap' }}>{dimNombre.get(pq.dimension_id)}</td>
+                <td style={{ padding: '5px 10px', width: 110, color: 'var(--ink)' }}>{ROL_INFO[pq.rol]?.label ?? pq.rol}</td>
+                <td style={{ padding: '5px 10px', color: 'var(--ink)' }}>{pq.texto}</td>
+                <td style={{ padding: '5px 10px', width: 44, textAlign: 'right', fontWeight: 800, color: 'var(--ink)' }}>{r.valor}</td>
               </tr>
             )
           })}
@@ -151,10 +154,13 @@ export default async function RespuestasPorPersonaPage({ params }: { params: Pro
             const total = ps2.reduce((acc, p) => acc + esperadas(p.rol), 0)
             const respondio = ps2.length > 0 && total > 0 && dadas >= total
             return (
-              <details key={inv.id} style={{ border: '1.5px solid var(--ink)', background: 'var(--card)' }}>
-                <summary style={{ listStyle: 'none', cursor: ps2.length ? 'pointer' : 'default', padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-                  <span style={{ fontSize: 15, fontWeight: 800, flex: 1, minWidth: 160 }}>{inv.nombre}</span>
-                  <span style={{ fontSize: 12, color: 'var(--ink-2)' }}>{inv.email}</span>
+              <div key={inv.id} style={{ border: '1.5px solid var(--ink)', background: 'var(--card)' }}>
+                <div style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+                  <span style={{ display: 'flex', alignItems: 'baseline', gap: 8, flex: 1, minWidth: 160 }}>
+                    <span style={{ fontSize: 15, fontWeight: 800, color: 'var(--ink)' }}>{inv.nombre}</span>
+                    <span style={{ fontSize: 13, color: 'var(--ink)' }}>/</span>
+                    <span style={{ fontSize: 12, color: 'var(--ink)' }}>{inv.email}</span>
+                  </span>
                   {inv.area && <span style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.04em', border: '1.5px solid var(--ink)', padding: '2px 8px' }}>{inv.area}</span>}
                   <span style={{
                     fontSize: 10, letterSpacing: '.06em', textTransform: 'uppercase', fontWeight: 700, padding: '3px 8px',
@@ -164,26 +170,26 @@ export default async function RespuestasPorPersonaPage({ params }: { params: Pro
                   }}>
                     {respondio ? 'Respondió' : ps2.length ? `Incompleto ${dadas}/${total}` : 'Sin iniciar'}
                   </span>
-                </summary>
+                </div>
                 {ps2.length > 0 && (
-                  <div style={{ borderTop: '1.5px solid var(--ink)', padding: '4px 6px 10px' }}>
+                  <div style={{ padding: '0 6px 10px' }}>
                     {ps2.map(p => <DetalleParticipante key={p.id} part={p} />)}
                   </div>
                 )}
-              </details>
+              </div>
             )
           })}
 
           {anonimos.length > 0 && (
-            <details style={{ border: '1.5px dashed var(--ink)', background: 'var(--card)' }}>
-              <summary style={{ listStyle: 'none', cursor: 'pointer', padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 12 }}>
+            <div style={{ border: '1.5px dashed var(--ink)', background: 'var(--card)' }}>
+              <div style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 12 }}>
                 <span style={{ fontSize: 15, fontWeight: 800, flex: 1 }}>Sin identificar</span>
                 <span style={{ fontSize: 12, color: 'var(--mute)' }}>{anonimos.length} respuesta(s) por link genérico</span>
-              </summary>
+              </div>
               <div style={{ borderTop: '1.5px solid var(--ink)', padding: '4px 6px 10px' }}>
                 {anonimos.map(p => <DetalleParticipante key={p.id} part={p} />)}
               </div>
-            </details>
+            </div>
           )}
         </div>
       )}

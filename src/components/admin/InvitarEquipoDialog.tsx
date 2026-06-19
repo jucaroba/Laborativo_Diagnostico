@@ -109,7 +109,7 @@ export default function InvitarEquipoDialog({ equipoId, variant = 'button', copy
           }}
           style={{
             borderLeft: '1.5px solid var(--ink)',
-            padding: '12px 16px',
+            padding: '12px 8px 12px 16px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
@@ -120,9 +120,9 @@ export default function InvitarEquipoDialog({ equipoId, variant = 'button', copy
           }}
         >
           <span style={{ fontSize: 14, fontWeight: 700 }}>Invitación</span>
-          <span style={{ display: 'flex', alignItems: 'center', gap: 4 }} onClick={(e) => e.stopPropagation()}>
+          <span style={{ display: 'flex', alignItems: 'center', gap: 2 }} onClick={(e) => e.stopPropagation()}>
             {copyUrl && <CopiarLink url={copyUrl} />}
-            <span style={{ flexShrink: 0, padding: '4px 8px 4px 4px', color: 'var(--ink)', display: 'flex' }} aria-hidden="true">
+            <span style={{ flexShrink: 0, padding: 4, color: 'var(--ink)', display: 'flex' }} aria-hidden="true">
               <Mail size={16} strokeWidth={2} />
             </span>
           </span>

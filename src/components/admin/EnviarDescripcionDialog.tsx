@@ -78,7 +78,7 @@ export default function EnviarDescripcionDialog({
   return (
     <>
       <div style={{
-        padding: '12px 16px',
+        padding: '12px 8px 12px 16px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
@@ -98,13 +98,13 @@ export default function EnviarDescripcionDialog({
         >
           Descripción
         </a>
-        <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+        <span style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
           <CopiarLink url={linkUrl} />
           <button
             onClick={() => setOpen(true)}
             title="Enviar link de descripción"
             aria-label="Enviar link de descripción"
-            style={{ flexShrink: 0, background: 'none', border: 'none', cursor: 'pointer', padding: '4px 8px 4px 4px', color: 'var(--ink)', display: 'flex' }}
+            style={{ flexShrink: 0, background: 'none', border: 'none', cursor: 'pointer', padding: 4, color: 'var(--ink)', display: 'flex' }}
           >
             <Mail size={16} strokeWidth={2} />
           </button>

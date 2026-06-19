@@ -232,7 +232,7 @@ function InternalLinkCard({ label, href }: { label: string; href: string }) {
   return (
     <div style={{
       borderLeft: '1.5px solid var(--ink)',
-      padding: '12px 16px',
+      padding: '12px 8px 12px 16px',
       display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12,
     }}>
       <Link href={href} style={{ fontSize: 14, fontWeight: 700, color: 'var(--ink)', textDecoration: 'none', outline: 'none' }}>
@@ -249,7 +249,7 @@ function LinkCard({ label, url }: { label: string; url: string }) {
   return (
     <div style={{
       borderLeft: '1.5px solid var(--ink)',
-      padding: '12px 16px',
+      padding: '12px 8px 12px 16px',
       display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12,
     }}>
       <a
@@ -260,7 +260,7 @@ function LinkCard({ label, url }: { label: string; url: string }) {
       >
         {label}
       </a>
-      <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+      <span style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
         <CopiarLink url={url} />
         <a
           href={url}
