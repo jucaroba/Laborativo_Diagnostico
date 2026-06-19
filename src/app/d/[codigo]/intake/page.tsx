@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabase'
+import { supabaseAdmin } from '@/lib/supabase-admin'
 import { notFound } from 'next/navigation'
 import IntakeForm from '@/components/diagnostico/IntakeForm'
 import EstadoNoDisponible from '@/components/diagnostico/EstadoNoDisponible'
@@ -21,8 +22,10 @@ export default async function IntakePage({ params, searchParams }: { params: Pro
   // de este equipo). Si no hay token o no coincide, se responde de forma anónima.
   let invitacion: { id: string; nombre: string; perfil: 'lider' | 'miembro' | null } | null = null
   if (token) {
+    // `invitaciones` tiene RLS solo para usuarios autenticados; el intake es
+    // público, así que se resuelve el token con el service role en el servidor.
     // select('*') para resistir si la columna `perfil` aún no existe en la BD.
-    const { data } = await supabase
+    const { data } = await supabaseAdmin
       .from('invitaciones')
       .select('*')
       .eq('token', token)
