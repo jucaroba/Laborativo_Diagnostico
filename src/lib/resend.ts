@@ -46,16 +46,15 @@ export async function enviarInvitacionParticipante(params: {
   return getResend().emails.send({
     from: 'Laborativo <diagnostico@laborativo.com>',
     to: participanteEmail,
-    subject: `Diagnóstico organizacional ${nombreCompania} — Tu invitación`,
+    subject: `Participa en el diagnóstico de cultura de ${nombreCompania}`,
     html: `
       <p>Hola ${participanteNombre},</p>
-      <p>Estás invitado/a a participar en el diagnóstico organizacional de <strong>${nombreCompania}</strong>.</p>
-      <p>Toma entre 12 y 18 minutos. Este es tu link personal, no lo compartas.</p>
-      <p>Tus respuestas son confidenciales: tu empresa solo verá los resultados consolidados del equipo. Laborativo, como tercero independiente, conserva el detalle de forma reservada para análisis.</p>
-      <p><a href="${link}">Comenzar diagnóstico →</a></p>
-      <p style="font-size: 13px; color: #666;">O copia este link: ${link}</p>
-      <br/>
-      <p>— Equipo Laborativo</p>
+      <p>Estás invitado/a a participar en el diagnóstico de cultura organizacional de ${nombreCompania}.</p>
+      <p>Toma entre 10 y 15 minutos. Este es tu link personal, no lo compartas.</p>
+      <p>Tus respuestas son confidenciales, tu empresa solo verá los resultados consolidados del equipo. Laborativo, como tercero independiente, conserva el detalle de forma reservada para análisis.</p>
+      <p><a href="${link}" style="font-weight: 700;">Comenzar diagnóstico →</a></p>
+      <hr style="border: none; border-top: 1px solid #ddd; margin: 20px 0;" />
+      <p>Gracias por tu ayuda :)<br/>Equipo Laborativo.</p>
     `,
   })
 }
