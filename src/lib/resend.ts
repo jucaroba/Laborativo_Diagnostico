@@ -53,7 +53,7 @@ export async function enviarInvitacionParticipante(params: {
       <p>Toma entre 10 y 15 minutos. Este es tu link personal, no lo compartas.</p>
       <p>Tus respuestas son confidenciales, tu empresa solo verá los resultados consolidados del equipo. Laborativo, como tercero independiente, conserva el detalle de forma reservada para análisis.</p>
       <p><a href="${link}" style="font-weight: 700;">Comenzar diagnóstico →</a></p>
-      <hr style="border: none; border-top: 1px solid #ddd; margin: 20px 0;" />
+      <div style="width: 40px; border-top: 3px solid #0A0A0A; margin: 20px 0;"></div>
       <p>Gracias por tu ayuda :)<br/>Equipo Laborativo.</p>
     `,
   })
