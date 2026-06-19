@@ -122,9 +122,15 @@ export default function InvitarEquipoDialog({ equipoId, variant = 'button', copy
           <span style={{ fontSize: 14, fontWeight: 700 }}>Invitación</span>
           <span style={{ display: 'flex', alignItems: 'center', gap: 2 }} onClick={(e) => e.stopPropagation()}>
             {copyUrl && <CopiarLink url={copyUrl} />}
-            <span style={{ flexShrink: 0, padding: 4, color: 'var(--ink)', display: 'flex' }} aria-hidden="true">
+            <button
+              type="button"
+              onClick={() => setOpen(true)}
+              title="Enviar invitación"
+              aria-label="Enviar invitación"
+              style={{ flexShrink: 0, padding: 4, color: 'var(--ink)', display: 'flex', background: 'none', border: 'none', cursor: 'pointer' }}
+            >
               <Mail size={16} strokeWidth={2} />
-            </span>
+            </button>
           </span>
         </div>
       ) : variant === 'iconOnly' ? (

@@ -88,7 +88,7 @@ function BotonesAccion({ onDescartar, onGuardar, guardando }: { onDescartar: () 
   )
 }
 
-export default function EditorTema({ temaId, temaNombre, descripcion, preguntas, tipo }: Props) {
+export default function EditorTema({ temaId, temaNombre, preguntas, tipo }: Props) {
   const tipoConfig = TIPOS_DIAGNOSTICO[tipo ?? 'cultura_360']
   const rolesIter = tipoConfig?.rolesPregunta ?? (['A', 'C', 'D', 'B'] as const)
   const router = useRouter()
@@ -166,8 +166,6 @@ export default function EditorTema({ temaId, temaNombre, descripcion, preguntas,
         <Link href="/admin/preguntas-base" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 12, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', color: 'var(--mute)', textDecoration: 'none', marginBottom: 8 }}>
           <ArrowLeft size={13} strokeWidth={2.5} /> Temas
         </Link>
-        <span className="page-header__eyebrow">Tema</span>
-        <div className="page-header__rule" />
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 24, flexWrap: 'wrap' }}>
           <TemaTitulo temaId={temaId} nombreInicial={temaNombre} />
           {enReview ? (
@@ -178,7 +176,6 @@ export default function EditorTema({ temaId, temaNombre, descripcion, preguntas,
             </Button>
           ) : null}
         </div>
-        {descripcion && <p className="page-header__subtitle">{descripcion}</p>}
       </div>
 
       {/* Form IA */}

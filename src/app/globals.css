@@ -327,6 +327,7 @@ textarea:-webkit-autofill:focus {
 .spinning { animation: spin 1s linear infinite; }
 
 /* Acciones de fila — visibles solo en hover */
+summary::-webkit-details-marker { display: none; }
 tr:hover .row-actions { opacity: 1 !important; }
 .row-actions { transition: opacity .15s ease; }
 tr.revision-row:hover .row-actions { opacity: 1 !important; }

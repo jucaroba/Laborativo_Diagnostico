@@ -128,20 +128,11 @@ export default async function RespuestasPorPersonaPage({ params }: { params: Pro
         <Link href={`/admin/${id}`} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 12, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', color: 'var(--mute)', textDecoration: 'none', marginBottom: 8 }}>
           <ArrowLeft size={13} strokeWidth={2.5} /> {diag?.nombre_compania ?? 'Diagnóstico'}
         </Link>
-        <span className="page-header__eyebrow">Respuestas por persona · uso interno</span>
-        <div className="page-header__rule" />
         <h1 className="page-header__title">{equipo.nombre}</h1>
         <p className="page-header__subtitle">
           {totalRespondieron} de {invs.length} invitados respondieron
           {anonimos.length > 0 && ` · ${anonimos.length} respuesta(s) sin identificar`}
         </p>
-      </div>
-
-      <div style={{
-        border: '1.5px solid var(--ink)', background: 'var(--bg-2)', padding: '10px 14px',
-        fontSize: 12, color: 'var(--ink)', fontWeight: 600,
-      }}>
-        Detalle reservado para Laborativo. El cliente solo ve el dashboard de resultados consolidado.
       </div>
 
       {invs.length === 0 && anonimos.length === 0 ? (
@@ -154,8 +145,8 @@ export default async function RespuestasPorPersonaPage({ params }: { params: Pro
             const total = ps2.reduce((acc, p) => acc + esperadas(p.rol), 0)
             const respondio = ps2.length > 0 && total > 0 && dadas >= total
             return (
-              <div key={inv.id} style={{ border: '1.5px solid var(--ink)', background: 'var(--card)' }}>
-                <div style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+              <details key={inv.id} style={{ border: '1.5px solid var(--ink)', background: 'var(--card)' }}>
+                <summary style={{ listStyle: 'none', outline: 'none', cursor: ps2.length ? 'pointer' : 'default', padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
                   <span style={{ display: 'flex', alignItems: 'baseline', gap: 8, flex: 1, minWidth: 160 }}>
                     <span style={{ fontSize: 15, fontWeight: 800, color: 'var(--ink)' }}>{inv.nombre}</span>
                     <span style={{ fontSize: 13, color: 'var(--ink)' }}>/</span>
@@ -170,26 +161,26 @@ export default async function RespuestasPorPersonaPage({ params }: { params: Pro
                   }}>
                     {respondio ? 'Respondió' : ps2.length ? `Incompleto ${dadas}/${total}` : 'Sin iniciar'}
                   </span>
-                </div>
+                </summary>
                 {ps2.length > 0 && (
-                  <div style={{ padding: '0 6px 10px' }}>
+                  <div style={{ borderTop: '1.5px solid var(--ink)', padding: '4px 6px 10px' }}>
                     {ps2.map(p => <DetalleParticipante key={p.id} part={p} />)}
                   </div>
                 )}
-              </div>
+              </details>
             )
           })}
 
           {anonimos.length > 0 && (
-            <div style={{ border: '1.5px dashed var(--ink)', background: 'var(--card)' }}>
-              <div style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 12 }}>
+            <details style={{ border: '1.5px dashed var(--ink)', background: 'var(--card)' }}>
+              <summary style={{ listStyle: 'none', outline: 'none', cursor: 'pointer', padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 12 }}>
                 <span style={{ fontSize: 15, fontWeight: 800, flex: 1 }}>Sin identificar</span>
                 <span style={{ fontSize: 12, color: 'var(--mute)' }}>{anonimos.length} respuesta(s) por link genérico</span>
-              </div>
+              </summary>
               <div style={{ borderTop: '1.5px solid var(--ink)', padding: '4px 6px 10px' }}>
                 {anonimos.map(p => <DetalleParticipante key={p.id} part={p} />)}
               </div>
-            </div>
+            </details>
           )}
         </div>
       )}
