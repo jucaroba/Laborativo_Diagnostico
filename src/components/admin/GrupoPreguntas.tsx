@@ -87,7 +87,7 @@ export default function GrupoPreguntas({ grupo, rol, diagnosticoId, temaId, dime
           {preguntas.map((p, i) => (
             <TableRow key={p.id}>
               <TableCell className="text-mute" style={{ width: 32, fontWeight: 700, fontSize: 12 }}>{i + 1}</TableCell>
-              <TableCell style={{ fontSize: 13, fontWeight: 500 }}>
+              <TableCell style={{ fontSize: 13, fontWeight: 500, whiteSpace: 'normal' }}>
                 {editandoId === p.id ? (
                   <input
                     autoFocus
