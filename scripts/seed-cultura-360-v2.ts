@@ -22,7 +22,7 @@ if (!url || !serviceKey) {
 }
 const supabase = createClient(url, serviceKey)
 
-const TEMA_NOMBRE = 'Cultura 360 / 2'
+const TEMA_NOMBRE = 'Cultura 360'
 const TEMA_DESC = 'Set espejo: cada eje (orden 1/2/3) formula la misma afirmación desde las 4 perspectivas para que la correlación entre roles sea evidente.'
 
 type Rol = 'A' | 'B' | 'C' | 'D'
