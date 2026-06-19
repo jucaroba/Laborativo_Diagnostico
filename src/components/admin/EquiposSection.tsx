@@ -172,6 +172,7 @@ function EquipoCard({
   const linkParticipacion = `${BASE_URL}/d/${equipo.codigo_participacion}`
   const linkFormulario   = `${BASE_URL}/d/${equipo.codigo_participacion}/intake`
   const linkDashboard    = `${BASE_URL}/r/${equipo.codigo_resultados}`
+  const linkRespuestas   = `/admin/${diagnosticoId}/respuestas/${equipo.id}`
   void tipoConfig // reservado para futuras estadísticas por equipo
 
   return (
@@ -192,22 +193,11 @@ function EquipoCard({
         }}>{equipo.estado}</span>
         {equipo.numero_participantes != null && (
           <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--ink)' }}>
-            {equipo.numero_participantes} participantes{' '}
+            <span title="Cuestionarios completados">{completados} respuestas</span>{' '}
             <span style={{ color: 'var(--mute)', fontWeight: 600 }}>/</span>{' '}
-            <span title="Cuestionarios completados">{completados}</span>
+            <span title="Participantes esperados">{equipo.numero_participantes} participantes</span>
           </span>
         )}
-        <Link
-          href={`/admin/${diagnosticoId}/respuestas/${equipo.id}`}
-          title="Ver respuestas por persona (uso interno)"
-          style={{
-            fontSize: 11, fontWeight: 700, letterSpacing: '.04em', textTransform: 'uppercase',
-            color: 'var(--ink)', textDecoration: 'none', border: '1.5px solid var(--ink)',
-            padding: '3px 8px', display: 'inline-flex', alignItems: 'center', gap: 4,
-          }}
-        >
-          Respuestas <ArrowUpRight size={12} strokeWidth={2.5} />
-        </Link>
         <button
           onClick={onEliminar}
           title="Eliminar equipo"
@@ -218,7 +208,7 @@ function EquipoCard({
         </button>
       </div>
       <div style={{
-        display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 0,
+        display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 0,
       }}>
         <EnviarDescripcionDialog
           equipoId={equipo.id}
@@ -230,8 +220,27 @@ function EquipoCard({
           copyUrl={linkParticipacion}
         />
         <LinkCard label="Formulario" url={linkFormulario} />
+        <InternalLinkCard label="Respuestas" href={linkRespuestas} />
         <LinkCard label="Dashboard"  url={linkDashboard} />
       </div>
+    </div>
+  )
+}
+
+// Igual que LinkCard pero para una ruta interna del admin (misma pestaña, sin copiar).
+function InternalLinkCard({ label, href }: { label: string; href: string }) {
+  return (
+    <div style={{
+      borderLeft: '1.5px solid var(--ink)',
+      padding: '12px 16px',
+      display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12,
+    }}>
+      <Link href={href} style={{ fontSize: 14, fontWeight: 700, color: 'var(--ink)', textDecoration: 'none', outline: 'none' }}>
+        {label}
+      </Link>
+      <Link href={href} title="Ver respuestas por persona (uso interno)" aria-label={label} style={{ display: 'flex', padding: 4, color: 'var(--ink)', outline: 'none' }}>
+        <ArrowUpRight size={16} strokeWidth={2.5} />
+      </Link>
     </div>
   )
 }
