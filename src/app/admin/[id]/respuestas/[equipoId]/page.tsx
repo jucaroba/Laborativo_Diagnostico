@@ -100,15 +100,19 @@ export default async function RespuestasPorPersonaPage({ params }: { params: Pro
           {rs.map((r, i) => {
             const pq = preguntaById.get(r.pregunta_id)
             if (!pq) return null
-            // Línea gruesa negra solo al cambiar de dimensión (no antes de la primera).
+            // Línea gruesa negra al cambiar de dimensión (no antes de la primera),
+            // con más aire arriba y abajo de la línea.
             const prev = i > 0 ? preguntaById.get(rs[i - 1].pregunta_id) : null
+            const next = i < rs.length - 1 ? preguntaById.get(rs[i + 1].pregunta_id) : null
             const cambioDim = prev && prev.dimension_id !== pq.dimension_id
+            const ultimaDeDim = next && next.dimension_id !== pq.dimension_id
+            const pad = `${cambioDim ? 18 : 6}px 10px ${ultimaDeDim ? 18 : 6}px`
             return (
               <tr key={r.pregunta_id} style={cambioDim ? { borderTop: '3px solid var(--ink)' } : undefined}>
-                <td style={{ padding: '5px 10px', width: 90, color: 'var(--ink)', fontWeight: 700, whiteSpace: 'nowrap' }}>{dimNombre.get(pq.dimension_id)}</td>
-                <td style={{ padding: '5px 10px', width: 110, color: 'var(--ink)' }}>{ROL_INFO[pq.rol]?.label ?? pq.rol}</td>
-                <td style={{ padding: '5px 10px', color: 'var(--ink)' }}>{pq.texto}</td>
-                <td style={{ padding: '5px 10px', width: 44, textAlign: 'right', fontWeight: 800, color: 'var(--ink)' }}>{r.valor}</td>
+                <td style={{ padding: pad, width: 90, color: 'var(--ink)', fontWeight: 700, whiteSpace: 'nowrap' }}>{dimNombre.get(pq.dimension_id)}</td>
+                <td style={{ padding: pad, width: 110, color: 'var(--ink)' }}>{ROL_INFO[pq.rol]?.label ?? pq.rol}</td>
+                <td style={{ padding: pad, color: 'var(--ink)' }}>{pq.texto}</td>
+                <td style={{ padding: pad, width: 44, textAlign: 'right', fontWeight: 800, color: 'var(--ink)' }}>{r.valor}</td>
               </tr>
             )
           })}
