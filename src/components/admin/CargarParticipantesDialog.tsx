@@ -3,7 +3,7 @@ import { useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle,
+  Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle,
   DialogDescription, DialogFooter,
 } from '@/components/ui/dialog'
 import { Users } from 'lucide-react'
@@ -74,18 +74,15 @@ export default function CargarParticipantesDialog({ diagnosticoId, variant = 'bu
   }
 
   return (
-    <>
-      {variant === 'primary' ? (
-        <Button onClick={() => setOpen(true)}>
-          <Users size={14} strokeWidth={2.5} /> Cargar participantes
-        </Button>
-      ) : (
-        <Button onClick={() => setOpen(true)} style={{ background: '#fff', color: 'var(--ink)', border: '1.5px solid #fff' }}>
-          <Users size={14} strokeWidth={2.5} /> Cargar participantes
-        </Button>
-      )}
+    <Dialog open={open} onOpenChange={(v) => (v ? setOpen(true) : cerrar())}>
+      <DialogTrigger
+        render={
+          <Button style={variant === 'primary' ? undefined : { background: '#fff', color: 'var(--ink)', border: '1.5px solid #fff' }} />
+        }
+      >
+        <Users size={14} strokeWidth={2.5} /> Cargar participantes
+      </DialogTrigger>
 
-      <Dialog open={open} onOpenChange={(v) => (v ? setOpen(true) : cerrar())}>
         <DialogContent style={{ maxWidth: 820, padding: '28px 32px 0' }}>
           <DialogHeader>
             <DialogTitle style={{ fontWeight: 800 }}>Cargar participantes por área</DialogTitle>
@@ -174,7 +171,6 @@ export default function CargarParticipantesDialog({ diagnosticoId, variant = 'bu
             )}
           </DialogFooter>
         </DialogContent>
-      </Dialog>
-    </>
+    </Dialog>
   )
 }
