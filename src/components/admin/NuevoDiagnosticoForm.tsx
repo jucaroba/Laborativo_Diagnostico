@@ -127,6 +127,9 @@ export default function NuevoDiagnosticoForm() {
         contacto_cargo: datos.contacto_cargo,
         contacto_email: datos.contacto_email,
         tipo: tipo ?? 'cultura_360',
+        // Las preguntas se configuran en este wizard, así que al guardar el
+        // diagnóstico queda activado (la sección de equipos aparece directo).
+        activado: true,
       }).select().single()
       if (diagErr || !diag) throw new Error(diagErr?.message)
       const { error: pregErr } = await supabase.from('preguntas')
@@ -258,7 +261,7 @@ export default function NuevoDiagnosticoForm() {
               disabled={guardando}
               style={{ background: '#fff', color: 'var(--ink)', border: '1.5px solid #fff' }}
             >
-              {guardando ? 'Guardando…' : 'Guardar diagnóstico'}
+              {guardando ? 'Guardando…' : 'Guardar y activar'}
             </Button>
           )}
         </div>
@@ -381,7 +384,7 @@ export default function NuevoDiagnosticoForm() {
               disabled={guardando}
               style={{ background: '#fff', color: 'var(--ink)', border: '1.5px solid #fff' }}
             >
-              {guardando ? 'Guardando…' : 'Guardar diagnóstico'}
+              {guardando ? 'Guardando…' : 'Guardar y activar'}
             </Button>
           </div>
         </div>
