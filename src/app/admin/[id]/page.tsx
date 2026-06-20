@@ -1,12 +1,11 @@
 import { supabase } from '@/lib/supabase'
 import { notFound } from 'next/navigation'
-import { Diagnostico, Equipo, Pregunta, DIMENSIONES, Rol } from '@/types'
+import { Diagnostico, Equipo, Pregunta, Rol } from '@/types'
 import { TIPOS_DIAGNOSTICO } from '@/lib/tipos-diagnostico'
 import EliminarDiagnostico from '@/components/admin/EliminarDiagnostico'
 import EditarDiagnostico from '@/components/admin/EditarDiagnostico'
 import ActivarDiagnostico from '@/components/admin/ActivarDiagnostico'
 import EquiposSection from '@/components/admin/EquiposSection'
-import GrupoPreguntas from '@/components/admin/GrupoPreguntas'
 import IniciarRondaButton from '@/components/admin/IniciarRondaButton'
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
@@ -29,7 +28,6 @@ export default async function DiagnosticoPage({ params }: { params: Promise<{ id
   const eqs = (equipos ?? []) as Equipo[]
   const ps = (preguntas ?? []) as Pregunta[]
   const tipoConfig = TIPOS_DIAGNOSTICO[d.tipo ?? 'cultura_360']
-  const rolesIter = tipoConfig?.rolesPregunta ?? (['A', 'C', 'D', 'B'] as const)
 
   // ─── Cuántos participantes completaron el cuestionario por equipo.
   // Un participante "completó" cuando respondió todas las preguntas que le
@@ -139,36 +137,6 @@ export default async function DiagnosticoPage({ params }: { params: Promise<{ id
           completadosPorEquipo={completadosPorEquipo}
         />
       )}
-
-      {/* Preguntas */}
-      <div>
-        <div style={{ background: 'var(--ink)', padding: '10px 16px', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 10 }}>
-          <h2 style={{ fontSize: 20, fontWeight: 900, letterSpacing: '0', margin: 0, color: '#fff', fontFamily: 'Red Hat Display, sans-serif' }}>
-            Preguntas <span style={{ fontWeight: 700 }}>/ {ps.length}</span>
-          </h2>
-        </div>
-        {DIMENSIONES.map((dim, idx) => (
-          <div key={dim.id} style={{ marginBottom: 40, borderTop: idx === 0 ? 'none' : '2px solid var(--ink)', paddingTop: idx === 0 ? 16 : 16 }}>
-            <p className="page-header__eyebrow" style={{ margin: '0 0 4px' }}>{dim.subtitulo}</p>
-            <h3 style={{ fontSize: 20, fontWeight: 900, letterSpacing: '0', margin: '0 0 20px', fontFamily: 'Red Hat Display, sans-serif' }}>{dim.nombre}</h3>
-            {rolesIter.map(rol => {
-              const grupo = ps.filter(p => p.dimension_id === dim.id && p.rol === rol)
-              const maxOrden = grupo.length ? Math.max(...grupo.map(p => p.orden)) : ps.length
-              return (
-                <GrupoPreguntas
-                  key={rol}
-                  grupo={grupo}
-                  rol={rol}
-                  diagnosticoId={d.id}
-                  dimensionId={dim.id}
-                  maxOrden={maxOrden}
-                />
-
-              )
-            })}
-          </div>
-        ))}
-      </div>
     </div>
   )
 }
