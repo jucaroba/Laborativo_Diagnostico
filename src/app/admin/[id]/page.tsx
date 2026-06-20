@@ -4,6 +4,7 @@ import { Diagnostico, Equipo, Pregunta, DIMENSIONES, Rol } from '@/types'
 import { TIPOS_DIAGNOSTICO } from '@/lib/tipos-diagnostico'
 import EliminarDiagnostico from '@/components/admin/EliminarDiagnostico'
 import EditarDiagnostico from '@/components/admin/EditarDiagnostico'
+import ActivarDiagnostico from '@/components/admin/ActivarDiagnostico'
 import EquiposSection from '@/components/admin/EquiposSection'
 import GrupoPreguntas from '@/components/admin/GrupoPreguntas'
 import IniciarRondaButton from '@/components/admin/IniciarRondaButton'
@@ -124,18 +125,20 @@ export default async function DiagnosticoPage({ params }: { params: Promise<{ id
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'flex-start' }}>
           <EditarDiagnostico diagnostico={d} />
           <EliminarDiagnostico id={d.id} />
-          <IniciarRondaButton padre={d} />
+          {d.activado ? <IniciarRondaButton padre={d} /> : <ActivarDiagnostico id={d.id} />}
         </div>
       </div>
 
-      {/* Equipos */}
-      <EquiposSection
-        diagnosticoId={d.id}
-        tipo={d.tipo ?? 'cultura_360'}
-        codigoResultadosComparativo={d.codigo_resultados_comparativo}
-        equiposIniciales={eqs}
-        completadosPorEquipo={completadosPorEquipo}
-      />
+      {/* Equipos — solo en la etapa de envío (diagnóstico activado) */}
+      {d.activado && (
+        <EquiposSection
+          diagnosticoId={d.id}
+          tipo={d.tipo ?? 'cultura_360'}
+          codigoResultadosComparativo={d.codigo_resultados_comparativo}
+          equiposIniciales={eqs}
+          completadosPorEquipo={completadosPorEquipo}
+        />
+      )}
 
       {/* Preguntas */}
       <div>
