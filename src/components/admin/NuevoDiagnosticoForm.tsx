@@ -135,6 +135,18 @@ export default function NuevoDiagnosticoForm() {
       const { error: pregErr } = await supabase.from('preguntas')
         .insert(preguntas.map(p => ({ ...p, diagnostico_id: diag.id })))
       if (pregErr) throw new Error(pregErr.message)
+      // Tipos colectivos (no 360): se responde con un único link anónimo, sin
+      // equipos por área ni cargue de participantes. Creamos ese equipo aquí
+      // para que el admin tenga listo su link de participación (la DB asigna
+      // los códigos). 360 sí crea sus equipos desde el cargue de participantes.
+      if ((tipo ?? 'cultura_360') !== 'cultura_360') {
+        const { error: eqErr } = await supabase.from('equipos').insert({
+          diagnostico_id: diag.id,
+          nombre: datos.nombre_compania,
+          estado: 'activo',
+        })
+        if (eqErr) throw new Error(eqErr.message)
+      }
       // No mandamos email de activación todavía: la compañía recién creada
       // aún no tiene equipos. El email se manda por equipo desde el detalle.
       router.push(`/admin/${diag.id}`)

@@ -6,6 +6,7 @@ import EliminarDiagnostico from '@/components/admin/EliminarDiagnostico'
 import EditarDiagnostico from '@/components/admin/EditarDiagnostico'
 import ActivarDiagnostico from '@/components/admin/ActivarDiagnostico'
 import EquiposSection from '@/components/admin/EquiposSection'
+import EnlaceColectivo from '@/components/admin/EnlaceColectivo'
 import IniciarRondaButton from '@/components/admin/IniciarRondaButton'
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
@@ -127,15 +128,24 @@ export default async function DiagnosticoPage({ params }: { params: Promise<{ id
         </div>
       </div>
 
-      {/* Equipos — solo en la etapa de envío (diagnóstico activado) */}
+      {/* Tras activar: 360 gestiona equipos por área; los tipos colectivos
+          (pulso, termómetro, espejo) usan un único link de participación. */}
       {d.activado && (
-        <EquiposSection
-          diagnosticoId={d.id}
-          tipo={d.tipo ?? 'cultura_360'}
-          codigoResultadosComparativo={d.codigo_resultados_comparativo}
-          equiposIniciales={eqs}
-          completadosPorEquipo={completadosPorEquipo}
-        />
+        (d.tipo ?? 'cultura_360') === 'cultura_360' ? (
+          <EquiposSection
+            diagnosticoId={d.id}
+            tipo={d.tipo ?? 'cultura_360'}
+            codigoResultadosComparativo={d.codigo_resultados_comparativo}
+            equiposIniciales={eqs}
+            completadosPorEquipo={completadosPorEquipo}
+          />
+        ) : (
+          <EnlaceColectivo
+            diagnosticoId={d.id}
+            nombreCompania={d.nombre_compania}
+            equipo={eqs[0] ?? null}
+          />
+        )
       )}
     </div>
   )
