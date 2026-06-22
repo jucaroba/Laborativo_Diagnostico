@@ -97,12 +97,12 @@ export default function IntakeForm({ equipoId, nombreCompania, codigo, tipo = 'c
       />
     </div>
     <div className="only-desktop" style={{ minHeight: '100vh', fontFamily: "'Red Hat Display', sans-serif", padding: '56px 56px 56px 106px', display: 'flex', flexDirection: 'column', gap: 24, background: 'var(--bg)', maxWidth: 870 }}>
-      <span className="eyebrow">{esSimple ? 'Registro' : 'Paso 01 / 02 — Registro'}</span>
+      <span className="eyebrow">{esSimple ? 'Cuestionario' : 'Paso 01 / 02 — Registro'}</span>
       <div className="rule" />
       <div style={{ fontSize: 13, color: 'var(--ink)', fontWeight: 700, marginTop: 24, marginLeft: 100, textTransform: 'uppercase', letterSpacing: '.08em' }}>{nombreCompania}</div>
       {invitadoNombre && (
         <div style={{ fontSize: 15, color: 'var(--ink-2)', fontWeight: 600, marginTop: -12, marginLeft: 100 }}>
-          Hola, {invitadoNombre}. Respondes con tu link personal.
+          Hola, {invitadoNombre}.
         </div>
       )}
       <h2 style={{ fontWeight: 900, fontSize: 64, lineHeight: .92, letterSpacing: -1, marginLeft: 100 }}>
@@ -116,7 +116,7 @@ export default function IntakeForm({ equipoId, nombreCompania, codigo, tipo = 'c
               ? <>Vas a responder {preguntasColectivo} preguntas desde dos miradas: <strong>cómo te ves a ti</strong> y <strong>cómo ves al equipo</strong>. Sin respuestas correctas, tus respuestas son anónimas.</>
               : tipo === 'termometro_4'
               ? <>Vas a responder {preguntasColectivo} preguntas — una por cada dimensión de cultura. Toma menos de un minuto. Tus respuestas son anónimas y se promedian con las del resto del equipo.</>
-              : <>Vas a responder {preguntasColectivo} preguntas sobre cómo se siente el equipo en las cuatro dimensiones de cultura. No hay respuestas correctas o incorrectas. Tus respuestas son anónimas y se promedian con las del resto del equipo.</>}
+              : <>Vas a responder {preguntasColectivo} preguntas sobre cómo se siente el equipo en las cuatro dimensiones de cultura. No hay respuestas correctas o incorrectas.<br /><br />Tus respuestas son anónimas y se promedian con las del resto del equipo.</>}
           </div>
           {/* Separador corto entre las dos notas */}
           <div aria-hidden style={{ marginLeft: 100, width: 42, height: 1.5, background: 'var(--ink)', marginTop: 16 }} />
@@ -132,7 +132,9 @@ export default function IntakeForm({ equipoId, nombreCompania, codigo, tipo = 'c
           </div>
           <div style={{ marginTop: 'auto' }}>
             <span className="eyebrow soft">
-              ≈ {Math.max(2, Math.ceil(preguntasColectivo / 3))}–{Math.max(4, Math.ceil(preguntasColectivo / 2))} min · {preguntasColectivo} preguntas
+              {tipo === 'pulso_colectivo'
+                ? `≈ 5–10 min · ${preguntasColectivo} preguntas`
+                : `≈ ${Math.max(2, Math.ceil(preguntasColectivo / 3))}–${Math.max(4, Math.ceil(preguntasColectivo / 2))} min · ${preguntasColectivo} preguntas`}
             </span>
           </div>
         </>

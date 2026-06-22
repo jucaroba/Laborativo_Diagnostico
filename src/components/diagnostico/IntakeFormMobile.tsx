@@ -39,12 +39,12 @@ export default function IntakeFormMobile({
 
   return (
     <div style={{ minHeight: '100vh', fontFamily: "'Red Hat Display', sans-serif", padding: '24px 20px 32px', display: 'flex', flexDirection: 'column', gap: 18, background: 'var(--bg)', overflowX: 'hidden' }}>
-      <span className="eyebrow">{esSimple ? 'Registro' : 'Paso 01 / 02 — Registro'}</span>
+      <span className="eyebrow">{esSimple ? 'Cuestionario' : 'Paso 01 / 02 — Registro'}</span>
       <div className="rule" />
       <div style={{ fontSize: 12, color: 'var(--ink)', fontWeight: 700, marginTop: 8, textTransform: 'uppercase', letterSpacing: '.08em' }}>{nombreCompania}</div>
       {invitadoNombre && (
         <div style={{ fontSize: 14, color: 'var(--ink-2)', fontWeight: 600 }}>
-          Hola, {invitadoNombre}. Respondes con tu link personal.
+          Hola, {invitadoNombre}.
         </div>
       )}
       <h2 style={{ fontWeight: 900, fontSize: 'clamp(32px, 9vw, 44px)', lineHeight: .95, letterSpacing: -.5, margin: 0 }}>
@@ -57,7 +57,7 @@ export default function IntakeFormMobile({
             ? <>Vas a responder {preguntasColectivo} preguntas desde dos miradas: <strong>cómo te ves a ti</strong> y <strong>cómo ves al equipo</strong>. Sin respuestas correctas, tus respuestas son anónimas.</>
             : tipo === 'termometro_4'
             ? <>Vas a responder {preguntasColectivo} preguntas — una por cada dimensión de cultura. Toma menos de un minuto. Tus respuestas son anónimas y se promedian con las del resto del equipo.</>
-            : <>Vas a responder {preguntasColectivo} preguntas sobre cómo se siente el equipo en las cuatro dimensiones de cultura. No hay respuestas correctas o incorrectas. Tus respuestas son anónimas y se promedian con las del resto del equipo.</>}
+            : <>Vas a responder {preguntasColectivo} preguntas sobre cómo se siente el equipo en las cuatro dimensiones de cultura. No hay respuestas correctas o incorrectas.<br /><br />Tus respuestas son anónimas y se promedian con las del resto del equipo.</>}
         </p>
       ) : perfilFijado ? (
         <div style={{ marginTop: 8, border: '2px solid var(--ink)', padding: '14px 16px' }}>
@@ -119,7 +119,9 @@ export default function IntakeFormMobile({
       <div style={{ marginTop: 'auto', paddingTop: 24 }}>
         <span className="eyebrow soft">
           {esSimple
-            ? `≈ ${Math.max(2, Math.ceil(preguntasColectivo / 3))}–${Math.max(4, Math.ceil(preguntasColectivo / 2))} min · ${preguntasColectivo} preguntas`
+            ? tipo === 'pulso_colectivo'
+              ? `≈ 5–10 min · ${preguntasColectivo} preguntas`
+              : `≈ ${Math.max(2, Math.ceil(preguntasColectivo / 3))}–${Math.max(4, Math.ceil(preguntasColectivo / 2))} min · ${preguntasColectivo} preguntas`
             : `≈ 5–8 min${perfil ? ` · ${perfil === 'lider' ? preguntasLider : preguntasEquipo} preguntas` : ''}`}
         </span>
       </div>
