@@ -10,7 +10,6 @@ import {
   DialogDescription, DialogFooter,
 } from '@/components/ui/dialog'
 import InvitarEquipoDialog from './InvitarEquipoDialog'
-import CargarParticipantesDialog from './CargarParticipantesDialog'
 import EnviarDescripcionDialog from './EnviarDescripcionDialog'
 import CopiarLink from './CopiarLink'
 import { Trash2, ArrowUpRight } from 'lucide-react'
@@ -58,45 +57,47 @@ export default function EquiposSection({ diagnosticoId, tipo, codigoResultadosCo
 
   return (
     <div>
-      <div style={{
-        background: 'var(--ink)', padding: '10px 16px', marginBottom: 16,
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        gap: 12, flexWrap: 'wrap',
-      }}>
-        <h2 style={{ fontSize: 20, fontWeight: 900, letterSpacing: '0', margin: 0, color: '#fff', fontFamily: 'Red Hat Display, sans-serif' }}>
-          Equipos <span style={{ fontWeight: 700 }}>/ {equipos.length}</span>
-        </h2>
-        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-          {hayMultiples && (
-            <Link
-              href={`/r/c/${codigoResultadosComparativo}`}
-              target="_blank"
-              style={{
-                fontSize: 11, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase',
-                color: '#fff', textDecoration: 'none', border: '1.5px solid #fff', padding: '6px 10px',
-                display: 'inline-flex', alignItems: 'center', gap: 6,
-              }}
-            >
-              Comparativo <ArrowUpRight size={13} strokeWidth={2.5} />
-            </Link>
-          )}
-          <CargarParticipantesDialog diagnosticoId={diagnosticoId} />
-        </div>
-      </div>
-
+      {/* Sin grupos no se muestra nada acá: los grupos se crean desde la
+          invitación ("Cargar participantes") en el header del administrador.
+          Una vez creados, se listan con su barra "Equipos / N". */}
       {equipos.length > 0 && (
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 12 }}>
-          {equipos.map(e => (
-            <EquipoCard
-              key={e.id}
-              equipo={e}
-              diagnosticoId={diagnosticoId}
-              tipoConfig={tipoConfig}
-              completados={completadosPorEquipo[e.id] ?? 0}
-              onEliminar={() => abrirEliminar(e)}
-            />
-          ))}
-        </div>
+        <>
+          <div style={{
+            background: 'var(--ink)', padding: '10px 16px', marginBottom: 16,
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            gap: 12, flexWrap: 'wrap',
+          }}>
+            <h2 style={{ fontSize: 20, fontWeight: 900, letterSpacing: '0', margin: 0, color: '#fff', fontFamily: 'Red Hat Display, sans-serif' }}>
+              Equipos <span style={{ fontWeight: 700 }}>/ {equipos.length}</span>
+            </h2>
+            {hayMultiples && (
+              <Link
+                href={`/r/c/${codigoResultadosComparativo}`}
+                target="_blank"
+                style={{
+                  fontSize: 11, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase',
+                  color: '#fff', textDecoration: 'none', border: '1.5px solid #fff', padding: '6px 10px',
+                  display: 'inline-flex', alignItems: 'center', gap: 6,
+                }}
+              >
+                Comparativo <ArrowUpRight size={13} strokeWidth={2.5} />
+              </Link>
+            )}
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 12 }}>
+            {equipos.map(e => (
+              <EquipoCard
+                key={e.id}
+                equipo={e}
+                diagnosticoId={diagnosticoId}
+                tipoConfig={tipoConfig}
+                completados={completadosPorEquipo[e.id] ?? 0}
+                onEliminar={() => abrirEliminar(e)}
+              />
+            ))}
+          </div>
+        </>
       )}
 
       <Dialog open={!!eliminar} onOpenChange={(v) => { if (!v) { setEliminar(null); setEliminarConRespuestas(false) } }}>
