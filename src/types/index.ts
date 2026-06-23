@@ -42,8 +42,6 @@ export interface Diagnostico {
   vertical: string | null
   contexto_ia: string | null
   tipo: TipoDiagnostico
-  diagnostico_padre_id?: string | null
-  ronda?: number
   benchmark_habilitado?: boolean
   /** Etapa: false = en configuración (sección de equipos oculta); true = activado. */
   activado?: boolean

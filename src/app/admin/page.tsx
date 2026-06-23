@@ -18,25 +18,8 @@ export default async function AdminPage() {
   const { data: diagnosticosRaw } = await supabase
     .from('diagnosticos').select('*').order('created_at', { ascending: false })
 
-  // Una "cadena" de rondas (Ronda 1 → 2 → 3 …) son N filas distintas en
-  // `diagnosticos` ligadas por `diagnostico_padre_id`. En el listado solo
-  // mostramos la punta más reciente de cada cadena (la que NO es padre de
-  // ningún otro diagnóstico). Las rondas anteriores se ven desde el detalle.
-  const padresConHijo = new Set<string>()
-  for (const d of diagnosticosRaw ?? []) {
-    if (d.diagnostico_padre_id) padresConHijo.add(d.diagnostico_padre_id as string)
-  }
-  const diagnosticos = (diagnosticosRaw ?? []).filter(d => !padresConHijo.has(d.id))
-
-  // Mapa id → diagnóstico (incluye rondas anteriores para reconstruir cadenas).
-  const byId: Record<string, Diagnostico> = {}
-  for (const d of diagnosticosRaw ?? []) byId[d.id] = d as Diagnostico
-
-  // Los stats (equipos, participantes, completados) los calculamos sobre TODOS
-  // los diagnósticos de la BD (no solo los visibles) porque cada ronda anterior
-  // también tiene sus números, y los necesitamos para mostrar la cadena completa
-  // en la columna PAX.
-  const diagIds = (diagnosticosRaw ?? []).map(d => d.id)
+  const diagnosticos = (diagnosticosRaw ?? []) as Diagnostico[]
+  const diagIds = diagnosticos.map(d => d.id)
   const { data: equipos } = diagIds.length > 0
     ? await supabase.from('equipos').select('id, diagnostico_id, estado, numero_participantes').in('diagnostico_id', diagIds)
     : { data: [] as { id: string; diagnostico_id: string; estado: string; numero_participantes: number | null }[] }
@@ -126,10 +109,10 @@ export default async function AdminPage() {
         <Table>
           <TableHeader>
             <TableRow style={{ background: '#0A0A0A', borderBottom: 'none' }}>
-              {['Empresa', 'Tipo', 'Contacto', 'Fecha', 'Ronda', 'Equipos', 'PAX', ''].map(h => (
+              {['Empresa', 'Tipo', 'Contacto', 'Fecha', 'Equipos', 'PAX', ''].map(h => (
                 <TableHead key={h} style={{
                   color: '#fff', fontWeight: 700, fontSize: 12, letterSpacing: '.06em', textTransform: 'uppercase', background: 'transparent',
-                  textAlign: (h === 'Equipos' || h === 'PAX' || h === 'Ronda') ? 'center' : 'left',
+                  textAlign: (h === 'Equipos' || h === 'PAX') ? 'center' : 'left',
                 }}>{h}</TableHead>
               ))}
             </TableRow>
@@ -138,14 +121,6 @@ export default async function AdminPage() {
             {diagnosticos.map((d: Diagnostico) => {
               const tipoConfig = TIPOS_DIAGNOSTICO[(d.tipo ?? 'cultura_360') as keyof typeof TIPOS_DIAGNOSTICO]
               const stats = porCompania[d.id] ?? { n: 0, activos: 0, completados: 0, invitados: 0 }
-
-              // Cadena completa: desde la raíz (Ronda 1) hasta `d` (la punta).
-              const cadena: Diagnostico[] = [d]
-              let cur: Diagnostico | undefined = d
-              while (cur?.diagnostico_padre_id) {
-                cur = byId[cur.diagnostico_padre_id]
-                if (cur) cadena.unshift(cur)
-              }
 
               return (
               <TableRow key={d.id}>
@@ -165,9 +140,6 @@ export default async function AdminPage() {
                 <TableCell style={{ color: 'var(--ink)', fontWeight: 500, fontSize: 14 }}>
                   {fechaCorta(d.created_at)}
                 </TableCell>
-                <TableCell style={{ textAlign: 'center', fontSize: 13, fontWeight: 700, color: 'var(--ink)' }}>
-                  {d.ronda ?? 1}
-                </TableCell>
                 <TableCell style={{ textAlign: 'center' }}>
                   <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--ink)' }}>
                     {stats.n}{' '}
@@ -177,18 +149,9 @@ export default async function AdminPage() {
                 </TableCell>
                 <TableCell style={{ textAlign: 'center' }}>
                   <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--ink)' }}>
-                    {cadena.map((c, i) => {
-                      const inv = porCompania[c.id]?.invitados ?? 0
-                      const comp = completadosPorCompania[c.id] ?? 0
-                      return (
-                        <span key={c.id}>
-                          {i > 0 && <span style={{ color: 'var(--mute)', fontWeight: 600, margin: '0 6px' }}>—</span>}
-                          {inv}{' '}
-                          <span style={{ color: 'var(--mute)', fontWeight: 600 }}>/</span>{' '}
-                          <span title={`Ronda ${c.ronda ?? 1} · cuestionarios completados`}>{comp}</span>
-                        </span>
-                      )
-                    })}
+                    {porCompania[d.id]?.invitados ?? 0}{' '}
+                    <span style={{ color: 'var(--mute)', fontWeight: 600 }}>/</span>{' '}
+                    <span title="Cuestionarios completados">{completadosPorCompania[d.id] ?? 0}</span>
                   </span>
                 </TableCell>
                 <TableCell>

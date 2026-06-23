@@ -8,7 +8,7 @@ import ResultadosMobile from '@/components/resultados/ResultadosMobile'
 import ResultadosPulso from '@/components/resultados/ResultadosPulso'
 import ResultadosTermometro from '@/components/resultados/ResultadosTermometro'
 import ResultadosEspejo from '@/components/resultados/ResultadosEspejo'
-import { calcSimpleFromData, calcEspejoFromData, fetchYCalcSimple, fetchYCalcEspejo, fetchBenchmarkSimple, fetchBenchmarkEspejo } from '@/lib/calc-resultados'
+import { calcSimpleFromData, calcEspejoFromData, fetchBenchmarkSimple, fetchBenchmarkEspejo } from '@/lib/calc-resultados'
 import { evaluarBrechas, evaluarRelaciones } from '@/lib/arquetipos'
 import { TIPOS_DIAGNOSTICO } from '@/lib/tipos-diagnostico'
 
@@ -69,11 +69,6 @@ export default async function ResultadosPage({ params }: { params: Promise<{ cod
   // dedicadas. La rama 360 (default) sigue debajo intacta.
   const tipoDiag = (diag.tipo ?? 'cultura_360') as string
 
-  // Ronda anterior, si existe — para mostrar Δ en los dashboards
-  const padreId = (diag as { diagnostico_padre_id?: string }).diagnostico_padre_id ?? null
-  const rondaActual = (diag as { ronda?: number }).ronda ?? 1
-  const rondaAnterior = rondaActual - 1
-
   // Benchmark Laborativo — si está habilitado, traemos el promedio histórico
   const benchmarkHabilitado = !!(diag as { benchmark_habilitado?: boolean }).benchmark_habilitado
 
@@ -84,7 +79,6 @@ export default async function ResultadosPage({ params }: { params: Promise<{ cod
       (preguntas ?? []) as { id: string; dimension_id: number; rol: string }[],
       (respuestas ?? []).map(r => ({ pregunta_id: r.pregunta_id, valor: r.valor })),
     )
-    const comparacion = padreId ? await fetchYCalcSimple(padreId) : null
     const benchmark = benchmarkHabilitado
       ? await fetchBenchmarkSimple(tipoDiag as 'pulso_colectivo' | 'termometro_4', diag.id)
       : null
@@ -146,9 +140,6 @@ export default async function ResultadosPage({ params }: { params: Promise<{ cod
       totalParticipantes,
       totalFormularios: totalFormulariosSimple,
       resultados: resultadosSimple,
-      comparacion,
-      rondaActual,
-      rondaAnterior,
       benchmark: benchmark?.resultados ?? null,
       benchmarkN: benchmark?.nDiagnosticos ?? 0,
       dispersionPorDim,
@@ -165,7 +156,6 @@ export default async function ResultadosPage({ params }: { params: Promise<{ cod
       (preguntas ?? []) as { id: string; dimension_id: number; rol: string }[],
       (respuestas ?? []).map(r => ({ pregunta_id: r.pregunta_id, valor: r.valor })),
     )
-    const comparacion = padreId ? await fetchYCalcEspejo(padreId) : null
     const benchmark = benchmarkHabilitado
       ? await fetchBenchmarkEspejo('equipo_en_espejo', diag.id)
       : null
@@ -249,9 +239,6 @@ export default async function ResultadosPage({ params }: { params: Promise<{ cod
         totalParticipantes={totalParticipantes}
         totalFormularios={totalFormulariosEspejo}
         resultados={resultadosEspejo}
-        comparacion={comparacion}
-        rondaActual={rondaActual}
-        rondaAnterior={rondaAnterior}
         benchmark={benchmark?.resultados ?? null}
         benchmarkN={benchmark?.nDiagnosticos ?? 0}
         dispersionPorDimEspejo={dispersionPorDimEspejo}
@@ -364,7 +351,6 @@ export default async function ResultadosPage({ params }: { params: Promise<{ cod
         arqRelaciones={arqRelaciones}
         arqCtx={arqCtx}
         diagnosticoId={diag.id}
-        rondaActual={rondaActual}
       />
     </div>
     <div className="only-desktop" style={{ fontFamily: "'Red Hat Display', sans-serif", background: 'var(--bg)', minHeight: '100vh' }}>
@@ -388,12 +374,6 @@ export default async function ResultadosPage({ params }: { params: Promise<{ cod
             fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase', fontWeight: 700,
             background: 'var(--ink)', color: '#fff', padding: '3px 8px',
           }}>{TIPOS_DIAGNOSTICO[(diag.tipo ?? 'cultura_360') as keyof typeof TIPOS_DIAGNOSTICO]?.etiqueta ?? diag.tipo}</span>
-          {rondaActual > 1 && (
-            <span style={{
-              fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase', fontWeight: 700,
-              background: 'transparent', color: 'var(--ink)', border: '1.5px solid var(--ink)', padding: '2px 8px',
-            }}>Ronda {rondaActual}</span>
-          )}
         </div>
         <h1 className="page-header__title" style={{ fontSize: 'clamp(32px,4vw,48px)' }}>
           {diag.nombre_compania}

@@ -1,8 +1,6 @@
 // ─────────────────────────────────────────────────────────────
 // Helpers para calcular resultados por dimensión.
 // Pensados para Pulso, Termómetro y Espejo (tipos sin perfil).
-// Sirven tanto para el diagnóstico actual como para el padre,
-// cuando hay una ronda anterior con la que comparar.
 // ─────────────────────────────────────────────────────────────
 
 import { supabase } from '@/lib/supabase'
@@ -98,20 +96,6 @@ export function calcEspejoFromData(
   })
 }
 
-// ─── Fetch + cálculo (para el diagnóstico padre) ───────────────
-
-export async function fetchYCalcSimple(diagnosticoId: string): Promise<DimSimple[] | null> {
-  const { preguntas, respuestas } = await fetchPreguntasYRespuestas(diagnosticoId)
-  if (!preguntas.length) return null
-  return calcSimpleFromData(preguntas, respuestas)
-}
-
-export async function fetchYCalcEspejo(diagnosticoId: string): Promise<DimEspejo[] | null> {
-  const { preguntas, respuestas } = await fetchPreguntasYRespuestas(diagnosticoId)
-  if (!preguntas.length) return null
-  return calcEspejoFromData(preguntas, respuestas)
-}
-
 // ─── Benchmark Laborativo ─────────────────────────────────────
 // Promedio histórico por dimensión sobre todos los OTROS
 // diagnósticos del mismo tipo (excluye el diag actual).
@@ -184,35 +168,3 @@ export async function fetchBenchmarkEspejo(tipo: TipoDiagnostico, excluirId: str
   return { resultados: calcEspejoFromData(preguntas, respuestas), nDiagnosticos }
 }
 
-async function fetchPreguntasYRespuestas(diagnosticoId: string) {
-  // "Antes/después" a nivel compañía: agregamos a TODOS los equipos del
-  // diagnóstico padre como un solo conjunto.
-  const { data: preguntas } = await supabase
-    .from('preguntas')
-    .select('id, dimension_id, rol')
-    .eq('diagnostico_id', diagnosticoId)
-
-  const { data: equipos } = await supabase
-    .from('equipos')
-    .select('id')
-    .eq('diagnostico_id', diagnosticoId)
-  const equipoIds = (equipos ?? []).map(e => e.id)
-  if (!equipoIds.length) {
-    return { preguntas: (preguntas ?? []) as PreguntaMin[], respuestas: [] as RespuestaMin[] }
-  }
-
-  const { data: participantes } = await supabase
-    .from('participantes')
-    .select('id')
-    .in('equipo_id', equipoIds)
-
-  const partIds = (participantes ?? []).map(p => p.id)
-  const { data: respuestas } = partIds.length > 0
-    ? await supabase
-        .from('respuestas')
-        .select('pregunta_id, valor')
-        .in('participante_id', partIds)
-    : { data: [] as RespuestaMin[] }
-
-  return { preguntas: (preguntas ?? []) as PreguntaMin[], respuestas: (respuestas ?? []) as RespuestaMin[] }
-}

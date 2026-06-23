@@ -154,19 +154,13 @@ export function LeyendaDispersion() {
 }
 
 // ─── ChipTipo: chip negro de tipo en el header del dashboard ──────
-export function ChipTipo({ etiqueta, rondaActual }: { etiqueta: string; rondaActual?: number }) {
+export function ChipTipo({ etiqueta }: { etiqueta: string }) {
   return (
     <div style={{ display: 'inline-flex', alignItems: 'center', gap: 10, marginBottom: 12, flexWrap: 'wrap' }}>
       <span style={{
         fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase', fontWeight: 700,
         background: 'var(--ink)', color: '#fff', padding: '3px 8px',
       }}>{etiqueta}</span>
-      {rondaActual && rondaActual > 1 && (
-        <span style={{
-          fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase', fontWeight: 700,
-          background: 'transparent', color: 'var(--ink)', border: '1.5px solid var(--ink)', padding: '2px 8px',
-        }}>Ronda {rondaActual}</span>
-      )}
     </div>
   )
 }

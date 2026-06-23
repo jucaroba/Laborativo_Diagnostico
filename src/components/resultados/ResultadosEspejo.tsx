@@ -29,33 +29,12 @@ type Props = {
   totalParticipantes: number
   totalFormularios: number
   resultados: DimResultado[]
-  comparacion?: DimResultado[] | null
-  rondaActual?: number
-  rondaAnterior?: number
   benchmark?: DimResultado[] | null
   benchmarkN?: number
   /** Para cada dimensión, lista de promedios por persona por perspectiva. */
   dispersionPorDimEspejo?: Record<number, { YO: number[]; EQUIPO: number[] }>
   /** Preguntas ordenadas por brecha Yo-Equipo (descendente). */
   preguntasBrechaEspejo?: PreguntaBrecha[]
-}
-
-function DeltaRonda({ actual, anterior, rondaAnterior }: { actual: number | null; anterior: number | null; rondaAnterior?: number }) {
-  if (actual === null || anterior === null) return null
-  const diff = Math.round((actual - anterior) * 10) / 10
-  const color = diff > 0.1 ? '#1A9850' : diff < -0.1 ? '#D73027' : 'var(--mute)'
-  const flecha = diff > 0.1 ? '↑' : diff < -0.1 ? '↓' : '→'
-  const signo = diff > 0 ? '+' : ''
-  return (
-    <span style={{
-      display: 'inline-flex', alignItems: 'center', gap: 4,
-      fontSize: 10.5, fontWeight: 700, color,
-      fontFeatureSettings: '"tnum" 1, "zero" 0',
-    }}>
-      {flecha} {signo}{diff.toFixed(1)}
-      {rondaAnterior ? <span style={{ fontWeight: 500, color: 'var(--mute)', letterSpacing: '.04em', textTransform: 'uppercase', fontSize: 8.5 }}> vs r{rondaAnterior}</span> : null}
-    </span>
-  )
 }
 
 // Paleta Espejo — mismo lenguaje cromático que el 360 (cyan + rosa)
@@ -171,7 +150,7 @@ function BarrasYoEquipo({
   )
 }
 
-function DimCard({ dim, anterior, rondaAnterior, benchmark, benchmarkN, mobile }: { dim: DimResultado; anterior?: DimResultado | null; rondaAnterior?: number; benchmark?: DimResultado | null; benchmarkN?: number; mobile?: boolean }) {
+function DimCard({ dim, benchmark, benchmarkN, mobile }: { dim: DimResultado; benchmark?: DimResultado | null; benchmarkN?: number; mobile?: boolean }) {
   return (
     <div style={{
       padding: mobile ? '0' : '0',
@@ -195,18 +174,6 @@ function DimCard({ dim, anterior, rondaAnterior, benchmark, benchmarkN, mobile }
         </span>
       </div>
       <BarrasYoEquipo yo={dim.yo.promedio} equipo={dim.equipo.promedio} mobile={mobile} />
-      {anterior && (
-        <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap', borderTop: '1px solid var(--line-soft)', paddingTop: 8 }}>
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-            <span style={{ fontSize: 9, letterSpacing: '.08em', textTransform: 'uppercase', fontWeight: 700, color: 'var(--mute)' }}>Yo</span>
-            <DeltaRonda actual={dim.yo.promedio} anterior={anterior.yo.promedio} rondaAnterior={rondaAnterior} />
-          </span>
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-            <span style={{ fontSize: 9, letterSpacing: '.08em', textTransform: 'uppercase', fontWeight: 700, color: 'var(--mute)' }}>Equipo</span>
-            <DeltaRonda actual={dim.equipo.promedio} anterior={anterior.equipo.promedio} rondaAnterior={rondaAnterior} />
-          </span>
-        </div>
-      )}
       {benchmark && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 4, borderTop: '1px solid var(--line-soft)', paddingTop: 8 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 10.5, fontWeight: 600, color: 'var(--ink-2)' }}>
@@ -357,10 +324,9 @@ function RadarEspejo({ resultados, maxSize }: { resultados: DimResultado[]; maxS
 
 export default function ResultadosEspejo({
   nombreCompania, estado, totalParticipantes, totalFormularios, resultados,
-  comparacion, rondaActual, rondaAnterior, benchmark, benchmarkN,
+  benchmark, benchmarkN,
   dispersionPorDimEspejo, preguntasBrechaEspejo,
 }: Props) {
-  const getAnterior = (id: number) => comparacion?.find(c => c.id === id) ?? null
   const getBenchmark = (id: number) => benchmark?.find(b => b.id === id) ?? null
   return (
     <>
@@ -375,7 +341,7 @@ export default function ResultadosEspejo({
         </header>
 
         <div style={{ padding: '24px 20px 20px', borderBottom: '1.5px solid var(--ink)' }}>
-          <ChipTipo etiqueta="Equipo en Espejo" rondaActual={rondaActual} />
+          <ChipTipo etiqueta="Equipo en Espejo" />
           <h1 style={{ fontSize: 'clamp(28px, 8vw, 36px)', fontWeight: 900, letterSpacing: '-.02em', lineHeight: 1, margin: 0 }}>
             {nombreCompania}
           </h1>
@@ -405,7 +371,7 @@ export default function ResultadosEspejo({
         <div style={{ borderBottom: '1.5px solid var(--ink)' }}>
           {[...resultados].sort((a, b) => b.delta - a.delta).map((dim, i, arr) => (
             <div key={dim.id} style={{ borderBottom: i < arr.length - 1 ? '1.5px solid var(--ink)' : 'none' }}>
-              <DimCard dim={dim} anterior={getAnterior(dim.id)} rondaAnterior={rondaAnterior} benchmark={getBenchmark(dim.id)} benchmarkN={benchmarkN} mobile />
+              <DimCard dim={dim} benchmark={getBenchmark(dim.id)} benchmarkN={benchmarkN} mobile />
             </div>
           ))}
         </div>
@@ -466,7 +432,7 @@ export default function ResultadosEspejo({
 
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
           <div style={{ padding: '40px 24px 32px', borderBottom: '1.5px solid var(--ink)' }}>
-            <ChipTipo etiqueta="Equipo en Espejo" rondaActual={rondaActual} />
+            <ChipTipo etiqueta="Equipo en Espejo" />
             <h1 className="page-header__title" style={{ fontSize: 'clamp(32px,4vw,48px)' }}>
               {nombreCompania}
             </h1>
@@ -500,8 +466,6 @@ export default function ResultadosEspejo({
               <DimCard
                 key={dim.id}
                 dim={dim}
-                anterior={getAnterior(dim.id)}
-                rondaAnterior={rondaAnterior}
                 benchmark={getBenchmark(dim.id)}
                 benchmarkN={benchmarkN}
               />

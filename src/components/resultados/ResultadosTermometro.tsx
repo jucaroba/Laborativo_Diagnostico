@@ -16,9 +16,6 @@ type Props = {
   totalParticipantes: number
   totalFormularios: number
   resultados: DimResultado[]
-  comparacion?: DimResultado[] | null
-  rondaActual?: number
-  rondaAnterior?: number
   benchmark?: DimResultado[] | null
   benchmarkN?: number
   /** Promedios por persona por dimensión (calculado en el server). */
@@ -45,24 +42,6 @@ function fraseDim(nombre: string, valor: number | null): string {
 }
 
 
-function DeltaRonda({ actual, anterior, rondaAnterior }: { actual: number | null; anterior: number | null; rondaAnterior?: number }) {
-  if (actual === null || anterior === null) return null
-  const diff = Math.round((actual - anterior) * 10) / 10
-  const color = diff > 0.1 ? '#1A9850' : diff < -0.1 ? '#D73027' : 'var(--mute)'
-  const flecha = diff > 0.1 ? '↑' : diff < -0.1 ? '↓' : '→'
-  const signo = diff > 0 ? '+' : ''
-  return (
-    <span style={{
-      display: 'inline-flex', alignItems: 'center', gap: 4,
-      fontSize: 11, fontWeight: 700, color,
-      fontFeatureSettings: '"tnum" 1, "zero" 0',
-    }}>
-      {flecha} {signo}{diff.toFixed(1)}
-      {rondaAnterior ? <span style={{ fontWeight: 500, color: 'var(--mute)', letterSpacing: '.04em', textTransform: 'uppercase', fontSize: 9 }}> vs ronda {rondaAnterior}</span> : null}
-    </span>
-  )
-}
-
 // Color del relleno de la barra del termómetro: ahora unificado con el
 // semáforo del resto del dashboard (verde/amarillo/rojo del promedioBg).
 const tempColor = (v: number | null) => {
@@ -83,7 +62,7 @@ function SectionBar({ title, subtitle, mobile }: { title: string; subtitle?: str
   )
 }
 
-function MedidorBase({ dim, sizeNumber, padding, anterior, rondaAnterior, benchmark, benchmarkN }: { dim: DimResultado; sizeNumber: number; padding: string; anterior?: number | null; rondaAnterior?: number; benchmark?: number | null; benchmarkN?: number }) {
+function MedidorBase({ dim, sizeNumber, padding, benchmark, benchmarkN }: { dim: DimResultado; sizeNumber: number; padding: string; benchmark?: number | null; benchmarkN?: number }) {
   const pct = dim.promedio !== null ? ((dim.promedio - 1) / 9) * 100 : 0
   const color = tempColor(dim.promedio)
   return (
@@ -93,7 +72,6 @@ function MedidorBase({ dim, sizeNumber, padding, anterior, rondaAnterior, benchm
           <div style={{ fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--ink)', fontWeight: 700 }}>{dim.subtitulo}</div>
           <h3 style={{ fontSize: sizeNumber * 0.32, fontWeight: 900, letterSpacing: '-.02em', lineHeight: 1, margin: '4px 0 0' }}>{dim.nombre}</h3>
         </div>
-        {anterior !== null && anterior !== undefined && <DeltaRonda actual={dim.promedio} anterior={anterior} rondaAnterior={rondaAnterior} />}
       </div>
       <div style={{ display: 'flex', alignItems: 'baseline', gap: 10 }}>
         <span style={{ fontWeight: 900, fontSize: sizeNumber, lineHeight: .9, letterSpacing: '-.05em', color: 'var(--ink)' }}>
@@ -183,10 +161,8 @@ function PromedioCardTermometro({ resultados }: { resultados: DimResultado[] }) 
 
 export default function ResultadosTermometro({
   nombreCompania, estado, totalParticipantes, totalFormularios, resultados,
-  comparacion, rondaActual, rondaAnterior, benchmark, benchmarkN, dispersionPorDim,
+  benchmark, benchmarkN, dispersionPorDim,
 }: Props) {
-  const hayComparacion = comparacion && comparacion.length > 0
-  const getAnterior = (id: number) => comparacion?.find(c => c.id === id)?.promedio ?? null
   const hayBenchmark = !!benchmark && benchmark.length > 0
   const getBenchmark = (id: number) => benchmark?.find(b => b.id === id)?.promedio ?? null
   const lectura = lecturaEjecutiva(resultados)
@@ -203,7 +179,7 @@ export default function ResultadosTermometro({
         </header>
 
         <div style={{ padding: '24px 20px 20px', borderBottom: '1.5px solid var(--ink)' }}>
-          <ChipTipo etiqueta="Termómetro" rondaActual={rondaActual} />
+          <ChipTipo etiqueta="Termómetro" />
           <h1 style={{ fontSize: 'clamp(28px, 8vw, 36px)', fontWeight: 900, letterSpacing: '-.02em', lineHeight: 1, margin: 0 }}>
             {nombreCompania}
           </h1>
@@ -248,7 +224,7 @@ export default function ResultadosTermometro({
               borderRight: i % 2 === 0 ? '1.5px solid var(--ink)' : 'none',
               borderBottom: i < resultados.length - 2 ? '1.5px solid var(--ink)' : 'none',
             }}>
-              <MedidorBase dim={dim} sizeNumber={56} padding="18px 16px 20px" anterior={hayComparacion ? getAnterior(dim.id) : null} rondaAnterior={rondaAnterior} benchmark={hayBenchmark ? getBenchmark(dim.id) : null} benchmarkN={benchmarkN} />
+              <MedidorBase dim={dim} sizeNumber={56} padding="18px 16px 20px" benchmark={hayBenchmark ? getBenchmark(dim.id) : null} benchmarkN={benchmarkN} />
             </div>
           ))}
         </div>
@@ -294,7 +270,7 @@ export default function ResultadosTermometro({
 
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
           <div style={{ padding: '40px 24px 32px', borderBottom: '1.5px solid var(--ink)' }}>
-            <ChipTipo etiqueta="Termómetro" rondaActual={rondaActual} />
+            <ChipTipo etiqueta="Termómetro" />
             <h1 className="page-header__title" style={{ fontSize: 'clamp(32px,4vw,48px)' }}>
               {nombreCompania}
             </h1>
@@ -338,7 +314,7 @@ export default function ResultadosTermometro({
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', borderBottom: '1.5px solid var(--ink)' }}>
             {resultados.map(dim => (
               <div key={dim.id}>
-                <MedidorBase dim={dim} sizeNumber={96} padding="32px 24px 30px" anterior={hayComparacion ? getAnterior(dim.id) : null} rondaAnterior={rondaAnterior} benchmark={hayBenchmark ? getBenchmark(dim.id) : null} benchmarkN={benchmarkN} />
+                <MedidorBase dim={dim} sizeNumber={96} padding="32px 24px 30px" benchmark={hayBenchmark ? getBenchmark(dim.id) : null} benchmarkN={benchmarkN} />
               </div>
             ))}
             <PromedioCardTermometro resultados={resultados} />
