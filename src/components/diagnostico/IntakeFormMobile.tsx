@@ -112,14 +112,16 @@ export default function IntakeFormMobile({
             cursor: !habilitado ? 'not-allowed' : 'pointer',
             transition: 'background .15s ease, color .15s ease, border-color .15s ease',
           }}>
-          {loading ? 'Cargando…' : <>Comenzar preguntas <ArrowRight size={17} strokeWidth={2.5} /></>}
+          {loading ? 'Cargando…' : <>Iniciar cuestionario <ArrowRight size={17} strokeWidth={2.5} /></>}
         </button>
       </div>
 
       <div style={{ marginTop: 'auto', paddingTop: 24 }}>
         <span className="eyebrow soft">
           {esSimple
-            ? `≈ ${Math.max(2, Math.ceil(preguntasColectivo / 3))}–${Math.max(4, Math.ceil(preguntasColectivo / 2))} min · ${preguntasColectivo} preguntas`
+            ? tipo === 'pulso_colectivo'
+              ? `≈ 5–10 min · ${preguntasColectivo} preguntas`
+              : `≈ ${Math.max(2, Math.ceil(preguntasColectivo / 3))}–${Math.max(4, Math.ceil(preguntasColectivo / 2))} min · ${preguntasColectivo} preguntas`
             : `≈ 5–8 min${perfil ? ` · ${perfil === 'lider' ? preguntasLider : preguntasEquipo} preguntas` : ''}`}
         </span>
       </div>

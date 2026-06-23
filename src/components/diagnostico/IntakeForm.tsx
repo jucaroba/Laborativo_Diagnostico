@@ -127,12 +127,14 @@ export default function IntakeForm({ equipoId, nombreCompania, codigo, tipo = 'c
             <button onClick={comenzar} disabled={loading}
               className="btn primary"
               style={{ cursor: loading ? 'not-allowed' : 'pointer' }}>
-              {loading ? 'Cargando…' : <>Comenzar preguntas <ArrowRight size={15} strokeWidth={2.5} /></>}
+              {loading ? 'Cargando…' : <>Iniciar cuestionario <ArrowRight size={15} strokeWidth={2.5} /></>}
             </button>
           </div>
           <div style={{ marginTop: 'auto' }}>
             <span className="eyebrow soft">
-              ≈ {Math.max(2, Math.ceil(preguntasColectivo / 3))}–{Math.max(4, Math.ceil(preguntasColectivo / 2))} min · {preguntasColectivo} preguntas
+              {tipo === 'pulso_colectivo'
+                ? `≈ 5–10 min · ${preguntasColectivo} preguntas`
+                : `≈ ${Math.max(2, Math.ceil(preguntasColectivo / 3))}–${Math.max(4, Math.ceil(preguntasColectivo / 2))} min · ${preguntasColectivo} preguntas`}
             </span>
           </div>
         </>
@@ -175,7 +177,7 @@ export default function IntakeForm({ equipoId, nombreCompania, codigo, tipo = 'c
             <button onClick={comenzar} disabled={!perfil || loading}
               className="btn primary"
               style={{ cursor: (!perfil || loading) ? 'not-allowed' : 'pointer' }}>
-              {loading ? 'Cargando…' : <>Comenzar preguntas <ArrowRight size={15} strokeWidth={2.5} /></>}
+              {loading ? 'Cargando…' : <>Iniciar cuestionario <ArrowRight size={15} strokeWidth={2.5} /></>}
             </button>
           </div>
 
