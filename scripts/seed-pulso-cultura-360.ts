@@ -22,31 +22,39 @@ const TEMA_NOMBRE = 'Cultura 360 (Pulso)'
 const TEMA_TIPO = 'pulso_colectivo'
 const TEMA_DESC = 'Versión pulso (perspectiva colectiva) del set Cultura 360: una afirmación por eje, en primera persona del plural a nivel organización.'
 
-// 4 dimensiones × 3 ejes. Mismo orden temático que el set 360, en plural/empresa.
+// 4 dimensiones × 5 preguntas. Mismo orden temático que el set 360, en plural/empresa.
 const PREGUNTAS: Record<number, string[]> = {
   // 1 · Intención (Sentido)
   1: [
     'Tenemos claridad sobre hacia dónde se dirige la organización',
     'Conectamos nuestro trabajo diario con el propósito de la organización',
     'Nos entusiasma la visión de futuro de la organización',
+    'Entendemos cómo nuestro trabajo contribuye a las metas de la organización',
+    'Las prioridades de la organización son claras y coherentes',
   ],
   // 2 · Motivación (Energía)
   2: [
     'Ponemos energía y entusiasmo en nuestro trabajo diario',
     'Reconocemos y valoramos el esfuerzo y los logros de las personas',
     'Damos más de lo estrictamente requerido cuando se necesita',
+    'Encontramos sentido y disfrute en lo que hacemos',
+    'Nos sentimos motivados para seguir creciendo en la organización',
   ],
   // 3 · Interacción (Vínculos)
   3: [
     'Nos comunicamos de forma abierta y honesta',
     'Nos tenemos confianza entre nosotros',
     'Abordamos los desacuerdos de forma constructiva',
+    'Colaboramos entre áreas para lograr objetivos comunes',
+    'Nos sentimos respetados y escuchados en la organización',
   ],
   // 4 · Acción (Comportamiento)
   4: [
     'Cumplimos consistentemente con los compromisos que adquirimos',
     'Actuamos con autonomía y tomamos decisiones por nuestra cuenta',
     'Nos adaptamos con rapidez a los cambios y aprendemos de los errores',
+    'Ejecutamos nuestro trabajo con calidad y atención al detalle',
+    'Tomamos decisiones con agilidad cuando se necesita',
   ],
 }
 
