@@ -50,7 +50,7 @@ export async function enviarInvitacionParticipante(params: {
     html: `
       <p>Hola ${participanteNombre},</p>
       <p>Estás invitado/a a participar en el diagnóstico de cultura organizacional de ${nombreCompania}.</p>
-      <p>Toma entre 10 y 15 minutos. Este es tu link personal, no lo compartas.</p>
+      <p>Toma entre 5 y 10 minutos. Este es tu link personal, no lo compartas.</p>
       <p>Tus respuestas son confidenciales, tu empresa solo verá los resultados consolidados del equipo. Laborativo, como tercero independiente, conserva el detalle de forma reservada para análisis.</p>
       <p><a href="${link}" style="font-weight: 700;">Comenzar diagnóstico →</a></p>
       <div style="width: 40px; border-top: 3px solid #0A0A0A; margin: 20px 0;"></div>
