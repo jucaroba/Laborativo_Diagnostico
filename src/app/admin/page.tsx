@@ -14,15 +14,33 @@ const fechaCorta = (iso: string) => {
   return `${d.getDate()} ${MESES[d.getMonth()]} ${d.getFullYear()}`
 }
 
+// Supabase corta en 1000 filas por defecto. Para conteos agregados (respuestas,
+// participantes…) necesitamos TODAS las filas, así que paginamos con .range().
+// El orden por una columna única (id) hace la paginación determinista.
+async function fetchAllRows<T>(
+  build: (from: number, to: number) => PromiseLike<{ data: T[] | null }>,
+): Promise<T[]> {
+  const PAGE = 1000
+  const out: T[] = []
+  for (let from = 0; ; from += PAGE) {
+    const { data } = await build(from, from + PAGE - 1)
+    const rows = data ?? []
+    out.push(...rows)
+    if (rows.length < PAGE) break
+  }
+  return out
+}
+
 export default async function AdminPage() {
   const { data: diagnosticosRaw } = await supabase
     .from('diagnosticos').select('*').order('created_at', { ascending: false })
 
   const diagnosticos = (diagnosticosRaw ?? []) as Diagnostico[]
   const diagIds = diagnosticos.map(d => d.id)
-  const { data: equipos } = diagIds.length > 0
-    ? await supabase.from('equipos').select('id, diagnostico_id, estado, numero_participantes').in('diagnostico_id', diagIds)
-    : { data: [] as { id: string; diagnostico_id: string; estado: string; numero_participantes: number | null }[] }
+  const equipos = diagIds.length > 0
+    ? await fetchAllRows<{ id: string; diagnostico_id: string; estado: string; numero_participantes: number | null }>(
+        (from, to) => supabase.from('equipos').select('id, diagnostico_id, estado, numero_participantes').in('diagnostico_id', diagIds).order('id').range(from, to))
+    : []
 
   // Agregados por compañía: nº equipos, conteo por estado y total invitados
   const porCompania: Record<string, { n: number; activos: number; completados: number; invitados: number }> = {}
@@ -43,9 +61,10 @@ export default async function AdminPage() {
   const equipoToDiag: Record<string, string> = {}
   for (const eq of equipos ?? []) equipoToDiag[eq.id] = eq.diagnostico_id
 
-  const { data: preguntasRows } = diagIds.length > 0
-    ? await supabase.from('preguntas').select('id, diagnostico_id, rol').in('diagnostico_id', diagIds)
-    : { data: [] as { id: string; diagnostico_id: string; rol: Rol }[] }
+  const preguntasRows = diagIds.length > 0
+    ? await fetchAllRows<{ id: string; diagnostico_id: string; rol: Rol }>(
+        (from, to) => supabase.from('preguntas').select('id, diagnostico_id, rol').in('diagnostico_id', diagIds).order('id').range(from, to))
+    : []
 
   // preguntasPorDiag[diagId][rol] = Set<preguntaId>
   const preguntasPorDiag: Record<string, Record<Rol, Set<string>>> = {}
@@ -56,13 +75,15 @@ export default async function AdminPage() {
     preguntasPorDiag[p.diagnostico_id][p.rol as Rol].add(p.id)
   }
 
-  const { data: partsRows } = equipoIds.length > 0
-    ? await supabase.from('participantes').select('id, equipo_id, rol').in('equipo_id', equipoIds)
-    : { data: [] as { id: string; equipo_id: string; rol: Rol }[] }
-  const partIds = (partsRows ?? []).map(p => p.id)
-  const { data: respsRows } = partIds.length > 0
-    ? await supabase.from('respuestas').select('participante_id, pregunta_id').in('participante_id', partIds)
-    : { data: [] as { participante_id: string; pregunta_id: string }[] }
+  const partsRows = equipoIds.length > 0
+    ? await fetchAllRows<{ id: string; equipo_id: string; rol: Rol }>(
+        (from, to) => supabase.from('participantes').select('id, equipo_id, rol').in('equipo_id', equipoIds).order('id').range(from, to))
+    : []
+  const partIds = partsRows.map(p => p.id)
+  const respsRows = partIds.length > 0
+    ? await fetchAllRows<{ participante_id: string; pregunta_id: string }>(
+        (from, to) => supabase.from('respuestas').select('participante_id, pregunta_id').in('participante_id', partIds).order('id').range(from, to))
+    : []
 
   const respPorPart: Record<string, Set<string>> = {}
   for (const r of respsRows ?? []) {
