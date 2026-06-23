@@ -36,7 +36,6 @@ type Props = {
   arqRelaciones: Arquetipo
   arqCtx: ArquetipoCtx
   diagnosticoId: string
-  rondaActual?: number
 }
 
 const deltaBg = (d: number) => d >= 5 ? '#F2C2C2' : d >= 3 ? '#FCE99A' : '#C8E6C9'
@@ -55,7 +54,7 @@ function SectionBar({ title, subtitle }: { title: string; subtitle?: string }) {
 
 export default function ResultadosMobile({
   nombreCompania, estado, totalParticipantes, personasEquipo, personasLider, totalFormularios,
-  resultados, promediosPorRol, promedioGlobalPorRol, arqBrechas, arqRelaciones, arqCtx, diagnosticoId, rondaActual,
+  resultados, promediosPorRol, promedioGlobalPorRol, arqBrechas, arqRelaciones, arqCtx, diagnosticoId,
 }: Props) {
   return (
     <div style={{ fontFamily: "'Red Hat Display', sans-serif", background: 'var(--bg)', minHeight: '100vh' }}>
@@ -76,12 +75,6 @@ export default function ResultadosMobile({
             fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase', fontWeight: 700,
             background: 'var(--ink)', color: '#fff', padding: '3px 8px',
           }}>360°</span>
-          {rondaActual && rondaActual > 1 && (
-            <span style={{
-              fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase', fontWeight: 700,
-              background: 'transparent', color: 'var(--ink)', border: '1.5px solid var(--ink)', padding: '2px 8px',
-            }}>Ronda {rondaActual}</span>
-          )}
         </div>
         <h1 style={{ fontSize: 'clamp(28px, 8vw, 36px)', fontWeight: 900, letterSpacing: '-.02em', lineHeight: 1, margin: 0 }}>
           {nombreCompania}

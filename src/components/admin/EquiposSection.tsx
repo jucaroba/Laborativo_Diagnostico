@@ -80,7 +80,6 @@ export default function EquiposSection({ diagnosticoId, tipo, codigoResultadosCo
               Comparativo <ArrowUpRight size={13} strokeWidth={2.5} />
             </Link>
           )}
-          <CargarParticipantesDialog diagnosticoId={diagnosticoId} />
         </div>
       </div>
 
@@ -98,6 +97,11 @@ export default function EquiposSection({ diagnosticoId, tipo, codigoResultadosCo
           ))}
         </div>
       )}
+
+      {/* Cargar participantes: debajo de la lista de equipos */}
+      <div style={{ marginTop: 12, display: 'flex' }}>
+        <CargarParticipantesDialog diagnosticoId={diagnosticoId} variant="primary" />
+      </div>
 
       <Dialog open={!!eliminar} onOpenChange={(v) => { if (!v) { setEliminar(null); setEliminarConRespuestas(false) } }}>
         <DialogContent style={{ maxWidth: 480 }}>

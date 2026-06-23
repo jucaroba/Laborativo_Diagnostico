@@ -7,9 +7,6 @@ import EditarDiagnostico from '@/components/admin/EditarDiagnostico'
 import ActivarDiagnostico from '@/components/admin/ActivarDiagnostico'
 import EquiposSection from '@/components/admin/EquiposSection'
 import EnlaceColectivo from '@/components/admin/EnlaceColectivo'
-import IniciarRondaButton from '@/components/admin/IniciarRondaButton'
-import Link from 'next/link'
-import { ArrowLeft } from 'lucide-react'
 
 export const revalidate = 0
 
@@ -78,17 +75,6 @@ export default async function DiagnosticoPage({ params }: { params: Promise<{ id
     }
   }
 
-  // Padre (si esta es una ronda 2+) — para el badge "Ronda N · ← ver ronda anterior"
-  const { data: padreData } = d.diagnostico_padre_id
-    ? await supabase
-        .from('diagnosticos')
-        .select('id, nombre_compania, ronda')
-        .eq('id', d.diagnostico_padre_id)
-        .maybeSingle()
-    : { data: null }
-
-  const ronda = d.ronda ?? 1
-
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
 
@@ -99,24 +85,7 @@ export default async function DiagnosticoPage({ params }: { params: Promise<{ id
             <span style={{
               fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase', fontWeight: 700,
               background: 'var(--ink)', color: '#fff', padding: '3px 8px',
-            }}>{tipoConfig?.etiqueta ?? d.tipo}</span>
-            {ronda > 1 && padreData && (
-              <Link
-                href={`/admin/${padreData.id}`}
-                style={{
-                  fontSize: 11, color: 'var(--ink)', fontWeight: 600, letterSpacing: '.04em',
-                  textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 4,
-                }}
-              >
-                <ArrowLeft size={12} strokeWidth={2.5} /> Ronda {padreData.ronda ?? 1}
-              </Link>
-            )}
-            {ronda > 1 && (
-              <span style={{
-                fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase', fontWeight: 700,
-                background: 'transparent', color: 'var(--ink)', border: '1.5px solid var(--ink)', padding: '2px 8px',
-              }}>Ronda {ronda}</span>
-            )}
+            }}>{tipoConfig?.nombre ?? d.tipo}</span>
           </div>
           <h1 className="page-header__title" style={{ fontSize: 32, letterSpacing: '0px' }}>{d.nombre_compania}</h1>
           <p className="page-header__subtitle">{d.contacto_nombre} / {d.contacto_cargo} / {d.contacto_email}</p>
@@ -124,7 +93,7 @@ export default async function DiagnosticoPage({ params }: { params: Promise<{ id
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'flex-start' }}>
           <EditarDiagnostico diagnostico={d} />
           <EliminarDiagnostico id={d.id} />
-          {d.activado ? <IniciarRondaButton padre={d} /> : <ActivarDiagnostico id={d.id} />}
+          {!d.activado && <ActivarDiagnostico id={d.id} />}
         </div>
       </div>
 

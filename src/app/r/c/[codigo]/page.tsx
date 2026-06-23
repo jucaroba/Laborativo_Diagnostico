@@ -1,7 +1,9 @@
 import { supabase } from '@/lib/supabase'
 import { notFound, redirect } from 'next/navigation'
 import Image from 'next/image'
+import Link from 'next/link'
 import { Fragment } from 'react'
+import { ArrowLeft } from 'lucide-react'
 import { DIMENSIONES, Diagnostico, Equipo } from '@/types'
 import { TIPOS_DIAGNOSTICO } from '@/lib/tipos-diagnostico'
 
@@ -124,12 +126,22 @@ export default async function ComparativoCompaniaPage({ params }: { params: Prom
     <div style={{ fontFamily: "'Red Hat Display', sans-serif", background: 'var(--bg)', minHeight: '100vh' }}>
 
       {/* Header */}
-      <header style={{ borderBottom: '1.5px solid var(--ink)', background: '#ffffff', padding: '14px 40px', display: 'flex', alignItems: 'center' }}>
+      <header style={{ borderBottom: '1.5px solid var(--ink)', background: '#ffffff', padding: '14px 40px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
           <Image src="/brand/laborativo-logo.png" alt="Laborativo" width={154} height={39} style={{ objectFit: 'contain' }} />
           <span style={{ color: 'var(--mute)', fontSize: 14, marginTop: 5 }}>/</span>
           <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--ink)', letterSpacing: '.04em', marginTop: 5 }}>Comparativo</span>
         </div>
+        <Link
+          href={`/admin/${c.id}`}
+          style={{
+            fontSize: 11, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase',
+            color: 'var(--ink)', textDecoration: 'none', border: '1.5px solid var(--ink)', padding: '6px 10px',
+            display: 'inline-flex', alignItems: 'center', gap: 6,
+          }}
+        >
+          <ArrowLeft size={13} strokeWidth={2.5} /> Administrador
+        </Link>
       </header>
 
       <div style={{ maxWidth: 1200, margin: '0 auto' }}>

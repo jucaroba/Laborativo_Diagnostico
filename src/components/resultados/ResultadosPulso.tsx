@@ -16,9 +16,6 @@ type Props = {
   totalParticipantes: number
   totalFormularios: number
   resultados: DimResultado[]
-  comparacion?: DimResultado[] | null
-  rondaActual?: number
-  rondaAnterior?: number
   benchmark?: DimResultado[] | null
   benchmarkN?: number
   /** Para cada dimensión (id 1..4), array de promedios por persona. */
@@ -36,25 +33,6 @@ function BenchmarkLabel({ valor, n }: { valor: number | null; n?: number }) {
       Benchmark Laborativo · <b style={{ fontWeight: 800, fontFeatureSettings: '"tnum" 1, "zero" 0', color: 'var(--ink)' }}>{valor.toFixed(1)}</b>
       {n && n > 0 ? <span style={{ color: 'var(--mute)', fontWeight: 500 }}>· {n} {n === 1 ? 'equipo' : 'equipos'}</span> : null}
     </div>
-  )
-}
-
-// Pinta el Δ vs ronda anterior: subió, bajó, igual.
-function DeltaRonda({ actual, anterior, rondaAnterior }: { actual: number | null; anterior: number | null; rondaAnterior?: number }) {
-  if (actual === null || anterior === null) return null
-  const diff = Math.round((actual - anterior) * 10) / 10
-  const color = diff > 0.1 ? '#1A9850' : diff < -0.1 ? '#D73027' : 'var(--mute)'
-  const flecha = diff > 0.1 ? '↑' : diff < -0.1 ? '↓' : '→'
-  const signo = diff > 0 ? '+' : ''
-  return (
-    <span style={{
-      display: 'inline-flex', alignItems: 'center', gap: 4,
-      fontSize: 11, fontWeight: 700, color,
-      fontFeatureSettings: '"tnum" 1, "zero" 0',
-    }}>
-      {flecha} {signo}{diff.toFixed(1)}
-      {rondaAnterior ? <span style={{ fontWeight: 500, color: 'var(--mute)', letterSpacing: '.04em', textTransform: 'uppercase', fontSize: 9 }}> vs ronda {rondaAnterior}</span> : null}
-    </span>
   )
 }
 
@@ -100,11 +78,9 @@ function SectionBar({ title, subtitle, mobile }: { title: string; subtitle?: str
 
 export default function ResultadosPulso({
   nombreCompania, estado, totalParticipantes, totalFormularios, resultados,
-  comparacion, rondaActual, rondaAnterior, benchmark, benchmarkN, dispersionPorDim,
+  benchmark, benchmarkN, dispersionPorDim,
   preguntasRanking,
 }: Props) {
-  const hayComparacion = comparacion && comparacion.length > 0
-  const getAnterior = (id: number) => comparacion?.find(c => c.id === id)?.promedio ?? null
   const hayBenchmark = !!benchmark && benchmark.length > 0
   const getBenchmark = (id: number) => benchmark?.find(b => b.id === id)?.promedio ?? null
   return (
@@ -125,12 +101,6 @@ export default function ResultadosPulso({
               fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase', fontWeight: 700,
               background: 'var(--ink)', color: '#fff', padding: '3px 8px',
             }}>Pulso</span>
-            {rondaActual && rondaActual > 1 && (
-              <span style={{
-                fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase', fontWeight: 700,
-                background: 'transparent', color: 'var(--ink)', border: '1.5px solid var(--ink)', padding: '2px 8px',
-              }}>Ronda {rondaActual}</span>
-            )}
           </div>
           <h1 style={{ fontSize: 'clamp(28px, 8vw, 36px)', fontWeight: 900, letterSpacing: '-.02em', lineHeight: 1, margin: 0 }}>
             {nombreCompania}
@@ -162,8 +132,6 @@ export default function ResultadosPulso({
             <DimCardMobile
               key={dim.id}
               dim={dim}
-              anterior={hayComparacion ? getAnterior(dim.id) : null}
-              rondaAnterior={rondaAnterior}
               benchmark={hayBenchmark ? getBenchmark(dim.id) : null}
               benchmarkN={benchmarkN}
               ultimo={i === arr.length - 1}
@@ -222,12 +190,6 @@ export default function ResultadosPulso({
                 fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase', fontWeight: 700,
                 background: 'var(--ink)', color: '#fff', padding: '3px 8px',
               }}>Pulso</span>
-              {rondaActual && rondaActual > 1 && (
-                <span style={{
-                  fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase', fontWeight: 700,
-                  background: 'transparent', color: 'var(--ink)', border: '1.5px solid var(--ink)', padding: '2px 8px',
-                }}>Ronda {rondaActual}</span>
-              )}
             </div>
             <h1 className="page-header__title" style={{ fontSize: 'clamp(32px,4vw,48px)' }}>
               {nombreCompania}
@@ -259,8 +221,6 @@ export default function ResultadosPulso({
               <DimCardDesktop
                 key={dim.id}
                 dim={dim}
-                anterior={hayComparacion ? getAnterior(dim.id) : null}
-                rondaAnterior={rondaAnterior}
                 benchmark={hayBenchmark ? getBenchmark(dim.id) : null}
                 benchmarkN={benchmarkN}
                 ultimo={i === arr.length - 1}
@@ -304,7 +264,7 @@ export default function ResultadosPulso({
 
 // ─── DimCard ─────────────────────────────────────────────────────
 
-function DimCardMobile({ dim, anterior, rondaAnterior, benchmark, benchmarkN, ultimo }: { dim: DimResultado; anterior: number | null; rondaAnterior?: number; benchmark: number | null; benchmarkN?: number; ultimo: boolean }) {
+function DimCardMobile({ dim, benchmark, benchmarkN, ultimo }: { dim: DimResultado; benchmark: number | null; benchmarkN?: number; ultimo: boolean }) {
   return (
     <div style={{
       padding: '18px 20px 20px',
@@ -316,7 +276,6 @@ function DimCardMobile({ dim, anterior, rondaAnterior, benchmark, benchmarkN, ul
           <div style={{ fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--ink)', fontWeight: 700 }}>{dim.subtitulo}</div>
           <h3 style={{ fontSize: 20, fontWeight: 900, letterSpacing: '-.02em', lineHeight: 1, margin: '4px 0 0' }}>{dim.nombre}</h3>
         </div>
-        {anterior !== null && <DeltaRonda actual={dim.promedio} anterior={anterior} rondaAnterior={rondaAnterior} />}
       </div>
       <div style={{ display: 'flex', alignItems: 'baseline', gap: 10 }}>
         <span style={{ fontWeight: 900, fontSize: 52, lineHeight: 1, letterSpacing: '-.04em', color: avgColor(dim.promedio) }}>
@@ -371,7 +330,7 @@ function PromedioCardDesktop({ resultados }: { resultados: DimResultado[] }) {
   )
 }
 
-function DimCardDesktop({ dim, anterior, rondaAnterior, benchmark, benchmarkN }: { dim: DimResultado; anterior: number | null; rondaAnterior?: number; benchmark: number | null; benchmarkN?: number; ultimo: boolean }) {
+function DimCardDesktop({ dim, benchmark, benchmarkN }: { dim: DimResultado; benchmark: number | null; benchmarkN?: number; ultimo: boolean }) {
   return (
     <div style={{
       padding: '28px 24px 26px',
@@ -382,7 +341,6 @@ function DimCardDesktop({ dim, anterior, rondaAnterior, benchmark, benchmarkN }:
           <div style={{ fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--ink)', fontWeight: 700 }}>{dim.subtitulo}</div>
           <h3 style={{ fontSize: 22, fontWeight: 900, letterSpacing: '-.02em', lineHeight: 1, margin: '4px 0 0' }}>{dim.nombre}</h3>
         </div>
-        {anterior !== null && <DeltaRonda actual={dim.promedio} anterior={anterior} rondaAnterior={rondaAnterior} />}
       </div>
       <div style={{ width: 42, height: 8, background: 'var(--ink)' }} />
       <div style={{ display: 'flex', alignItems: 'baseline', gap: 12 }}>
