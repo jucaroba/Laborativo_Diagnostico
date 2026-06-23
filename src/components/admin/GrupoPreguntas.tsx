@@ -85,8 +85,8 @@ export default function GrupoPreguntas({ grupo, rol, diagnosticoId, temaId, dime
       <Table>
         <TableBody>
           {preguntas.map((p, i) => (
-            <TableRow key={p.id}>
-              <TableCell className="text-mute" style={{ width: 32, fontWeight: 700, fontSize: 12 }}>{i + 1}</TableCell>
+            <TableRow key={p.id} style={i === preguntas.length - 1 && !agregando ? { borderBottom: 'none' } : undefined}>
+              <TableCell className="text-mute" style={{ width: 32, paddingLeft: 12, fontWeight: 700, fontSize: 12 }}>{i + 1}</TableCell>
               <TableCell style={{ fontSize: 13, fontWeight: 500, whiteSpace: 'normal' }}>
                 {editandoId === p.id ? (
                   <input
@@ -116,8 +116,8 @@ export default function GrupoPreguntas({ grupo, rol, diagnosticoId, temaId, dime
 
           {/* Fila para agregar */}
           {agregando && (
-            <TableRow>
-              <TableCell className="text-mute" style={{ width: 32, fontWeight: 700, fontSize: 12 }}>{preguntas.length + 1}</TableCell>
+            <TableRow style={{ borderBottom: 'none' }}>
+              <TableCell className="text-mute" style={{ width: 32, paddingLeft: 12, fontWeight: 700, fontSize: 12 }}>{preguntas.length + 1}</TableCell>
               <TableCell>
                 <input
                   autoFocus

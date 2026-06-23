@@ -59,8 +59,15 @@ export default function CargarParticipantesDialog({ diagnosticoId, variant = 'bu
       })
       const data = await r.json()
       if (!r.ok) throw new Error(data.error || 'Error al cargar')
-      setResultado(data)
       router.refresh()
+      // Carga exitosa sin fallos: cierra el diálogo y vuelve directo a la vista
+      // de administrador (ya con el grupo cargado). Si hubo fallos, mostramos
+      // el resumen para revisarlos.
+      if (!data.fallidos || data.fallidos.length === 0) {
+        cerrar()
+      } else {
+        setResultado(data)
+      }
     } catch (e) {
       setResultado({ areas: 0, equiposCreados: 0, invitaciones: 0, enviados: 0, fallidos: [{ email: '—', error: e instanceof Error ? e.message : 'Error' }] })
     } finally {

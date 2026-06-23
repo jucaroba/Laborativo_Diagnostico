@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { Equipo, TipoDiagnostico } from '@/types'
@@ -31,6 +31,10 @@ export default function EquiposSection({ diagnosticoId, tipo, codigoResultadosCo
   const [equipos, setEquipos] = useState<Equipo[]>(equiposIniciales)
   const [eliminar, setEliminar] = useState<Equipo | null>(null)
   const [eliminarConRespuestas, setEliminarConRespuestas] = useState(false)
+
+  // Re-sincroniza con el servidor (p. ej. tras cargar participantes y
+  // router.refresh()): así los equipos recién creados aparecen sin recargar.
+  useEffect(() => { setEquipos(equiposIniciales) }, [equiposIniciales])
 
   const tipoConfig = TIPOS_DIAGNOSTICO[tipo]
   const hayMultiples = equipos.length >= 2
