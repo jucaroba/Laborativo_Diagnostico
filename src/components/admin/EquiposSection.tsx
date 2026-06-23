@@ -66,22 +66,19 @@ export default function EquiposSection({ diagnosticoId, tipo, codigoResultadosCo
         <h2 style={{ fontSize: 20, fontWeight: 900, letterSpacing: '0', margin: 0, color: '#fff', fontFamily: 'Red Hat Display, sans-serif' }}>
           Equipos <span style={{ fontWeight: 700 }}>/ {equipos.length}</span>
         </h2>
-        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-          {hayMultiples && (
-            <Link
-              href={`/r/c/${codigoResultadosComparativo}`}
-              target="_blank"
-              style={{
-                fontSize: 11, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase',
-                color: '#fff', textDecoration: 'none', border: '1.5px solid #fff', padding: '6px 10px',
-                display: 'inline-flex', alignItems: 'center', gap: 6,
-              }}
-            >
-              Comparativo <ArrowUpRight size={13} strokeWidth={2.5} />
-            </Link>
-          )}
-          <CargarParticipantesDialog diagnosticoId={diagnosticoId} />
-        </div>
+        {hayMultiples && (
+          <Link
+            href={`/r/c/${codigoResultadosComparativo}`}
+            target="_blank"
+            style={{
+              fontSize: 11, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase',
+              color: '#fff', textDecoration: 'none', border: '1.5px solid #fff', padding: '6px 10px',
+              display: 'inline-flex', alignItems: 'center', gap: 6,
+            }}
+          >
+            Comparativo <ArrowUpRight size={13} strokeWidth={2.5} />
+          </Link>
+        )}
       </div>
 
       {equipos.length > 0 && (
@@ -98,6 +95,11 @@ export default function EquiposSection({ diagnosticoId, tipo, codigoResultadosCo
           ))}
         </div>
       )}
+
+      {/* Cargar participantes: debajo de la lista de equipos */}
+      <div style={{ marginTop: 12, display: 'flex' }}>
+        <CargarParticipantesDialog diagnosticoId={diagnosticoId} variant="primary" />
+      </div>
 
       <Dialog open={!!eliminar} onOpenChange={(v) => { if (!v) { setEliminar(null); setEliminarConRespuestas(false) } }}>
         <DialogContent style={{ maxWidth: 480 }}>
