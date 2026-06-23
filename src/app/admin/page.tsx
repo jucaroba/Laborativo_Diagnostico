@@ -2,8 +2,7 @@ import { supabase } from '@/lib/supabase'
 import Link from 'next/link'
 import { Diagnostico, Rol } from '@/types'
 import { buttonVariants } from '@/components/ui/button'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import AccionesRow from '@/components/admin/AccionesRow'
+import TablaDiagnosticos from '@/components/admin/TablaDiagnosticos'
 import { TIPOS_DIAGNOSTICO } from '@/lib/tipos-diagnostico'
 
 export const revalidate = 0
@@ -112,6 +111,24 @@ export default async function AdminPage() {
     }
   }
 
+  // Filas planas para la tabla (el orden interactivo lo maneja el cliente).
+  const filas = diagnosticos.map(d => {
+    const tipoConfig = TIPOS_DIAGNOSTICO[(d.tipo ?? 'cultura_360') as keyof typeof TIPOS_DIAGNOSTICO]
+    const stats = porCompania[d.id] ?? { n: 0, activos: 0, completados: 0, invitados: 0 }
+    return {
+      id: d.id,
+      empresa: d.nombre_compania,
+      tipoEtiqueta: tipoConfig?.etiqueta ?? '360°',
+      contacto: d.contacto_nombre,
+      fechaIso: d.created_at,
+      fecha: fechaCorta(d.created_at),
+      equiposN: stats.n,
+      equiposActivos: stats.activos,
+      invitados: stats.invitados,
+      completados: completadosPorCompania[d.id] ?? 0,
+    }
+  })
+
   return (
     <div>
       <div className="page-header admin-list-header" style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
@@ -123,67 +140,10 @@ export default async function AdminPage() {
         <Link href="/admin/nuevo" className={buttonVariants()} style={{ background: '#0A0A0A', color: '#ffffff', border: '1px solid #0A0A0A' }}>+ Nuevo diagnóstico</Link>
       </div>
 
-      {!diagnosticos?.length ? (
+      {!filas.length ? (
         <p className="text-mute" style={{ fontSize: 14 }}>Aún no hay diagnósticos.</p>
       ) : (
-        <div className="admin-table-scroll">
-        <Table>
-          <TableHeader>
-            <TableRow style={{ background: '#0A0A0A', borderBottom: 'none' }}>
-              {['Empresa', 'Tipo', 'Contacto', 'Fecha', 'Equipos', 'PAX', ''].map(h => (
-                <TableHead key={h} style={{
-                  color: '#fff', fontWeight: 700, fontSize: 12, letterSpacing: '.06em', textTransform: 'uppercase', background: 'transparent',
-                  textAlign: (h === 'Equipos' || h === 'PAX') ? 'center' : 'left',
-                }}>{h}</TableHead>
-              ))}
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {diagnosticos.map((d: Diagnostico) => {
-              const tipoConfig = TIPOS_DIAGNOSTICO[(d.tipo ?? 'cultura_360') as keyof typeof TIPOS_DIAGNOSTICO]
-              const stats = porCompania[d.id] ?? { n: 0, activos: 0, completados: 0, invitados: 0 }
-
-              return (
-              <TableRow key={d.id}>
-                <TableCell>
-                  <Link href={`/admin/${d.id}`} style={{ textDecoration: 'none', color: 'inherit', fontWeight: 500, fontSize: 14 }}>
-                    {d.nombre_compania}
-                  </Link>
-                </TableCell>
-                <TableCell>
-                  <span style={{
-                    display: 'inline-block', padding: '2px 8px',
-                    fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase',
-                    fontWeight: 700, background: 'var(--ink)', color: '#fff',
-                  }}>{tipoConfig?.etiqueta ?? '360°'}</span>
-                </TableCell>
-                <TableCell style={{ color: 'var(--ink)', fontWeight: 500, fontSize: 14 }}>{d.contacto_nombre}</TableCell>
-                <TableCell style={{ color: 'var(--ink)', fontWeight: 500, fontSize: 14 }}>
-                  {fechaCorta(d.created_at)}
-                </TableCell>
-                <TableCell style={{ textAlign: 'center' }}>
-                  <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--ink)' }}>
-                    {stats.n}{' '}
-                    <span style={{ color: 'var(--mute)', fontWeight: 600 }}>/</span>{' '}
-                    {stats.activos} activo{stats.activos === 1 ? '' : 's'}
-                  </span>
-                </TableCell>
-                <TableCell style={{ textAlign: 'center' }}>
-                  <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--ink)' }}>
-                    {porCompania[d.id]?.invitados ?? 0}{' '}
-                    <span style={{ color: 'var(--mute)', fontWeight: 600 }}>/</span>{' '}
-                    <span title="Cuestionarios completados">{completadosPorCompania[d.id] ?? 0}</span>
-                  </span>
-                </TableCell>
-                <TableCell>
-                  <AccionesRow id={d.id} />
-                </TableCell>
-              </TableRow>
-              )
-            })}
-          </TableBody>
-        </Table>
-        </div>
+        <TablaDiagnosticos filas={filas} />
       )}
     </div>
   )
