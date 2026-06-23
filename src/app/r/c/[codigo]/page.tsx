@@ -134,25 +134,21 @@ export default async function ComparativoCompaniaPage({ params }: { params: Prom
 
       <div style={{ maxWidth: 1200, margin: '0 auto' }}>
 
-        {/* Título */}
+        {/* Título — badge con el nombre del tipo, sin subtítulo */}
         <div style={{ padding: '40px 24px 32px', borderBottom: '1.5px solid var(--ink)' }}>
           <span style={{
             display: 'inline-block', padding: '2px 8px', marginBottom: 8,
             fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase',
             fontWeight: 700, background: 'var(--ink)', color: '#fff',
-          }}>{tipoConfig?.etiqueta ?? c.tipo}</span>
+          }}>{tipoConfig?.nombre ?? c.tipo}</span>
           <h1 className="page-header__title" style={{ fontSize: 'clamp(32px,4vw,48px)' }}>
             {c.nombre_compania}
           </h1>
-          <p className="page-header__subtitle" style={{ marginTop: 8 }}>
-            Comparativo entre equipos · {tipoConfig?.nombre ?? c.tipo}
-          </p>
         </div>
 
         {/* Resumen */}
         <div style={{ background: 'var(--ink)', padding: '12px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
-          <h2 style={{ fontSize: 18, fontWeight: 900, letterSpacing: '-.01em', margin: 0, color: '#fff' }}>Resumen de la compañía</h2>
-          <span style={{ fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase', fontWeight: 600, color: '#fff' }}>Escala 1–10</span>
+          <h2 style={{ fontSize: 18, fontWeight: 900, letterSpacing: '-.01em', margin: 0, color: '#fff' }}>Comparativo entre equipos</h2>
         </div>
         <div style={{ borderBottom: '1.5px solid var(--ink)' }}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)' }}>
@@ -191,15 +187,13 @@ export default async function ComparativoCompaniaPage({ params }: { params: Prom
               border: '1.5px solid var(--ink)',
               fontFeatureSettings: '"tnum" 1, "zero" 0',
             }}>
-              {/* Header row */}
+              {/* Header row — celda de la esquina vacía y sin marco arriba/izquierda
+                  (se solapa 1.5px sobre el borde del contenedor para taparlo). */}
               <div style={{
                 borderRight: '1.5px solid var(--ink)', borderBottom: '1.5px solid var(--ink)',
-                padding: '14px 16px', background: 'var(--card)',
-                display: 'flex', alignItems: 'center',
-                fontSize: 11, fontWeight: 800, letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--ink)',
-              }}>
-                Equipo
-              </div>
+                padding: '14px 16px', background: 'var(--bg)',
+                margin: '-1.5px 0 0 -1.5px',
+              }} />
               {DIMENSIONES.map((dim, i) => (
                 <div key={dim.id} style={{
                   borderRight: i === DIMENSIONES.length - 1 ? '3px solid var(--ink)' : '1.5px solid var(--ink)',
@@ -231,10 +225,10 @@ export default async function ComparativoCompaniaPage({ params }: { params: Prom
                       display: 'flex', flexDirection: 'column', gap: 4,
                       background: 'var(--card)',
                     }}>
-                      <span style={{ fontSize: 14, fontWeight: 900, color: 'var(--ink)', letterSpacing: '-.01em' }}>
+                      <span style={{ fontSize: 16, fontWeight: 900, color: 'var(--ink)', letterSpacing: '-.01em' }}>
                         {eq.nombre}
                       </span>
-                      <span style={{ fontSize: 10, color: 'var(--mute)', letterSpacing: '.04em', textTransform: 'uppercase', fontWeight: 600 }}>
+                      <span style={{ fontSize: 10, color: 'var(--ink)', letterSpacing: '.04em', textTransform: 'uppercase', fontWeight: 600 }}>
                         {eq.participantes} {eq.participantes === 1 ? 'participante' : 'participantes'}
                       </span>
                     </div>
@@ -273,7 +267,7 @@ export default async function ComparativoCompaniaPage({ params }: { params: Prom
                 padding: '18px 16px', background: 'var(--card)',
                 display: 'flex', alignItems: 'center',
               }}>
-                <span style={{ fontSize: 14, fontWeight: 900, color: 'var(--ink)', letterSpacing: '-.01em' }}>Promedio de la compañía</span>
+                <span style={{ fontSize: 16, fontWeight: 900, color: 'var(--ink)', letterSpacing: '-.01em' }}>Promedio de la compañía</span>
               </div>
               {DIMENSIONES.map((dim, colIdx) => {
                 const val = promedioPorDim[colIdx]
