@@ -314,7 +314,6 @@ function PromedioCardDesktop({ resultados }: { resultados: DimResultado[] }) {
         <div style={{ fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--ink)', fontWeight: 700 }}>Global</div>
         <h3 style={{ fontSize: 22, fontWeight: 900, letterSpacing: '-.02em', lineHeight: 1, margin: '4px 0 0' }}>Promedio</h3>
       </div>
-      <div style={{ width: 42, height: 8, background: 'var(--ink)' }} />
       <div style={{ display: 'flex', alignItems: 'baseline', gap: 12 }}>
         <span style={{ fontWeight: 900, fontSize: 72, lineHeight: 1, letterSpacing: '-.04em', color: 'var(--ink)' }}>
           {prom !== null ? prom.toFixed(1) : '—'}
@@ -342,7 +341,6 @@ function DimCardDesktop({ dim, benchmark, benchmarkN }: { dim: DimResultado; ben
           <h3 style={{ fontSize: 22, fontWeight: 900, letterSpacing: '-.02em', lineHeight: 1, margin: '4px 0 0' }}>{dim.nombre}</h3>
         </div>
       </div>
-      <div style={{ width: 42, height: 8, background: 'var(--ink)' }} />
       <div style={{ display: 'flex', alignItems: 'baseline', gap: 12 }}>
         <span style={{ fontWeight: 900, fontSize: 72, lineHeight: 1, letterSpacing: '-.04em', color: avgColor(dim.promedio) }}>
           {dim.promedio !== null ? dim.promedio.toFixed(1) : '—'}

@@ -432,8 +432,6 @@ export default async function ResultadosPage({ params }: { params: Promise<{ cod
                 <h3 style={{ fontSize: 22, fontWeight: 900, letterSpacing: '-.02em', lineHeight: 1, margin: '4px 0 0' }}>{dim.nombre}</h3>
               </div>
 
-              <div style={{ width: 42, height: 8, background: 'var(--ink)' }} />
-
               <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, color: 'var(--ink)' }}>
                 <span style={{ fontWeight: 900, fontSize: 72, lineHeight: 1, letterSpacing: '-.04em' }}>
                   {dim.promedioGeneral !== null ? dim.promedioGeneral.toFixed(1) : '—'}
@@ -496,8 +494,7 @@ export default async function ResultadosPage({ params }: { params: Promise<{ cod
                   <h3 style={{ fontSize: 22, fontWeight: 900, letterSpacing: '-.02em', lineHeight: 1, margin: '4px 0 0' }}>Promedio</h3>
                 </div>
 
-                <div style={{ width: 42, height: 8, background: 'var(--ink)' }} />
-
+  
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, color: 'var(--ink)' }}>
                   <span style={{ fontWeight: 900, fontSize: 72, lineHeight: 1, letterSpacing: '-.04em' }}>
                     {promGlobal !== null ? promGlobal.toFixed(1) : '—'}
