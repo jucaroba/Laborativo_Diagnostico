@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
-import { enviarLinkDescripcion } from '@/lib/resend'
+import { enviarLinksDescripcionLote } from '@/lib/resend'
 
 type Entrada = { nombre: string; email: string }
 
@@ -36,31 +36,22 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Ningún registro válido' }, { status: 400 })
     }
 
-    const resultados = await Promise.allSettled(
-      limpia.map(e =>
-        enviarLinkDescripcion({
-          participanteEmail: e.email,
-          participanteNombre: e.nombre,
-          nombreCompania: diag.nombre_compania,
-          codigoParticipacion: equipo.codigo_participacion,
-        })
-      )
+    const { enviados: refsEnviados, fallidos } = await enviarLinksDescripcionLote(
+      limpia.map(e => ({
+        email: e.email,
+        nombre: e.nombre,
+        nombreCompania: diag.nombre_compania,
+        codigoParticipacion: equipo.codigo_participacion,
+      }))
     )
-
-    let enviados = 0
-    const fallidos: { email: string; error: string }[] = []
-    resultados.forEach((r, i) => {
-      if (r.status === 'fulfilled') enviados++
-      else fallidos.push({ email: limpia[i].email, error: String(r.reason?.message || r.reason) })
-    })
 
     return NextResponse.json({
       ok: true,
-      enviados,
-      fallidos,
+      enviados: refsEnviados.length,
+      fallidos: fallidos.map(f => ({ email: f.ref, error: f.error })),
       total: limpia.length,
     })
-  } catch (e: any) {
-    return NextResponse.json({ error: e?.message || 'Error inesperado' }, { status: 500 })
+  } catch (e: unknown) {
+    return NextResponse.json({ error: e instanceof Error ? e.message : 'Error inesperado' }, { status: 500 })
   }
 }

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
-import { enviarInvitacionParticipante } from '@/lib/resend'
+import { enviarInvitacionesLote } from '@/lib/resend'
 
 type Entrada = { nombre: string; email: string; area?: string }
 
@@ -64,24 +64,18 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: upsertError?.message || 'Error al guardar' }, { status: 500 })
     }
 
-    const resultados = await Promise.allSettled(
-      filas.map(f =>
-        enviarInvitacionParticipante({
-          participanteEmail: f.email,
-          participanteNombre: f.nombre,
-          nombreCompania: diag.nombre_compania,
-          codigoParticipacion: equipo.codigo_participacion,
-          token: f.token,
-        }).then(() => f.id)
-      )
+    const emailPorId = new Map(filas.map(f => [f.id, f.email]))
+    const { enviados: idsEnviados, fallidos: fallidosRef } = await enviarInvitacionesLote(
+      filas.map(f => ({
+        invitacionId: f.id,
+        email: f.email,
+        nombre: f.nombre,
+        nombreCompania: diag.nombre_compania,
+        codigoParticipacion: equipo.codigo_participacion,
+        token: f.token,
+      }))
     )
-
-    const idsEnviados: string[] = []
-    const fallidos: { email: string; error: string }[] = []
-    resultados.forEach((r, i) => {
-      if (r.status === 'fulfilled') idsEnviados.push(r.value as string)
-      else fallidos.push({ email: filas[i].email, error: String(r.reason?.message || r.reason) })
-    })
+    const fallidos = fallidosRef.map(f => ({ email: emailPorId.get(f.ref) ?? f.ref, error: f.error }))
 
     if (idsEnviados.length > 0) {
       await supabaseAdmin
@@ -96,7 +90,7 @@ export async function POST(req: NextRequest) {
       fallidos,
       total: filas.length,
     })
-  } catch (e: any) {
-    return NextResponse.json({ error: e?.message || 'Error inesperado' }, { status: 500 })
+  } catch (e: unknown) {
+    return NextResponse.json({ error: e instanceof Error ? e.message : 'Error inesperado' }, { status: 500 })
   }
 }

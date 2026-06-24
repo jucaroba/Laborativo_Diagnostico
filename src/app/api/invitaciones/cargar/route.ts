@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
-import { enviarInvitacionParticipante } from '@/lib/resend'
+import { enviarInvitacionesLote } from '@/lib/resend'
 
 // Cargue a nivel diagnóstico: crea un equipo por ÁREA y reparte cada persona
 // a su área. El rol (líder/miembro) viene en la lista, no se elige en el intake.
@@ -89,24 +89,19 @@ export async function POST(req: NextRequest) {
     const codigoPorEquipo = new Map<string, string>()
     for (const [, v] of equipoDeArea) codigoPorEquipo.set(v.id, v.codigo_participacion)
 
-    // 3) Envío de correos personalizados
-    const resultados = await Promise.allSettled(
-      invs.map(f =>
-        enviarInvitacionParticipante({
-          participanteEmail: f.email,
-          participanteNombre: f.nombre,
-          nombreCompania: diag.nombre_compania,
-          codigoParticipacion: codigoPorEquipo.get(f.equipo_id)!,
-          token: f.token,
-        }).then(() => f.id),
-      ),
+    // 3) Envío de correos personalizados (en lote, respetando el rate limit)
+    const emailPorId = new Map(invs.map(f => [f.id, f.email]))
+    const { enviados: idsEnviados, fallidos: fallidosRef } = await enviarInvitacionesLote(
+      invs.map(f => ({
+        invitacionId: f.id,
+        email: f.email,
+        nombre: f.nombre,
+        nombreCompania: diag.nombre_compania,
+        codigoParticipacion: codigoPorEquipo.get(f.equipo_id)!,
+        token: f.token,
+      })),
     )
-    const idsEnviados: string[] = []
-    const fallidos: { email: string; error: string }[] = []
-    resultados.forEach((r, i) => {
-      if (r.status === 'fulfilled') idsEnviados.push(r.value as string)
-      else fallidos.push({ email: invs[i].email, error: String(r.reason?.message || r.reason) })
-    })
+    const fallidos = fallidosRef.map(f => ({ email: emailPorId.get(f.ref) ?? f.ref, error: f.error }))
     if (idsEnviados.length > 0) {
       await supabaseAdmin.from('invitaciones').update({ enviado_at: new Date().toISOString() }).in('id', idsEnviados)
     }
