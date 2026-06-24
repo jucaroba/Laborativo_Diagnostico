@@ -1,6 +1,5 @@
 'use client'
 import { useState } from 'react'
-import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { DIMENSIONES, ROL_INFO, Rol, TipoDiagnostico } from '@/types'
@@ -9,7 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { ArrowLeft, Plus as PlusIcon, Pencil, Trash2, Check, X } from 'lucide-react'
+import { Plus as PlusIcon, Pencil, Trash2, Check, X } from 'lucide-react'
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle,
   DialogDescription, DialogFooter,
@@ -163,9 +162,6 @@ export default function EditorTema({ temaId, temaNombre, preguntas, tipo }: Prop
     <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
       {/* Header */}
       <div className="page-header" style={{ marginBottom: 0 }}>
-        <Link href="/admin/preguntas-base" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 12, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', color: 'var(--mute)', textDecoration: 'none', marginBottom: 8 }}>
-          <ArrowLeft size={13} strokeWidth={2.5} /> Temas
-        </Link>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 24, flexWrap: 'wrap' }}>
           <TemaTitulo temaId={temaId} nombreInicial={temaNombre} />
           {enReview ? (
