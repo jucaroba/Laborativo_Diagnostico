@@ -1,8 +1,7 @@
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { notFound } from 'next/navigation'
 import { DIMENSIONES, ROL_INFO, Rol } from '@/types'
-import Link from 'next/link'
-import { ArrowLeft } from 'lucide-react'
+import ListaRespuestasPersonas, { FilaInvitado } from '@/components/admin/ListaRespuestasPersonas'
 
 export const revalidate = 0
 
@@ -34,12 +33,6 @@ export default async function RespuestasPorPersonaPage({ params }: { params: Pro
     .single()
 
   if (!equipo || equipo.diagnostico_id !== id) notFound()
-
-  const { data: diag } = await supabaseAdmin
-    .from('diagnosticos')
-    .select('nombre_compania')
-    .eq('id', id)
-    .single()
 
   const [{ data: preguntas }, { data: invitaciones }, { data: participantes }] = await Promise.all([
     supabaseAdmin.from('preguntas').select('id, dimension_id, rol, texto, orden').eq('diagnostico_id', id).order('dimension_id').order('orden'),
@@ -126,12 +119,46 @@ export default async function RespuestasPorPersonaPage({ params }: { params: Pro
     return ps2.some(p => (respPorParticipante.get(p.id)?.length ?? 0) >= esperadas(p.rol) && esperadas(p.rol) > 0)
   }).length
 
+  // Filas serializables para el componente cliente (filtros + promedio por persona).
+  const filas: FilaInvitado[] = invs.map(inv => {
+    const ps2 = partsPorInvitacion.get(inv.id) ?? []
+    const dadas = ps2.reduce((acc, p) => acc + (respPorParticipante.get(p.id)?.length ?? 0), 0)
+    const total = ps2.reduce((acc, p) => acc + esperadas(p.rol), 0)
+    const respondio = ps2.length > 0 && total > 0 && dadas >= total
+    const estado = respondio ? 'respondio' : ps2.length ? 'incompleto' : 'sin-iniciar'
+
+    let suma = 0
+    let n = 0
+    const participantes = ps2.map(p => {
+      const rs = (respPorParticipante.get(p.id) ?? []).slice().sort((a, b) => {
+        const pa = preguntaById.get(a.pregunta_id)
+        const pb = preguntaById.get(b.pregunta_id)
+        if (!pa || !pb) return 0
+        return pa.dimension_id - pb.dimension_id || pa.orden - pb.orden
+      })
+      const filasDet = rs.flatMap(r => {
+        const pq = preguntaById.get(r.pregunta_id)
+        if (!pq) return []
+        suma += r.valor
+        n += 1
+        return [{
+          dimensionId: pq.dimension_id,
+          dimNombre: dimNombre.get(pq.dimension_id) ?? '',
+          rolLabel: ROL_INFO[pq.rol]?.label ?? pq.rol,
+          texto: pq.texto,
+          valor: r.valor,
+        }]
+      })
+      return { id: p.id, filas: filasDet }
+    })
+
+    const promedio = n > 0 ? Math.round((suma / n) * 10) / 10 : null
+    return { id: inv.id, nombre: inv.nombre, email: inv.email, area: inv.area, estado, dadas, total, promedio, participantes }
+  })
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
       <div className="page-header" style={{ marginBottom: 0 }}>
-        <Link href={`/admin/${id}`} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 12, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', color: 'var(--mute)', textDecoration: 'none', marginBottom: 8 }}>
-          <ArrowLeft size={13} strokeWidth={2.5} /> {diag?.nombre_compania ?? 'Diagnóstico'}
-        </Link>
         <h1 className="page-header__title">{equipo.nombre}</h1>
         <p className="page-header__subtitle">
           {totalRespondieron} de {invs.length} invitados respondieron
@@ -143,37 +170,7 @@ export default async function RespuestasPorPersonaPage({ params }: { params: Pro
         <p style={{ fontSize: 14, color: 'var(--mute)' }}>Aún no hay invitaciones ni respuestas en este equipo.</p>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          {invs.map(inv => {
-            const ps2 = partsPorInvitacion.get(inv.id) ?? []
-            const dadas = ps2.reduce((acc, p) => acc + (respPorParticipante.get(p.id)?.length ?? 0), 0)
-            const total = ps2.reduce((acc, p) => acc + esperadas(p.rol), 0)
-            const respondio = ps2.length > 0 && total > 0 && dadas >= total
-            return (
-              <details key={inv.id} style={{ border: '1.5px solid var(--ink)', background: 'var(--card)' }}>
-                <summary style={{ listStyle: 'none', outline: 'none', cursor: ps2.length ? 'pointer' : 'default', padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-                  <span style={{ display: 'flex', alignItems: 'baseline', gap: 8, flex: 1, minWidth: 160 }}>
-                    <span style={{ fontSize: 15, fontWeight: 800, color: 'var(--ink)' }}>{inv.nombre}</span>
-                    <span style={{ fontSize: 13, color: 'var(--ink)' }}>/</span>
-                    <span style={{ fontSize: 12, color: 'var(--ink)' }}>{inv.email}</span>
-                  </span>
-                  {inv.area && <span style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.04em', border: '1.5px solid var(--ink)', padding: '2px 8px' }}>{inv.area}</span>}
-                  <span style={{
-                    fontSize: 10, letterSpacing: '.06em', textTransform: 'uppercase', fontWeight: 700, padding: '3px 8px',
-                    background: respondio ? 'var(--ink)' : 'transparent',
-                    color: respondio ? '#fff' : 'var(--mute)',
-                    border: '1.5px solid', borderColor: respondio ? 'var(--ink)' : 'var(--mute)',
-                  }}>
-                    {respondio ? 'Respondió' : ps2.length ? `Incompleto ${dadas}/${total}` : 'Sin iniciar'}
-                  </span>
-                </summary>
-                {ps2.length > 0 && (
-                  <div style={{ borderTop: '1.5px solid var(--ink)', padding: '4px 6px 10px' }}>
-                    {ps2.map(p => <DetalleParticipante key={p.id} part={p} />)}
-                  </div>
-                )}
-              </details>
-            )
-          })}
+          {invs.length > 0 && <ListaRespuestasPersonas filas={filas} />}
 
           {anonimos.length > 0 && (
             <details style={{ border: '1.5px dashed var(--ink)', background: 'var(--card)' }}>
