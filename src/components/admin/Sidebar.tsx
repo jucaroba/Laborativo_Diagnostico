@@ -86,7 +86,7 @@ export default function Sidebar() {
       ))}
       <div className="admin-sidebar__section" style={{ marginTop: 'auto' }}>
         <div className="admin-sidebar__divider" />
-        <button onClick={salir} className="admin-sidebar__link" style={{ background: 'none', border: 'none', cursor: 'pointer', width: '100%', textAlign: 'left', font: 'inherit' }}>
+        <button onClick={salir} className="admin-sidebar__link" style={{ background: 'none', border: 'none', cursor: 'pointer', width: '100%', textAlign: 'left', fontFamily: 'inherit' }}>
           <LogOut size={16} strokeWidth={2} />
           Cerrar sesión
         </button>
